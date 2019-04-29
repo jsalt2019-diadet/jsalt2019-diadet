@@ -1,0 +1,6 @@
+[submodule "tools/pyannote/pyannote-metrics"]
+	path = tools/pyannote/pyannote-metrics
+	url = https://github.com/jsalt2019-diadet/pyannote-metrics.git
+[submodule "tools/hyperion/hyperion"]
+	path = tools/hyperion/hyperion
+	url = https://github.com/jsalt2019-diadet/hyperion.git
