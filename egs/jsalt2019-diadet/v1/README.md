@@ -90,16 +90,32 @@ If you want to change some config parameters you can either:
 
 This is a summary of the recipe steps:
 
- - run_001_prepare_data.sh: prepares all the training and evaluation data by createing kaldi style data directories with usual files: wav.scp, utt2spk, spk2utt, ...
+ - run_001_prepare_data.sh:
+      - Prepares all the training and evaluation data by createing kaldi style data directories with usual files: wav.scp, utt2spk, spk2utt, ...
 
- - run_002_compute_mfcc_evad.sh: Computes MFCC and energy VAD for all datasets. It also creates data directories with ground truth VAD for the evaluation data.
+ - run_002_compute_mfcc_evad.sh:
+      - Computes MFCC and energy VAD for all datasets.
+      - It also creates data directories with ground truth VAD for the evaluation data.
 
- - run_003_prepare_augment.sh: Creates augmented data directory for voxceleb data. It augments voxceleb with noise and reverberation. This augmented data is used to train x-vector and LDA/PLDA. However, if you use the default configuration you don't need to run this script since the default configuration only use non-augmented data to speed up the completion of the experiment.
+ - run_003_prepare_augment.sh:
+      - Creates augmented data directory for voxceleb data.
+      - It augments voxceleb with noise and reverberation.
+      - This augmented data is used to train x-vector and LDA/PLDA.
+      - However, if you use the default configuration you don't need to run this script since the default configuration only use non-augmented data to speed up the completion of the experiment.
 
- - run_004_compute_mfcc_augment.sh: Computes MFCC for the augmented data and merges original and augmented data directories. Again, if you use the default configuration you don't need to run this script.
+ - run_004_compute_mfcc_augment.sh:
+      - Computes MFCC for the augmented data and merges original and augmented data directories.
+      - Again, if you use the default configuration you don't need to run this script.
 
- - run_010_prepare_xvec_train_data.sh: Prepares the features for x-vector training, i.e., removes silence and applies CMN.
+ - run_010_prepare_xvec_train_data.sh:
+      - Prepares the features for x-vector training, i.e., removes silence and applies CMN.
 
- - run_011_train_xvector.sh: trains kaldi x-vector nnet.
+ - run_011_train_xvector.sh:
+      - Trains kaldi x-vector nnet.
 
+ - run_020_prepare_data_for_diar.sh:
+      - Applies CMN to features for diarization
+      - Creates segmented data directories from original data directories:
+           - Each continous speech segment is assigned a new utt-id = original-utt-id-time-begin-time-end based on ground truth VAD in the rttm file or binary VAD from Energy VAD.
+	   - The feat.scp file is modified to split the feature matrices into a matrix per subsegment
 
