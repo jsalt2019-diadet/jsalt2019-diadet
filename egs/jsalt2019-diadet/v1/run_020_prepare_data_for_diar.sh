@@ -5,17 +5,29 @@
 set -e
 
 feats_diar=`pwd -P`/exp/feats_diar
-storage_name=chime5-spkdet-v1-diar-$(date +'%m_%d_%H_%M')
+storage_name=jsalt19-v1-diar-$(date +'%m_%d_%H_%M')
 stage=1
+config_file=default_config.sh
 
 . parse_options.sh || exit 1;
 
+#datasets:
+# - voxceleb
+# - speaker detection test part with energy vad and ground truth vad
+# - speaker diarization datasets with energy vad and ground truth vad
+datasets="voxceleb \
+		    jsalt19_spkdet_babytrain_dev_test jsalt19_spkdet_babytrain_dev_test_gtvad \
+		    jsalt19_spkdet_babytrain_eval_test jsalt19_spkdet_babytrain_eval_test_gtvad \
+		    jsalt19_spkdiar_babytrain_train_gtvad \
+		    jsalt19_spkdiar_babytrain_dev jsalt19_spkdiar_babytrain_dev_gtvad \
+		    jsalt19_spkdiar_babytrain_eval jsalt19_spkdiar_babytrain_eval_gtvad"
+		
 
 if [ $stage -le 1 ];then
 
-#    for name in voxceleb chime5_spkdet_test; do
-    for name in chime5_spkdet_test; do
-    	steps_kaldi_diar/prepare_feats.sh --nj 39 --cmd "$train_cmd" --storage_name $storage_name \
+    for name in $datasets    
+    do
+    	steps_kaldi_diar/prepare_feats.sh --nj 40 --cmd "$train_cmd" --storage_name $storage_name \
     					  data/$name data_diar/${name}_cmn $feats_diar/${name}_cmn
     	cp data/$name/vad.scp data_diar/${name}_cmn/
     	if [ -f data/$name/segments ]; then
@@ -23,18 +35,29 @@ if [ $stage -le 1 ];then
     	fi
     	utils/fix_data_dir.sh data_diar/${name}_cmn
     done
-
 fi
 
 
 if [ $stage -le 2 ];then
     # Create segments to extract x-vectors
-    for name in voxceleb chime5_spkdet_test
+    for name in $datasets
     do
 	echo "0.01" > data_diar/${name}_cmn/frame_shift
-	steps_kaldi_diar/vad_to_segments.sh --nj 39 --cmd "$train_cmd" \
-					    data_diar/${name}_cmn data_diar/${name}_cmn_segmented
+	# if we have the vad in rttm format but not segments format, convert to segments format
+	if [ -f "data/$name/vad.rttm" ] && [ ! -f "data/$name/vad.segments" ];then
+	    local/vad_rttm2segments.sh data/$name/vad.rttm > data/$name/vad.segments
+	fi
+	#if we already have the ground truth vad in segments format we just copy it and create the segmented dataset
+	if [ -f "data/$name/vad.segments" ];then
+	    cp data/$name/vad.segments data_diar/${name}_cmn/subsegments
+	    #create segmented dataset
+	    utils/data/subsegment_data_dir.sh data_diar/${name}_cmn \
+					      data_diar/${name}_cmn/subsegments data_diar/${name}_cmn_segmented
+	else
+	    #create segmented dataset from binary vad
+	    steps_kaldi_diar/vad_to_segments.sh --nj 10 --cmd "$train_cmd" \
+						data_diar/${name}_cmn data_diar/${name}_cmn_segmented
+	fi
     done
-    exit
 fi
 

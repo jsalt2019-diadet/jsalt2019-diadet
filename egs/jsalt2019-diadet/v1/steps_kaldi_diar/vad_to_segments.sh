@@ -10,7 +10,8 @@
 nj=2
 stage=0
 cmd=run.pl
-segmentation_opts=  # E.g. set this as --segmentation-opts "--silance-proportion 0.2 --max-segment-length 10"
+# E.g. set this as --segmentation-opts "--silence-proportion 0.2 --max-segment-length 10"
+segmentation_opts="--silence-proportion 0.0 --max-segment-length 100000 --hard-max-segment-length 100000"  
 min_duration=0.25
 
 # end configuration section.
@@ -54,7 +55,7 @@ if [ $stage -le 0 ]; then
   $cmd JOB=1:$nj $data_out/log/vad_to_segments.JOB.log \
     copy-vector scp:$sdata/JOB/vad.scp ark,t:- \| \
     sed -e "s/\[ //g;s/ \]//g" \| \
-    utils/segmentation.pl $segmentation_opts \
+    steps_kaldi_diar/segmentation.pl $segmentation_opts \
     --remove-noise-only-segments false \
     '>' $sdata/JOB/subsegments || exit 1;
 
