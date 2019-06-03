@@ -4,7 +4,7 @@
 # Apache 2.0.
 
 # Make lists for JSALT19 worshop speaker detection and tracking task
-# for Babytrain dataset
+# for AMI dataset
 
 if [  $# != 3 ]; then
     echo "$0 <wav-path> <list-path> <output_path>"
@@ -15,7 +15,7 @@ wav_path=$1
 list_path=$2
 output_path=$3
 
-data_name=jsalt19_spkdet_chime5
+data_name=jsalt19_spkdet_ami
 
 # Make Training data
 # This will be used to adapt NNet and PLDA models

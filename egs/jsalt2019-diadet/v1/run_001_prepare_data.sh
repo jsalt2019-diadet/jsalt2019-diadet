@@ -12,46 +12,42 @@
 set -e
 
 
-stage=1
+stage=2
+config_file=default_config.sh
 
 . parse_options.sh || exit 1;
 
-ldc_root=/export/corpora/LDC
-sitw_root=/export/corpora/SRI/sitw
-voxceleb1_root=/export/corpora/VoxCeleb1
-voxceleb2_root=/export/corpora/VoxCeleb2
-chime5_root=/export/corpora4/dgr_CHiME5_segmented
+. datapath.sh
 
-if [ $stage -le 1 ]; then
-    # Prepare telephone and microphone speech from Mixer6.
-    local/make_mx6.sh $ldc_root/LDC2013S03 16 data
-    grep -v "trim 0.000 =0.000" data/mx6_mic/wav.scp > data/mx6_mic/wav.scp.tmp
-    mv data/mx6_mic/wav.scp.tmp data/mx6_mic/wav.scp
-    fix_data_dir.sh data/mx6_mic
-    exit
-fi
-
-if [ $stage -le 2 ];then
+if [ $stage -le 1 ];then
     # Prepare the VoxCeleb1 dataset.  The script also downloads a list from
     # http://www.openslr.org/resources/49/voxceleb1_sitw_overlap.txt that
     # contains the speakers that overlap between VoxCeleb1 and our evaluation
     # set SITW.  The script removes these overlapping speakers from VoxCeleb1.
-    local/make_voxceleb1cat.pl $voxceleb1_root 16 data
+    local/make_voxceleb1.pl $voxceleb1_root 16 data
 
     # Prepare the dev portion of the VoxCeleb2 dataset.
-    local/make_voxceleb2cat.pl $voxceleb2_root dev 16 data/voxceleb2cat_train
+    local/make_voxceleb2.pl $voxceleb2_root dev 16 data/voxceleb2_train
+fi
+
+if [ $stage -le 2 ];then
+    # Prepare babytrain
+    local/make_babytrain_spkdet.sh $baby_root $babytrain_list_dir ./data
+    local/make_babytrain_spkdiar.sh $baby_root $babytrain_list_dir ./data
+    exit
 fi
 
 if [ $stage -le 3 ];then
-  # Prepare SITW dev to train x-vector
-    local/make_sitw_train.sh $sitw_root dev 16 data/sitw_train_dev
-    local/make_sitw_train.sh $sitw_root eval 16 data/sitw_train_eval
-    utils/combine_data.sh data/sitw_train data/sitw_train_dev data/sitw_train_eval
+    # Prepare chime5
+    local/make_chime5_spkdet_jsalt19.sh $chime5_root $chime5_list_dir ./data
+    local/make_chime5_spkdiar_jsalt19.sh $chime5_root $chime5_list_dir ./data
 fi
+
 
 if [ $stage -le 4 ];then
-    # Prepare chime5
-    local/make_chime5_spkdet.sh $chime5_root ./data
+    # Prepare ami
+    local/make_ami_spkdet.sh $ami_root $ami_list_dir ./data
+    local/make_ami_spkdiar.sh $ami_root $ami_list_dir ./data
 fi
 
-exit
+

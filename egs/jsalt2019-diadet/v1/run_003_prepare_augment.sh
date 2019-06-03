@@ -16,29 +16,34 @@ vaddiardir=`pwd`/vad_diar
 
 stage=1
 
-. parse_options.sh || exit 1;
+config_file=default_config.sh
 
-# In this script, we augment the SWBD,SRE,MX6 and Voxceleb data with reverberation,
+. parse_options.sh || exit 1;
+. datapath.sh
+. $config_file
+
+# In this script, we augment the Voxceleb data with reverberation,
 # noise, music, and babble, and combined it with the clean data.
 # The combined list will be used to train the xvector DNN.
+
+if [ "$nnet_data" == "voxceleb_div2" ] && [ "$plda_data" == "voxceleb_div2_longest" ];then
+    echo "According to your configuration file, you don't need to do augmentations"
+    exit
+fi
 
 frame_shift=0.01
 
 if [ $stage -le 1 ]; then
 
     if [ ! -d "RIRS_NOISES" ]; then
-	if [ -d ../../sre18/v1.8k/RIRS_NOISES ];then
-	    ln -s ../../sre18/v1.8k/RIRS_NOISES
-	else
-	    # Download the package that includes the real RIRs, simulated RIRs, isotropic noises and point-source noises
-	    wget --no-check-certificate http://www.openslr.org/resources/28/rirs_noises.zip
-	    unzip rirs_noises.zip
-	fi
+	# Download the package that includes the real RIRs, simulated RIRs, isotropic noises and point-source noises
+	wget --no-check-certificate http://www.openslr.org/resources/28/rirs_noises.zip
+	unzip rirs_noises.zip
     fi
 
     # Prepare the MUSAN corpus, which consists of music, speech, and noise
     # suitable for augmentation.
-    local/make_musan.sh /export/corpora/JHU/musan 16 data
+    local/make_musan.sh $musan_root 16 data
     
     # Get the duration of the MUSAN recordings.  This will be used by the
     # script augment_data_dir.py.
@@ -54,7 +59,7 @@ fi
 
 if [ $stage -le 2 ]; then
     
-  for name in voxceleb sitw_train
+  for name in voxceleb
   do
       awk -v frame_shift=$frame_shift '{print $1, $2*frame_shift;}' data/$name/utt2num_frames > data/$name/reco2dur
       
