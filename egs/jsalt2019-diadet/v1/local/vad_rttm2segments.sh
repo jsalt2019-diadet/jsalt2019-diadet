@@ -18,6 +18,6 @@ fi
 
 rttm=$1
 
-awk '$5>="'$frame_shift'" { printf "%s-%07d-%07d %s %.2f %.2f\n",$2,$4,$4+$5,$2,$4,$4+$5}' $rttm 
+awk '$5>="'$frame_shift'" { printf "%s-%07d-%07d %s %.2f %.2f\n",$2,$4*100,($4+$5)*100,$2,$4,$4+$5}' $rttm 
 
 
