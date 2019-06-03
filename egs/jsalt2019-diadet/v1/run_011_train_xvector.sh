@@ -6,29 +6,22 @@
 #                2017   Johns Hopkins University (Author: Daniel Povey)
 # Apache 2.0.
 #
-
 . ./cmd.sh
 . ./path.sh
 set -e
 
-net_name=3b
-num_epochs=3
-nnet_dir=exp/xvector_nnet_$net_name
-
-stage=6
+stage=1
+config_file=default_config.sh
 
 . parse_options.sh || exit 1;
+. $config_file
 
 if [ $stage -le 8 ]; then
-    steps_kaldi_xvec/run_xvector_3b.sh --stage $stage --train-stage -1 --num_epochs $num_epochs --nodes b1 \
-    				       --storage_name voices_challenge-v1-$(date +'%m_%d_%H_%M') \
-    				       --data data/train_combined_no_sil --nnet-dir $nnet_dir \
-    				       --egs-dir $nnet_dir/egs
-    # steps_kaldi_xvec/run_xvector_3b.sh --stage $stage --train-stage 2 --num_epochs $num_epochs --nodes b1 \
-    # 				       --storage_name voices_challenge-v1-$(date +'%m_%d_%H_%M') \
-    # 				       --data data/train_combined_no_sil --nnet-dir $nnet_dir \
-    # 				       --egs-dir $nnet_dir/egs
+    steps_kaldi_xvec/run_xvector_${nnet_vers}.sh --stage $stage --train-stage -1 --num_epochs $nnet_num_epochs \
+    				 --storage_name jsalt19-v1-$(date +'%m_%d_%H_%M') \
+    				 --data data/${nnet_data}_no_sil --nnet-dir $nnet_dir \
+    				 --egs-dir $nnet_dir/egs
 
 fi
 
-exit
+
