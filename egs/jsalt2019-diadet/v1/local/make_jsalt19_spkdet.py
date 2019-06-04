@@ -76,6 +76,7 @@ def read_rttm(list_path):
     #remove empty lines:
     index = (rttm['tdur']>= 0.025)
     rttm = rttm[index]
+    rttm['stype'] = '<NA>'
     return rttm
 
 

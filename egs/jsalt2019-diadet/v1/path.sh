@@ -8,6 +8,9 @@ export PATH=$PWD/utils/:$KALDI_ROOT/tools/openfst/bin:$KALDI_ROOT/tools/sph2pipe
 . $KALDI_ROOT/tools/config/common_path.sh
 export LC_ALL=C
 
+#sctk
+PATH=$KALDI_ROOT/tools/sctk-2.4.10/src/md-eval:$PATH
+
 KERAS_PATH=$TOOLS_ROOT/keras
 HYP_ROOT=$TOOLS_ROOT/hyperion/hyperion
 
