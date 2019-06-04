@@ -3,7 +3,7 @@
 #xvector training 
 nnet_data=voxceleb_div2
 nnet_vers=2a.1
-nnet_name=2a.1
+nnet_name=2a.1.voxceleb_div2
 nnet_num_epochs=3
 nnet_dir=exp/xvector_nnet_$nnet_name
 

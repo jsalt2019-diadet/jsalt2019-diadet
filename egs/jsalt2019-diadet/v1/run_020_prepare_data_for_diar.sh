@@ -63,7 +63,7 @@ if [ $stage -le 2 ];then
 	fi
 	#if we already have the ground truth vad in segments format we just copy it and create the segmented dataset
 	if [ -f "data/$name/vad.segments" ];then
-	    cp data/$name/vad.segments data_diar/${name}_cmn/subsegments
+	    awk '($4-$3)>=0.025' data/$name/vad.segments > data_diar/${name}_cmn/subsegments
 	    #create segmented dataset
 	    utils/data/subsegment_data_dir.sh data_diar/${name}_cmn \
 					      data_diar/${name}_cmn/subsegments data_diar/${name}_cmn_segmented
@@ -75,6 +75,7 @@ if [ $stage -le 2 ];then
 						data_diar/${name}_cmn data_diar/${name}_cmn_segmented
 	fi
     done
+    exit
 fi
 
 if [ $stage -le 3 ];then
