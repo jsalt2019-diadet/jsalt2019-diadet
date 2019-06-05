@@ -146,4 +146,23 @@ This is a summary of the recipe steps:
 	exp/diarization/2a.1.voxceleb_div2/lda120_plda_voxceleb_babytrain/jsalt19_spkdiar_babytrain_eval_gtvad/plda_scores_tbest/result.md-eval
 	```
 	
-  
+ - run_030_extract_xvectors_wo_diar.sh
+    - Extracts x-vectors for spk detection without any diarization
+       - Voxceleb for training back-end with energy VAD
+       - Adaptation datasets for babytrain, chime5, ami with ground truth VAD
+       - Enrollment datasets for dev/eval with ground truth VAD
+       - Test datasets for dev/eval with energy and ground truth VAD
+
+ - run_040_train_spkdet_be.sh
+    - Trains PLDA back-end for speaker detection
+    - With/Without PLDA adaptation
+       - Adapted to each dataset: babytrain, ami, chime5
+
+ - run_041_eval_spkdet_be_wo_diar.sh
+    - Evals speaker detection back-end for the three datasets without any speaker diarization
+    - Two VADs: ground truth and energy VAD
+    - Three back-end versions:
+        - PLDA without domain adaptation
+	- PLDA with domain adaptatio
+	- PLDA with domain adaptation + adaptive S-Norm
+	
