@@ -1,0 +1,40 @@
+#!/bin/bash
+# Copyright       2019   Johns Hopkins University (Author: Jesus Villalba)
+#                
+# Apache 2.0.
+#
+. ./cmd.sh
+. ./path.sh
+set -e
+
+stage=1
+config_file=default_config.sh
+
+. parse_options.sh || exit 1;
+. $config_file
+. datapath.sh 
+
+xvector_dir=exp/xvectors/$nnet_name
+be_babytrain_dir=exp/be/$nnet_name/$be_babytrain_name
+be_chime5_dir=exp/be/$nnet_name/$be_chime5_name
+be_ami_dir=exp/be/$nnet_name/$be_ami_name
+
+#Train back-ends
+if [ $stage -le 1 ]; then
+
+    echo "Training back-end for babytrain"
+    steps_be/train_be_v1.sh --cmd "$train_cmd" \
+    				--lda_dim $lda_dim \
+    				--plda_type $plda_type \
+    				--y_dim $plda_y_dim --z_dim $plda_z_dim \
+    				--w_B1 $w_B_babytrain --w_W1 $w_W_babytrain \
+    				$xvector_dir/$plda_data/xvector.scp \
+    				data/$plda_data \
+    				$xvector_dir/jsalt19_spkdet_babytrain_train/xvector.scp \
+    				data/jsalt19_spkdet_babytrain_train $be_babytrain_dir &
+
+fi
+
+wait
+
+

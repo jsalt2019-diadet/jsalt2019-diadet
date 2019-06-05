@@ -22,3 +22,31 @@ diar_thr=-0.9
 min_dur=10
 rttm_dir=./exp/diarization/$nnet_name/$be_diar_name
 diar_name=diar${nnet_name}_thr${diar_thr}
+
+
+#spkdet back-end
+lda_dim=200
+plda_y_dim=150
+plda_z_dim=200
+
+plda_data=voxceleb_div2
+plda_type=splda
+plda_label=${plda_type}y${plda_y_dim}_v1
+
+be_name=lda${lda_dim}_${plda_label}_${plda_data}
+be_babytrain_name=${be_name}_babytrain
+be_chime5_name=${be_name}_chime5
+be_ami_name=${be_name}_ami
+
+#adaptation weights for plda between-class and within-class covs
+w_B_babytrain=0.5
+w_W_babytrain=0.5
+w_B_chime5=0.5
+w_W_chime5=0.5
+w_B_ami=0.5
+w_W_ami=0.5
+
+#score norm, number of cohort recordings
+ncoh_babytrain=300
+ncoh_chime5=300
+ncoh_ami=300

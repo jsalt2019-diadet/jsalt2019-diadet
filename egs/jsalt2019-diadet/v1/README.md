@@ -116,8 +116,8 @@ This is a summary of the recipe steps:
  - run_020_prepare_data_for_diar.sh:
       - Applies CMN to features for diarization
       - Creates segmented data directories from original data directories:
-           - Each continous speech segment is assigned a new utt-id = original-utt-id-time-begin-time-end based on ground truth VAD in the rttm file or binary VAD from Energy VAD.
-	   - The feat.scp file is modified to split the feature matrices into a matrix per subsegment
+          - Each continous speech segment is assigned a new utt-id = original-utt-id-time-begin-time-end based on ground truth VAD in the rttm file or binary VAD from Energy VAD.
+	  - The feat.scp file is modified to split the feature matrices into a matrix per subsegment
 
  - run_021_extract_xvectors_for_diar.sh
      - Compute xvectors with sliding window for:      

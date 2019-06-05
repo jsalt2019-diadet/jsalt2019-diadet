@@ -17,7 +17,7 @@ xvector_dir=exp/xvectors_diar/$nnet_name
 
 be_dir=exp/be_diar/$nnet_name/$be_diar_name
 be_babytrain_dir=exp/be_diar/$nnet_name/$be_diar_babytrain_name
-be_chimer_dir=exp/be_diar/$nnet_name/$be_diar_chime5_name
+be_chime5_dir=exp/be_diar/$nnet_name/$be_diar_chime5_name
 be_ami_dir=exp/be_diar/$nnet_name/$be_diar_ami_name
 
 #Train LDA
