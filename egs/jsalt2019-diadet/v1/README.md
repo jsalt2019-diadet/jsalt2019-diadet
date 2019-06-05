@@ -119,3 +119,31 @@ This is a summary of the recipe steps:
            - Each continous speech segment is assigned a new utt-id = original-utt-id-time-begin-time-end based on ground truth VAD in the rttm file or binary VAD from Energy VAD.
 	   - The feat.scp file is modified to split the feature matrices into a matrix per subsegment
 
+ - run_021_extract_xvectors_for_diar.sh
+     - Compute xvectors with sliding window for:      
+         - Dev and eval speaker diarization datasets
+	 - Test part of dev and eval speaker detection/tracking datasets to cluster files into single speaker clusters.
+	 - Voxceleb to train PLDA for diarization
+	 - Train speaker diarization datsets to adapt PLDA
+
+ - run_022_train_diar_be.sh
+     - Trains diarization back-end (LDA, PLDA) using kaldi tools
+        - Trains out-of-domain PLDA on voxceleb
+        - Trains mixed-domain PLDAs on Voxceleb + train-part of each test dataset
+
+ - run_023_eval_diar_be.sh
+     - Evaluates AHC using out-of-domain PLDA
+         - Optains optimum AHC threshold from dev part
+	 - Results are left in, e.g.,
+	 ```bash
+	 exp/diarization/2a.1.voxceleb_div2/lda120_plda_voxceleb/jsalt19_spkdet_babytrain_eval_test_gtvad/plda_scores_tbest/result.md-eval
+	 ```
+
+ - run_024_eval_diar_be_adapt.sh
+    - Evaluates AHC using mixed-domain PLDA
+        - Results are left in e.g.,
+	```bash
+	exp/diarization/2a.1.voxceleb_div2/lda120_plda_voxceleb_babytrain/jsalt19_spkdiar_babytrain_eval_gtvad/plda_scores_tbest/result.md-eval
+	```
+	
+  
