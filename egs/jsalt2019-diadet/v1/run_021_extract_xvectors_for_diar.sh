@@ -40,15 +40,14 @@ if [ $stage -le 2 ]; then
     for name in jsalt19_spkdiar_babytrain_train_gtvad
     do
     
-	utils/subset_data_dir.sh data_diar/${name}_cmn_segmented 64000 data_diar/${name}_cmn_segmented_64k
 	steps_kaldi_diar/extract_xvectors.sh --cmd "$train_cmd --mem 10G" \
-					     --nj 40 --window 3.0 --period 10.0 --min-segment 1.5 --apply-cmn false \
+					     --nj 40 --window 1.5 --period 1.5 --min-segment 1.5 --apply-cmn false \
 					     --hard-min true $nnet_dir \
-					     data_diar/${name}_cmn_segmented_128k $xvector_dir/${name}_128k
+					     data_diar/${name}_cmn_segmented $xvector_dir/${name}
     done
     
 fi
-
+exit
 
 # Extract x-vectors for test datasets
 if [ $stage -le 3 ]; then

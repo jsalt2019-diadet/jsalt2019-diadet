@@ -12,7 +12,12 @@ nnet_dir=exp/xvector_nnet_$nnet_name
 lda_diar_dim=120
 plda_diar_data=voxceleb
 be_diar_name=lda${lda_diar_dim}_plda_${plda_diar_data}
+be_diar_babytrain_name=lda${lda_diar_dim}_plda_${plda_diar_data}_babytrain
+be_diar_chime5_name=lda${lda_diar_dim}_plda_${plda_diar_data}_chime5
+be_diar_ami_name=lda${lda_diar_dim}_plda_${plda_diar_data}_ami
 
+
+#spkdet diarization vars
 diar_thr=-0.9
 min_dur=10
 rttm_dir=./exp/diarization/$nnet_name/$be_diar_name

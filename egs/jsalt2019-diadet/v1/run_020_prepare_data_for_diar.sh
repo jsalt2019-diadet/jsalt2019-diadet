@@ -6,7 +6,7 @@ set -e
 
 feats_diar=`pwd -P`/exp/feats_diar
 storage_name=jsalt19-v1-diar-$(date +'%m_%d_%H_%M')
-stage=1
+stage=4
 config_file=default_config.sh
 
 . parse_options.sh || exit 1;
@@ -45,10 +45,10 @@ datasets_evad="voxceleb \
 
 datasets_gtvad="jsalt19_spkdet_babytrain_dev_test_gtvad \
 		    jsalt19_spkdet_babytrain_eval_test_gtvad \
-		    jsalt19_spkdiar_babytrain_train_gtvad \
 		    jsalt19_spkdiar_babytrain_dev_gtvad \
 		    jsalt19_spkdiar_babytrain_eval_gtvad"
-		
+
+datasets_adapt="jsalt19_spkdiar_babytrain_train_gtvad"
 
 
 if [ $stage -le 2 ];then
@@ -56,13 +56,18 @@ if [ $stage -le 2 ];then
     for name in $datasets_gtvad
     do
 	echo "0.01" > data_diar/${name}_cmn/frame_shift
+	
+	# remove segments file if exists because having segments file, it will produce rttm time marks w.r.t to original audio file
+	# by removing segments file, we will obtain time marks with respect to the audio cuts.
 	rm -f data_diar/${name}_cmn/segments
+
 	# if we have the vad in rttm format but not segments format, convert to segments format
 	if [ -f "data/$name/vad.rttm" ] && [ ! -f "data/$name/vad.segments" ];then
 	    local/vad_rttm2segments.sh data/$name/vad.rttm > data/$name/vad.segments
 	fi
 	#if we already have the ground truth vad in segments format we just copy it and create the segmented dataset
 	if [ -f "data/$name/vad.segments" ];then
+	    # segments with less than 25ms produce errors, we remove then
 	    awk '($4-$3)>=0.025' data/$name/vad.segments > data_diar/${name}_cmn/subsegments
 	    #create segmented dataset
 	    utils/data/subsegment_data_dir.sh data_diar/${name}_cmn \
@@ -70,12 +75,8 @@ if [ $stage -le 2 ];then
 	else
 	    echo "ground truth vad.rttm or vad.segments not found for dataset $name"
 	    exit 1
-	    #create segmented dataset from binary vad
-	    steps_kaldi_diar/vad_to_segments.sh --nj 10 --cmd "$train_cmd" \
-						data_diar/${name}_cmn data_diar/${name}_cmn_segmented
 	fi
     done
-    exit
 fi
 
 if [ $stage -le 3 ];then
@@ -83,6 +84,8 @@ if [ $stage -le 3 ];then
     for name in $datasets_evad
     do
 	echo "0.01" > data_diar/${name}_cmn/frame_shift
+	# remove segments file if exists because having segments file, it will produce rttm time marks w.r.t to original audio file
+	# by removing segments file, we will obtain time marks with respect to the audio cuts.
 	rm -f data_diar/${name}_cmn/segments
 	#create segmented dataset from binary vad
 	steps_kaldi_diar/vad_to_segments.sh --nj 10 --cmd "$train_cmd" \
@@ -90,3 +93,23 @@ if [ $stage -le 3 ];then
     done
 fi
 
+
+
+if [ $stage -le 4 ];then
+    # Create segments to extract x-vectors for adaptation datsets using ground truth VAD
+    # requires diarization.rttm
+    for name in $datasets_adapt
+    do
+	echo "0.01" > data_diar/${name}_cmn/frame_shift
+	rm -f data_diar/${name}_cmn/segments
+	# we already have the ground truth diarization marks to generate segments for training PLDA
+	if [ -f "data/$name/diarization.rttm" ];then
+	    #we only use segments with more than 3 secs
+	    local/subsegment_data_dir_from_diar_rttm.sh --min-dur 1.5 data/$name/diarization.rttm data_diar/${name}_cmn
+	    hyp_utils/remove_spk_few_utts.sh --min-num-utts 4 data_diar/${name}_cmn_segmented
+	else
+	    echo "ground truth diarization.rttm not found for dataset $name"
+	    exit 1
+	fi
+    done
+fi
