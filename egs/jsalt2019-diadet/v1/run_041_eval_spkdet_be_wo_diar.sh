@@ -53,7 +53,7 @@ if [ $stage -le 1 ];then
 				       $score_plda_dir/${db}_enr${dur}_scores
 		
 		local/score_babytrain_spkdet.sh data/${db}_test/trials $part $dur $score_plda_dir 
-	    ) &
+	    ) #&
 
 	    # ground truth VAD
 	    (
@@ -66,7 +66,7 @@ if [ $stage -le 1 ];then
 				       $score_plda_gtvad_dir/${db}_enr${dur}_scores
 		
 		local/score_babytrain_spkdet.sh data/${db}_test/trials $part $dur $score_plda_gtvad_dir 
-	    ) &
+	    ) #&
 
 
 	    # energy VAD + PLDA adapt
@@ -80,7 +80,7 @@ if [ $stage -le 1 ];then
 				       $score_plda_adapt_dir/${db}_enr${dur}_scores
 		
 		local/score_babytrain_spkdet.sh data/${db}_test/trials $part $dur $score_plda_adapt_dir 
-	    ) &
+	    ) #&
 
 	    # ground truth VAD + PLDA adapt
 	    (
@@ -93,7 +93,7 @@ if [ $stage -le 1 ];then
 				       $score_plda_adapt_gtvad_dir/${db}_enr${dur}_scores
 		
 		local/score_babytrain_spkdet.sh data/${db}_test/trials $part $dur $score_plda_adapt_gtvad_dir 
-	    ) &
+	    ) #&
 
 	    # energy VAD + PLDA adapt + AS-Norm
 	    (
@@ -108,7 +108,7 @@ if [ $stage -le 1 ];then
 				       $score_plda_adapt_snorm_dir/${db}_enr${dur}_scores
 		
 		local/score_babytrain_spkdet.sh data/${db}_test/trials $part $dur $score_plda_adapt_snorm_dir 
-	    ) &
+	    ) #&
 
 	    # ground truth VAD + PLDA adapt + AS-Norm
 	    (
@@ -123,7 +123,7 @@ if [ $stage -le 1 ];then
 					     $score_plda_adapt_snorm_gtvad_dir/${db}_enr${dur}_scores
 		
 		local/score_babytrain_spkdet.sh data/${db}_test/trials $part $dur $score_plda_adapt_snorm_gtvad_dir 
-	    ) &
+	    ) #&
 
 
 	    
@@ -132,7 +132,7 @@ if [ $stage -le 1 ];then
     wait
 
 fi
-
+exit
 if [ $stage -le 2 ];then
 
     db=jsalt19_spkdet_babytrain
