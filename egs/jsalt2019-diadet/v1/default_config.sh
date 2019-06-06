@@ -18,10 +18,15 @@ be_diar_ami_name=lda${lda_diar_dim}_plda_${plda_diar_data}_ami
 
 
 #spkdet diarization vars
-diar_thr=-0.9
-min_dur=10
-rttm_dir=./exp/diarization/$nnet_name/$be_diar_name
-diar_name=diar${nnet_name}_thr${diar_thr}
+diar_thr=best
+min_dur_spkdet_subsegs=10 # minimum duration for the diarization clusters used for spk detection
+min_dur_track_subsegs=0.25 # minimum duration for the diarization clusters used for spk tracking
+# automatic diarization rttms used for spkdet and tracking
+rttm_babytrain_dir=./exp/diarization/$nnet_name/$be_diar_babytrain_name
+rttm_chime5_dir=./exp/diarization/$nnet_name/$be_diar_chime5_name
+rttm_ami_dir=./exp/diarization/$nnet_name/$be_diar_ami_name
+spkdet_diar_name=spkdetdiar_nnet${nnet_name}_thr${diar_thr}
+track_diar_name=trackdiar_nnet${nnet_name}_thr${diar_thr}
 
 
 #spkdet back-end
