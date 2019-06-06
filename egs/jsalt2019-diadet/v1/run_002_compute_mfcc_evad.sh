@@ -59,7 +59,7 @@ if [ $stage -le 3 ];then
   utils/combine_data.sh --extra-files "utt2num_frames" data/voxceleb data/voxceleb1 data/voxceleb2_train
   utils/fix_data_dir.sh data/voxceleb
 
-  if [ "$nnet_data" == "voxceleb_div2" ] || [ "$plda_data" == "voxceleb_div2_longest" ];then
+  if [ "$nnet_data" == "voxceleb_div2" ] || [ "$plda_data" == "voxceleb_div2" ];then
       #divide the size of voxceleb
       utils/subset_data_dir.sh data/voxceleb $(echo "1236567/2" | bc) data/voxceleb_div2
   fi

@@ -16,9 +16,10 @@ The numbering of the scripts follows this convention:
  - 00X: data preparation and feature extraction
  - 01X: x-vector training
  - 02X: speaker diarization steps
- - 03X: x-vector extraction
- - 04X: PLDA back-ends for speaker detection/tracking.
- - 05X: print results
+ - 03X: x-vector extraction for spk detection and tracking
+ - 04X: PLDA back-ends for speaker detection
+ - 05X: PLDA back-ends for speaker tracking
+ - 06X: print results
 
 Please, read and understand what each script does before running it.
 

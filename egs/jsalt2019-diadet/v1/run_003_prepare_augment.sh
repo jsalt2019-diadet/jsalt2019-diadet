@@ -26,7 +26,7 @@ config_file=default_config.sh
 # noise, music, and babble, and combined it with the clean data.
 # The combined list will be used to train the xvector DNN.
 
-if [ "$nnet_data" == "voxceleb_div2" ] && [ "$plda_data" == "voxceleb_div2_longest" ];then
+if [ "$nnet_data" == "voxceleb_div2" ] && [ "$plda_data" == "voxceleb_div2" ];then
     echo "According to your configuration file, you don't need to do augmentations"
     exit
 fi

@@ -20,7 +20,7 @@ vector_file=$1
 data_dir=$2
 adapt_vector_file=$3
 adapt_data_dir=$4
-output_dir=$3
+output_dir=$5
 
 mkdir -p $output_dir/log
 
@@ -61,7 +61,7 @@ $cmd $output_dir/log/train_be.log \
      --lda-dim $lda_dim \
      --plda-type $plda_type \
      --y-dim $y_dim --z-dim $z_dim \
-     --w-mu $w_mu --w-b $w_B -w-w $w_W \
+     --w-mu $w_mu --w-b $w_B --w-w $w_W \
      --output-path $output_dir
 
 

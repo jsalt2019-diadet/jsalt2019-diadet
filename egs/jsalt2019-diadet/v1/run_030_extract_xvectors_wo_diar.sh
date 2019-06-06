@@ -19,8 +19,17 @@ config_file=default_config.sh
 xvector_dir=exp/xvectors/$nnet_name
 
 if [ $stage -le 1 ]; then
+    #create subset of voxceleb with segments of more than 15secs
+    utils/subset_data_dir.sh \
+	--utt-list <(awk '$2>1500' data/$plda_data/utt2num_frames) \
+         data/${plda_data} data/${plda_data}_15s
+
+fi
+
+
+if [ $stage -le 2 ]; then
     # Extract xvectors for training LDA/PLDA
-    for name in ${plda_data}
+    for name in ${plda_data}_15s
     do
 	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 12G" --nj 60 \
 					     $nnet_dir data/${name} \
@@ -29,7 +38,7 @@ if [ $stage -le 1 ]; then
 
 fi
 
-if [ $stage -le 2 ]; then
+if [ $stage -le 3 ]; then
     # Extracts x-vectors for adaptation data
     for name in jsalt19_spkdet_babytrain_train
     do
@@ -40,7 +49,7 @@ if [ $stage -le 2 ]; then
 fi
 
 
-if [ $stage -le 3 ]; then
+if [ $stage -le 4 ]; then
     # Extracts x-vectors for enrollment
     for db in jsalt19_spkdet_babytrain_dev jsalt19_spkdet_babytrain_eval
     do
@@ -54,7 +63,7 @@ if [ $stage -le 3 ]; then
     done
 fi
 
-if [ $stage -le 4 ]; then
+if [ $stage -le 5 ]; then
     # Extracts x-vectors for test with ground truth VAD
     for db in jsalt19_spkdet_babytrain_dev jsalt19_spkdet_babytrain_eval
     do
@@ -65,7 +74,7 @@ if [ $stage -le 4 ]; then
     done
 fi
 
-if [ $stage -le 5 ]; then
+if [ $stage -le 6 ]; then
     # Extracts x-vectors for test with energy VAD
     for db in jsalt19_spkdet_babytrain_dev jsalt19_spkdet_babytrain_eval
     do
