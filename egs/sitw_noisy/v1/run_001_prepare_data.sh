@@ -6,17 +6,14 @@
 #                2017   Johns Hopkins University (Author: Daniel Povey)
 # Apache 2.0.
 #
-
 . ./cmd.sh
 . ./path.sh
 set -e
-
 
 stage=2
 config_file=default_config.sh
 
 . parse_options.sh || exit 1;
-
 . datapath.sh
 
 if [ $stage -le 1 ];then
@@ -31,23 +28,7 @@ if [ $stage -le 1 ];then
 fi
 
 if [ $stage -le 2 ];then
-    # Prepare babytrain
-    local/make_babytrain_spkdet.sh $baby_root $babytrain_list_dir ./data
-    local/make_babytrain_spkdiar.sh $baby_root $babytrain_list_dir ./data
-    exit
+    # Make SITW dev and eval sets
+    local/make_sitw_core.sh $sitw_root 16 data/sitw
 fi
-
-if [ $stage -le 3 ];then
-    # Prepare chime5
-    local/make_chime5_spkdet_jsalt19.sh $chime5_root $chime5_list_dir ./data
-    local/make_chime5_spkdiar_jsalt19.sh $chime5_root $chime5_list_dir ./data
-fi
-
-
-if [ $stage -le 4 ];then
-    # Prepare ami
-    local/make_ami_spkdet.sh $ami_root $ami_list_dir ./data
-    local/make_ami_spkdiar.sh $ami_root $ami_list_dir ./data
-fi
-
 
