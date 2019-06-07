@@ -1,12 +1,7 @@
-# jsalt2019-diadet/v1
+# SITW noisy V1
 
-Recipe for speaker diarization detection and tracking for JSALT2019 workshop on
-"Speaker Detection in Adverse Scenarios with a Single Microphone"
-
-It will run for the workshop tasks based on datasets:
- - BabyTrain
- - Chime5
- - Ami
+Recipe of Speakers in the Wild with noise and reverberation added. This recipe is intended to evaluate speech enhancement techniques and measure
+their effectiveness at different SNR levels and RT60 reverberation time intervals.
 
 ## How to run
 
@@ -15,11 +10,9 @@ The recipe has a style similar to Kaldi recipes. However, instead of having a un
 The numbering of the scripts follows this convention:
  - 00X: data preparation and feature extraction
  - 01X: x-vector training
- - 02X: speaker diarization steps
  - 03X: x-vector extraction for spk detection and tracking
  - 04X: PLDA back-ends for speaker detection
- - 05X: PLDA back-ends for speaker tracking
- - 06X: print results
+ - 05X: print results
 
 Please, read and understand what each script does before running it.
 
@@ -114,39 +107,6 @@ This is a summary of the recipe steps:
  - run_011_train_xvector.sh:
       - Trains kaldi x-vector nnet.
 
- - run_020_prepare_data_for_diar.sh:
-      - Applies CMN to features for diarization
-      - Creates segmented data directories from original data directories:
-          - Each continous speech segment is assigned a new utt-id = original-utt-id-time-begin-time-end based on ground truth VAD in the rttm file or binary VAD from Energy VAD.
-	  - The feat.scp file is modified to split the feature matrices into a matrix per subsegment
-
- - run_021_extract_xvectors_for_diar.sh
-     - Compute xvectors with sliding window for:      
-         - Dev and eval speaker diarization datasets
-	 - Test part of dev and eval speaker detection/tracking datasets to cluster files into single speaker clusters.
-	 - Voxceleb to train PLDA for diarization
-	 - Train speaker diarization datsets to adapt PLDA
-
- - run_022_train_diar_be.sh
-     - Trains diarization back-end (LDA, PLDA) using kaldi tools
-        - Trains out-of-domain PLDA on voxceleb
-        - Trains mixed-domain PLDAs on Voxceleb + train-part of each test dataset
-
- - run_023_eval_diar_be.sh
-     - Evaluates AHC using out-of-domain PLDA
-         - Optains optimum AHC threshold from dev part
-	 - Results are left in, e.g.,
-	 ```bash
-	 exp/diarization/2a.1.voxceleb_div2/lda120_plda_voxceleb/jsalt19_spkdet_babytrain_eval_test_gtvad/plda_scores_tbest/result.md-eval
-	 ```
-
- - run_024_eval_diar_be_adapt.sh
-    - Evaluates AHC using mixed-domain PLDA
-        - Results are left in e.g.,
-	```bash
-	exp/diarization/2a.1.voxceleb_div2/lda120_plda_voxceleb_babytrain/jsalt19_spkdiar_babytrain_eval_gtvad/plda_scores_tbest/result.md-eval
-	```
-	
  - run_030_extract_xvectors_wo_diar.sh
     - Extracts x-vectors for spk detection without any diarization
        - Voxceleb for training back-end with energy VAD
