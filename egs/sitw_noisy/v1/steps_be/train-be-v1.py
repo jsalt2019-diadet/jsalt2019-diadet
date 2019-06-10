@@ -26,11 +26,9 @@ from hyperion.helpers import PLDAFactory as F
 
 
 def train_be(iv_file, train_list,
-             adapt_iv_file, adapt_list,
              lda_dim, 
              plda_type, y_dim, z_dim,
              epochs, ml_md, md_epochs,
-             w_mu, w_B, w_W,
              output_path, **kwargs):
 
     # Read data

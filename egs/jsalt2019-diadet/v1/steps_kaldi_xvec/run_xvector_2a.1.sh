@@ -158,7 +158,7 @@ if [ $stage -le 8 ]; then
     --trainer.optimization.num-jobs-final=8 \
     --trainer.optimization.initial-effective-lrate=0.001 \
     --trainer.optimization.final-effective-lrate=0.0001 \
-    --trainer.optimization.minibatch-size=128 \
+    --trainer.optimization.minibatch-size=100 \
     --trainer.srand=$srand \
     --trainer.max-param-change=2 \
     --trainer.num-epochs=$num_epochs \
