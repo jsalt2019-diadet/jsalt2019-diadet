@@ -10,11 +10,15 @@ The recipe has a style similar to Kaldi recipes. However, instead of having a un
 The numbering of the scripts follows this convention:
  - 00X: data preparation and feature extraction
  - 01X: x-vector training
- - 03X: x-vector extraction for spk detection and tracking
+ - 03X: x-vector extraction 
  - 04X: PLDA back-ends for speaker detection
  - 05X: print results
 
 Please, read and understand what each script does before running it.
+
+Many steps are common to the jsalt19-diadet recipe such us feature/x-vector extraction for voxceleb
+and x-vector training so you don't need to run it again.
+You can just copy the correspoding data directories or neural networks from the other recipe.
 
 ## Directory structure
 
@@ -37,7 +41,6 @@ The recipe contains the following directories:
  - hyp_utils: link to hyperion utils directory
  - steps_be: scripts for the steps of the PLDA back-end
  - steps_fe: scripts for some front-end tasks like kaldi VAD
- - steps_kaldi_diar: scripts for diarization using kaldi tools.
  - steps_kaldi_xvec: scripts to train and compute x-vectors using kaldi tools
 
 
@@ -91,16 +94,23 @@ This is a summary of the recipe steps:
       - Computes MFCC and energy VAD for all datasets.
       - It also creates data directories with ground truth VAD for the evaluation data.
 
- - run_003_prepare_augment.sh:
+ - run_003_prepare_augment_train.sh:
       - Creates augmented data directory for voxceleb data.
       - It augments voxceleb with noise and reverberation.
       - This augmented data is used to train x-vector and LDA/PLDA.
       - However, if you use the default configuration you don't need to run this script since the default configuration only use non-augmented data to speed up the completion of the experiment.
 
- - run_004_compute_mfcc_augment.sh:
+ - run_004_compute_mfcc_augment_train.sh:
       - Computes MFCC for the augmented data and merges original and augmented data directories.
       - Again, if you use the default configuration you don't need to run this script.
 
+ - run_005_prepare_augment_deveval.sh:
+      - Creates augmented data directories for sitw dev and eval test data
+      - 5 different snr, 4 noise types, 4 rt60 intervals.
+
+ - run_006_compute_mfcc_augment_deveval.sh:
+      - Computes MFCC for the sitw augmented data
+      
  - run_010_prepare_xvec_train_data.sh:
       - Prepares the features for x-vector training, i.e., removes silence and applies CMN.
 
@@ -108,22 +118,15 @@ This is a summary of the recipe steps:
       - Trains kaldi x-vector nnet.
 
  - run_030_extract_xvectors_wo_diar.sh
-    - Extracts x-vectors for spk detection without any diarization
+    - Extracts x-vectors
        - Voxceleb for training back-end with energy VAD
-       - Adaptation datasets for babytrain, chime5, ami with ground truth VAD
-       - Enrollment datasets for dev/eval with ground truth VAD
-       - Test datasets for dev/eval with energy and ground truth VAD
+       - SITW original data
+       - SITW augmented data
+       - Merges all SITW x-vectors into a unique xvector.scp
 
- - run_040_train_spkdet_be.sh
+ - run_040_eval_be.sh
     - Trains PLDA back-end for speaker detection
-    - With/Without PLDA adaptation
-       - Adapted to each dataset: babytrain, ami, chime5
+    - Evals back-end for original sitw data
+    - Evals back-end for augmented sitw data
 
- - run_041_eval_spkdet_be_wo_diar.sh
-    - Evals speaker detection back-end for the three datasets without any speaker diarization
-    - Two VADs: ground truth and energy VAD
-    - Three back-end versions:
-        - PLDA without domain adaptation
-	- PLDA with domain adaptatio
-	- PLDA with domain adaptation + adaptive S-Norm
 	

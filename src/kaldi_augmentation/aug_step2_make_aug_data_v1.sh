@@ -1,63 +1,9 @@
 #!/bin/bash
 # Copyright
-#                2019   Johns Hopkins University (Author: Phani Sankar Nidadavolu, Jesus Villalba)
+#                2019   Johns Hopkins University (Author: Phani Sankar Nidadavolu)
 # Apache 2.0.
 #
 set -e
-
-function get_snr_interval()
-{
-    local snr=$1
-    local min_snr=$(echo $snr | awk -F ":" '{ min_snr=1000; for(i=1;i<=NF;i++){if ($i<min_snr){min_snr=$i}}; print min_snr }')
-    local max_snr=$(echo $snr | awk -F ":" '{ max_snr=-1000; for(i=1;i<=NF;i++){if ($i>max_snr){max_snr=$i}}; print max_snr }')
-    if [ $min_snr -eq $max_snr ];then
-	snr_interval=$min_snr
-    else
-	snr_interval=${min_snr}-${max_snr}
-    fi
-    echo $snr_interval
-}
-
-function make_utt2snr0()
-{
-    local snr=$1
-    local aug_type=$2
-    local data=$3
-    awk -v snr=$snr -v aug=$aug_type -f kaldi_augmentation/make_utt2snr.awk \
-	$data/utt2uniq | \
-	sort -k1,1 > $data/utt2snr
-}
-
-function make_utt2snr()
-{
-    local aug_type=$1
-    local data=$2
-    awk -v aug=$aug_type -v u2u=$data/utt2uniq -f kaldi_augmentation/make_utt2snr.awk \
-	$data/wav.scp | \
-	sort -k1,1 > $data/utt2snr
-}
-
-
-function utt2snr_to_utt2info()
-{
-    local data=$1
-    awk '{print $0" NA NA NA NA"}' $data/utt2snr \
-	> $data/utt2info
-}
-
-function make_utt2info_for_reverb_plus_noise()
-{
-    awk -v suff="${suff_aug}" -v u2s=data/${name_aug}/utt2snr \
-	'BEGIN{
-while(getline < u2s)
-{
-  snr[$1]=$4;
-  aug[$1]=$3;
-}
-}
-{ $1=$1"-"suff; $3=aug[$1]; $4=snr[$1]; print $0}' data/${name}/utt2info > data/${name_aug}/utt2info
-
-}
 
 stage=1
 sampling_rate=16000
@@ -75,7 +21,6 @@ combine_reverbs=false
 make_reverb_plus_noise=false
 combine_reverb_plus_noises=false
 normalize_output=false
-num_noises_babble="3:4:5:6:7"
 
 echo "$0 $@"  # Print the command line for logging.
 
@@ -138,91 +83,95 @@ if [ $stage -le 1 ]; then
     # Augment the train directories
     for name in $dir_list; do
 	if [ -f "data/$name/utt2num_frames" ];then
-	    awk -v frame_shift=$frame_shift '{print $1, $2*frame_shift;}' \
-		data/$name/utt2num_frames > data/$name/reco2dur
+	    awk -v frame_shift=$frame_shift '{print $1, $2*frame_shift;}' data/$name/utt2num_frames > data/$name/reco2dur
 	else
 	    utils/data/get_reco2dur.sh data/$name
 	fi
-	combine_str=""
 	for snr in $snrs_noise; do
 	    # Augment with musan_noise
 	    aug_type=noise
-	    snr_interval=$(get_snr_interval $snr)
-	    name_aug=${name}_${aug_type}_snr${snr_interval}
-	    suff_aug="${aug_type}-snr${snr_interval}"
-	    combine_str="$combine_str data/$name_aug"
-	    
-	    kaldi_augmentation/augment_data_dir.py --utt-suffix "${suff_aug}" --fg-interval 1 \
+	    kaldi_augmentation/augment_data_dir.py --utt-suffix "${aug_type}-snr$snr" --fg-interval 1 \
 						   --normalize-output $normalize_output \
 						   --fg-snrs "$snr" --fg-noise-dir "data/musan_${aug_type}_${mode}" \
 						   --modify-spk-id "false" \
-						   data/$name data/${name_aug}
-	    
-	    make_utt2snr $aug_type data/${name_aug}
-	    utt2snr_to_utt2info data/${name_aug}
-	    utils/fix_data_dir.sh --utt-extra-files "utt2snr utt2info" data/${name_aug}
+						   data/$name data/${name}_${aug_type}_snr$snr
+	    awk -v snr=$snr -v aug=$aug_type '{print $0" "aug" "snr}' data/${name}_${aug_type}_snr$snr/utt2uniq | \
+		sort -k1,1 > data/${name}_${aug_type}_snr$snr/utt2snr
+	    awk '{print $0" NA NA NA NA"}' data/${name}_${aug_type}_snr$snr/utt2snr > data/${name}_${aug_type}_snr$snr/utt2info
+	    utils/fix_data_dir.sh --utt-extra-files "utt2snr utt2info" data/${name}_${aug_type}_snr$snr
 	done
 
 	for snr in $snrs_music; do
 	    # Augment with musan_music
 	    aug_type=music
-	    snr_interval=$(get_snr_interval $snr)
-	    name_aug=${name}_${aug_type}_snr${snr_interval}
-	    suff_aug="${aug_type}-snr${snr_interval}"
-	    combine_str="$combine_str data/$name_aug"
-	    
-	    kaldi_augmentation/augment_data_dir.py --utt-suffix "${suff_aug}" --bg-snrs "$snr" \
+	    kaldi_augmentation/augment_data_dir.py --utt-suffix "${aug_type}-snr$snr" --bg-snrs "$snr" \
 						   --normalize-output $normalize_output \
 						   --num-bg-noises "1" --bg-noise-dir "data/musan_${aug_type}_${mode}" \
 						   --modify-spk-id "false" \
-						   data/$name data/${name_aug}
-	    
-	    make_utt2snr $aug_type data/${name_aug}
-	    utt2snr_to_utt2info data/${name_aug}
-	    utils/fix_data_dir.sh --utt-extra-files "utt2snr utt2info" data/${name_aug}
+						   data/$name data/${name}_${aug_type}_snr$snr
+	    awk -v snr=$snr -v aug=$aug_type '{print $0" "aug" "snr}' data/${name}_${aug_type}_snr$snr/utt2uniq | \
+		sort -k1,1 > data/${name}_${aug_type}_snr$snr/utt2snr
+	    awk '{print $0" NA NA NA NA"}' data/${name}_${aug_type}_snr$snr/utt2snr > data/${name}_${aug_type}_snr$snr/utt2info
+	    utils/fix_data_dir.sh --utt-extra-files "utt2snr utt2info" data/${name}_${aug_type}_snr$snr
 	done
 
 	for snr in $snrs_babble; do
 	    # Augment with musan_speech
 	    aug_type=babble
-	    snr_interval=$(get_snr_interval $snr)
-	    name_aug=${name}_${aug_type}_snr${snr_interval}
-	    suff_aug="${aug_type}-snr${snr_interval}"
-	    combine_str="$combine_str data/$name_aug"
-	    
-	    kaldi_augmentation/augment_data_dir.py --utt-suffix "${suff_aug}" --bg-snrs "$snr" \
+	    kaldi_augmentation/augment_data_dir.py --utt-suffix "${aug_type}-snr$snr" --bg-snrs "$snr" \
 						   --normalize-output $normalize_output \
-						   --num-bg-noises "$num_noises_babble" --bg-noise-dir "data/musan_speech_${mode}" \
+						   --num-bg-noises "3:4:5:6:7" --bg-noise-dir "data/musan_speech_${mode}" \
 						   --modify-spk-id "false" \
-						   data/$name data/${name_aug}
-	    
-	    make_utt2snr $aug_type data/${name_aug}
-	    utt2snr_to_utt2info data/${name_aug}
-	    utils/fix_data_dir.sh --utt-extra-files "utt2snr utt2info" data/${name_aug}
+						   data/$name data/${name}_${aug_type}_snr$snr
+	    awk -v snr=$snr -v aug=$aug_type '{print $0" "aug" "snr}' data/${name}_${aug_type}_snr$snr/utt2uniq | \
+		sort -k1,1 > data/${name}_${aug_type}_snr$snr/utt2snr
+	    awk '{print $0" NA NA NA NA"}' data/${name}_${aug_type}_snr$snr/utt2snr > data/${name}_${aug_type}_snr$snr/utt2info
+	    utils/fix_data_dir.sh --utt-extra-files "utt2snr utt2info" data/${name}_${aug_type}_snr$snr
 	done
 
 	for snr in $snrs_chime3bg; do
 	    # Augment with chime3background + demand
 	    aug_type=chime3bg
-	    snr_interval=$(get_snr_interval $snr)
-	    name_aug=${name}_${aug_type}_snr${snr_interval}
-	    suff_aug="${aug_type}-snr${snr_interval}"
-	    combine_str="$combine_str data/$name_aug"
-	    
-	    kaldi_augmentation/augment_data_dir.py --utt-suffix "${suff_aug}" --bg-snrs "$snr" \
+	    kaldi_augmentation/augment_data_dir.py --utt-suffix "${aug_type}-snr$snr" --bg-snrs "$snr" \
 						   --normalize-output $normalize_output \
 						   --num-bg-noises "1" --bg-noise-dir "data/chime3background_${mode}" \
 						   --modify-spk-id "false" \
-						   data/$name data/${name_aug}
-	    
-	    make_utt2snr $aug_type data/${name_aug}
-	    utt2snr_to_utt2info data/${name_aug}
-	    utils/fix_data_dir.sh --utt-extra-files "utt2snr utt2info" data/${name_aug}
+						   data/$name data/${name}_${aug_type}_snr$snr
+	    awk -v snr=$snr -v aug=$aug_type '{print $0" "aug" "snr}' data/${name}_${aug_type}_snr$snr/utt2uniq | \
+		sort -k1,1 > data/${name}_${aug_type}_snr$snr/utt2snr
+	    awk '{print $0" NA NA NA NA"}' data/${name}_${aug_type}_snr$snr/utt2snr > data/${name}_${aug_type}_snr$snr/utt2info
+	    utils/fix_data_dir.sh --utt-extra-files "utt2snr utt2info" data/${name}_${aug_type}_snr$snr
 	done
+	#   if [ "$mode" == "train" ]; then
+	#     # Augment with DEMAND, entire demand is used for training
+	#     aug_type=demand
+	#     kaldi_augmentation/augment_data_dir.py --utt-suffix "${aug_type}-snr$snr" --bg-snrs "$snr" \
+	#         --normalize-output $normalize_output \
+	#         --num-bg-noises "1" --bg-noise-dir "data/demand_${mode}" \
+	#         --modify-spk-id "false" \
+	#         data/$name data/${name}_${aug_type}_snr$snr
+	#     awk -v snr=$snr -v aug=$aug_type '{print $0" "aug" "snr}' data/${name}_${aug_type}_snr$snr/utt2uniq | \
+	#         sort -k1,1 > data/${name}_${aug_type}_snr$snr/utt2snr
+	#     awk '{print $0" NA NA NA NA"}' data/${name}_${aug_type}_snr$snr/utt2snr > data/${name}_${aug_type}_snr$snr/utt2info
+	#     utils/fix_data_dir.sh --utt-extra-files "utt2snr utt2info" data/${name}_${aug_type}_snr$snr
+	#   fi
+	# done
+	
+	# aug_types="babble noise music chime3bg"
+	# if [ "$mode" == "train" ]; then
+	#     aug_types=$aug_types" demand"
+	# fi
 	
 	if [ "$combine_noises" == "true" ];then
+	    # Also combine different snr directories to a single directory for each aug type
+	    for aug_type in $aug_types; do
+		combine_str=""
+		for snr in $snrs; do
+		    combine_str=$combine_str" data/${name}_${aug_type}_snr$snr"
+		done
 		utils/combine_data.sh --extra-files "utt2snr utt2info" \
-				      data/${name}_allnoises $combine_str
+				      data/${name}_${aug_type} $combine_str
+	    done
 	fi
     done
     
@@ -238,7 +187,7 @@ if [ $stage -le 2 ]; then
 	    rt60_max=`echo $rt60_range | cut -d ":" -f2`
 	    kwrd=rt60_min_${rt60_min}_max_${rt60_max}
 	    kwrds=" $kwrd"
-	    name_aug=${name}_reverb_rt60-${rt60_min}-${rt60_max}
+	    name_aug=${name}_reverb_${kwrd}
 	    suff_aug="-reverb-rt60-${rt60_min}-${rt60_max}"
 	    combine_str=$combine_str" data/${name_aug}"
 
@@ -289,24 +238,23 @@ if [ $stage -le 3 ] && [ "$make_reverb_plus_noise" == "true" ]; then
 	for rt60_range in $rt60s; do
 	    rt60_min=`echo $rt60_range | cut -d ":" -f1`
 	    rt60_max=`echo $rt60_range | cut -d ":" -f2`
-	    kwrd_reverb=rt60-${rt60_min}-${rt60_max}
+	    kwrd_reverb=rt60_min_${rt60_min}_max_${rt60_max}
 	    name=${name0}_reverb_${kwrd_reverb}
 
 	    for snr in $snrs_noise; do
 		# Augment with musan_noise
 		aug_type=noise
-		snr_interval=$(get_snr_interval $snr)
-		name_aug=${name}_${aug_type}_snr${snr_interval}
-		suff_aug="${aug_type}-snr${snr_interval}"
-
+		name_aug=${name}_${aug_type}_snr${snr}
+		suff_aug=${aug_type}-snr$snr
 		kaldi_augmentation/augment_data_dir.py --utt-suffix "${suff_aug}" --fg-interval 1 \
 						       --normalize-output $normalize_output \
 						       --fg-snrs "$snr" --fg-noise-dir "data/musan_${aug_type}_${mode}" \
 						       --modify-spk-id "false" \
 						       data/$name data/${name_aug}
-
-		make_utt2snr $aug_type data/${name_aug}
-		make_utt2info_for_reverb_plus_noise
+		awk -v snr=$snr -v aug=$aug_type '{print $0" "aug" "snr}' data/${name_aug}/utt2uniq | \
+		    sort -k1,1 > data/${name_aug}/utt2snr
+		awk -v suff="${suff_aug}" -v snr=$snr -v aug=$aug_type \
+		    '{ $1=$1"-"suff; $3=aug; $4=snr; print $0}' data/${name}/utt2info > data/${name_aug}/utt2info
 		utils/fix_data_dir.sh --utt-extra-files "utt2snr utt2info" data/${name_aug}
 		combine_str="$combine_str data/${name_aug}"
 	    done
@@ -314,18 +262,18 @@ if [ $stage -le 3 ] && [ "$make_reverb_plus_noise" == "true" ]; then
 	    for snr in $snrs_music; do
 		# Augment with musan_music
 		aug_type=music
-		snr_interval=$(get_snr_interval $snr)
-		name_aug=${name}_${aug_type}_snr${snr_interval}
-		suff_aug="${aug_type}-snr${snr_interval}"
-		
+		name_aug=${name}_${aug_type}_snr${snr}
+		suff_aug=${aug_type}-snr$snr
 		kaldi_augmentation/augment_data_dir.py --utt-suffix "${suff_aug}" --bg-snrs "$snr" \
 						       --normalize-output $normalize_output \
 						       --num-bg-noises "1" --bg-noise-dir "data/musan_${aug_type}_${mode}" \
 						       --modify-spk-id "false" \
 						       data/$name data/${name_aug}
+		awk -v snr=$snr -v aug=$aug_type '{print $0" "aug" "snr}' data/${name_aug}/utt2uniq | \
+		    sort -k1,1 > data/${name_aug}/utt2snr
+		awk -v suff="${suff_aug}" -v snr=$snr -v aug=$aug_type \
+		    '{ $1=$1"-"suff; $3=aug; $4=snr; print $0}' data/${name}/utt2info > data/${name_aug}/utt2info
 		
-		make_utt2snr $aug_type data/${name_aug}
-		make_utt2info_for_reverb_plus_noise
 		utils/fix_data_dir.sh --utt-extra-files "utt2snr utt2info" data/${name_aug}
 		combine_str="$combine_str data/${name_aug}"
 	    done
@@ -333,39 +281,39 @@ if [ $stage -le 3 ] && [ "$make_reverb_plus_noise" == "true" ]; then
 	    for snr in $snrs_babble; do
 		# Augment with musan_speech
 		aug_type=babble
-		snr_interval=$(get_snr_interval $snr)
-		name_aug=${name}_${aug_type}_snr${snr_interval}
-		suff_aug="${aug_type}-snr${snr_interval}"
-
+		name_aug=${name}_${aug_type}_snr${snr}
+		suff_aug=${aug_type}-snr$snr
 		kaldi_augmentation/augment_data_dir.py --utt-suffix "${suff_aug}" --bg-snrs "$snr" \
 						       --normalize-output $normalize_output \
-						       --num-bg-noises "$num_noises_babble" --bg-noise-dir "data/musan_speech_${mode}" \
+						       --num-bg-noises "3:4:5:6:7" --bg-noise-dir "data/musan_speech_${mode}" \
 						       --modify-spk-id "false" \
 						       data/$name data/${name_aug}
-
-		make_utt2snr $aug_type data/${name_aug}
-		make_utt2info_for_reverb_plus_noise
-		utils/fix_data_dir.sh --utt-extra-files "utt2snr utt2info" data/${name_aug}
+		awk -v snr=$snr -v aug=$aug_type '{print $0" "aug" "snr}' data/${name_aug}/utt2uniq | \
+		    sort -k1,1 > data/${name_aug}/utt2snr
+		awk -v suff="${suff_aug}" -v snr=$snr -v aug=$aug_type \
+		    '{ $1=$1"-"suff; $3=aug; $4=snr; print $0}' data/${name}/utt2info > data/${name_aug}/utt2info
 		combine_str="$combine_str data/${name_aug}"
+		utils/fix_data_dir.sh --utt-extra-files "utt2snr utt2info" data/${name_aug}
 	    done
 	    
 	    for snr in $snrs_chime3bg; do
 		# Augment with chime3background
 		aug_type=chime3bg
-		snr_interval=$(get_snr_interval $snr)
-		name_aug=${name}_${aug_type}_snr${snr_interval}
-		suff_aug="${aug_type}-snr${snr_interval}"
-		
+		name_aug=${name}_${aug_type}_snr${snr}
+		suff_aug=${aug_type}-snr$snr
 		kaldi_augmentation/augment_data_dir.py --utt-suffix "${suff_aug}" --bg-snrs "$snr" \
 						       --normalize-output $normalize_output \
 						       --num-bg-noises "1" --bg-noise-dir "data/chime3background_${mode}" \
 						       --modify-spk-id "false" \
 						       data/$name data/${name_aug}
+		awk -v snr=$snr -v aug=$aug_type '{print $0" "aug" "snr}' data/${name_aug}/utt2uniq | \
+		    sort -k1,1 > data/${name_aug}/utt2snr
+		awk -v suff="${suff_aug}" -v snr=$snr -v aug=$aug_type \
+		    '{ $1=$1"-"suff; $3=aug; $4=snr; print $0}' data/${name}/utt2info > data/${name_aug}/utt2info
 		
-		make_utt2snr $aug_type data/${name_aug}
-		make_utt2info_for_reverb_plus_noise
 		utils/fix_data_dir.sh --utt-extra-files "utt2snr utt2info" data/${name_aug}
 		combine_str="$combine_str data/${name_aug}"
+		
 	    done
 
 	done

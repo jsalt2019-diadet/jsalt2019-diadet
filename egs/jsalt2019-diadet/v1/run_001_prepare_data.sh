@@ -6,17 +6,14 @@
 #                2017   Johns Hopkins University (Author: Daniel Povey)
 # Apache 2.0.
 #
-
 . ./cmd.sh
 . ./path.sh
 set -e
 
-
-stage=2
+stage=1
 config_file=default_config.sh
 
 . parse_options.sh || exit 1;
-
 . datapath.sh
 
 if [ $stage -le 1 ];then

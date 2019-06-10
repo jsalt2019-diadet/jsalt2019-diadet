@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
+"""
+  Copyright 2019 Johns Hopkins University  (Author: Phani Sankar Nidadavolu)
+  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)  
 
+"""
 from __future__ import print_function
 import os
 import sys

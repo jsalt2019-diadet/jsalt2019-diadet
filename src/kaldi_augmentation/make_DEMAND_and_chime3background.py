@@ -1,7 +1,11 @@
 #!/usr/bin/env python
-# python >= 2.7 required
-import os, errno, fnmatch
+"""
+  Copyright 2019 Johns Hopkins University  (Author: Saurabh Kataria)
+  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)  
 
+  python >= 2.7 required
+"""
+import os, errno, fnmatch, sys
 
 # https://stackoverflow.com/a/600612/3342981
 def mkdir_p(path):
@@ -41,9 +45,13 @@ def filterkeysfromdict(dictionary, pattern):
 
 
 if __name__ == "__main__":
-    dir_DEMAND="/export/corpora/DEMAND"
-    dir_chime3background="/export/corpora4/CHiME4/CHiME3/data/audio/16kHz/backgrounds"
-    dir_target = "data"     # change this to "." if you want folder to be made in working directory
+    #dir_DEMAND="/export/corpora/DEMAND"
+    #dir_chime3background="/export/corpora4/CHiME4/CHiME3/data/audio/16kHz/backgrounds"
+    #dir_target = "data"     # change this to "." if you want folder to be made in working directory
+
+    dir_DEMAND = sys.argv[1]
+    dir_chime3background = sys.argv[2]
+    dir_target = sys.argv[3]
 
     mkdir_p(os.path.join(dir_target, "demand_train"))
     mkdir_p(os.path.join(dir_target, "chime3background"))

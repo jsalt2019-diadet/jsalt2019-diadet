@@ -17,7 +17,7 @@ train_stage=0
 use_gpu=true
 remove_egs=false
 num_epochs=3
-nodes=b0
+nodes=fs01
 storage_name=$(date +'%m_%d_%H_%M')
 
 data=data/train
@@ -64,6 +64,9 @@ if [ $stage -le 6 ]; then
       elif [ "$nodes" == "b1" ];then
 	  utils/create_split_dir.pl \
 	      /export/b{14,15,16,17}/$dir_name $egs_dir/storage
+      elif [ "$nodes" == "fs01" ];then
+	  utils/create_split_dir.pl \
+	      /export/fs01/jsalt19/$dir_name $egs_dir/storage
       else
 	  utils/create_split_dir.pl \
 	      /export/c{06,07,08,09}/$dir_name $egs_dir/storage

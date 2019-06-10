@@ -1,15 +1,21 @@
 #!/bin/bash
-
+# Copyright
+#                2019   Johns Hopkins University (Author: Phani Sankar Nidadavolu)
+# Apache 2.0.
+#
 set -e
 
-stage=0
+stage=1
 sampling_rate=16000
 download_rirs=false
 seed=777
 # SRC locations of musan and simulated rirs
 musan_src_location=/export/corpora/JHU/musan
-rirs_src_location=/export/b17/snidada1/kaldi_jsalt_2019/egs/voxceleb/v2/RIRS_NOISES # If download rirs is set to true this path will never be used
-rt60_map_file=/home/snidada1/jsalt_2019/rir_info/simrir2rt60.info
+rirs_src_location=/export/fs01/jsalt19/databases/RIRS_NOISES
+DEMAND_src_location=/export/corpora/DEMAND
+chime3background_src_location=/export/corpora4/CHiME4/CHiME3/data/audio/16kHz/backgrounds
+rt60_map_file=./kaldi_augmentation/simrir2rt60.info
+
 echo "$0 $@"  # Print the command line for logging.
 
 if [ -f path.sh ]; then . ./path.sh; fi
@@ -32,12 +38,12 @@ fi
 #rirs_info_path=data/rirs_info
 rirs_info_path=$1
 
-if [ $stage -le 0 ]; then
+if [ $stage -le 1 ]; then
   # First make the MUSAN corpus
   # We will make 90-10 splits of speech, noise and music directories
   # The 90 split will be used for augmenting the train directories
   # The 10 split will be used for augmenting the eval directories
-  steps/data/make_musan.sh --sampling-rate $sampling_rate \
+  kaldi_augmentation/make_musan.sh --sampling-rate $sampling_rate \
         $musan_src_location data
   for name in speech noise music; do
     utils/subset_data_dir_tr_cv.sh --seed $seed data/musan_${name} \
@@ -53,19 +59,24 @@ if [ $stage -le 0 ]; then
   echo "Finished setting up MUSAN corpus"
 fi
 
-if [ $stage -le 1 ]; then
+if [ $stage -le 2 ]; then
   # Make the demand and chime2 background noise dirs
-  local/make_DEMAND_and_chime3background.py || exit 1;
-  for name in demand_train chime3background_train chime3background_eval; do
-    utils/fix_data_dir.sh data/$name
-    utils/data/get_utt2dur.sh data/$name
-    mv data/${name}/utt2dur data/${name}/reco2dur
-    utils/fix_data_dir.sh data/$name
-  done
+    kaldi_augmentation/make_DEMAND_and_chime3background.py $DEMAND_src_location $chime3background_src_location data || exit 1;
+    #merge demand and chime3-train
+    rm -rf data/tmp
+    mv data/chime3background_train data/tmp
+    utils/combine_data.sh data/chime3background_train data/tmp data/demand_train
+    rm -rf data/tmp
+    for name in chime3background_train chime3background_eval; do
+	utils/fix_data_dir.sh data/$name
+	utils/data/get_utt2dur.sh data/$name
+	mv data/${name}/utt2dur data/${name}/reco2dur
+	utils/fix_data_dir.sh data/$name
+    done
 fi
 
 # Reverberant speech simulation
-if [ $stage -le 2 ]; then
+if [ $stage -le 3 ]; then
   if [ "$download_rirs" == true ]; then
     # Download the package that includes the real RIRs, simulated RIRs, isotropic noises and point-source noises
     wget --no-check-certificate http://www.openslr.org/resources/28/rirs_noises.zip
@@ -74,7 +85,7 @@ if [ $stage -le 2 ]; then
     # downloading everytime is a time taking and disk consuming process
     # It is better to softlink from a location that we will not delete untill the end of workshop
     if [ ! -d "RIRS_NOISES" ]; then
-        ln -s $sim_rirs_src_location RIRS_NOISES
+        ln -s $rirs_src_location RIRS_NOISES
     fi
   fi
 

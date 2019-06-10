@@ -1,4 +1,8 @@
 #!/bin/bash
+# Copyright
+#                2019   Johns Hopkins University (Author: Phani Sankar Nidadavolu)
+# Apache 2.0.
+#
 set -e
 
 stage=0

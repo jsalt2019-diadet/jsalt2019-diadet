@@ -15,7 +15,6 @@ vaddir=`pwd`/mfcc
 vaddiardir=`pwd`/vad_diar
 
 stage=1
-
 config_file=default_config.sh
 
 . parse_options.sh || exit 1;
@@ -33,7 +32,9 @@ fi
 
 
 if [ $stage -le 1 ]; then
-    kaldi_augmentation/aug_step1_prepare_noise_rir_data.sh data/rirs_info
+    if [ ! -d "data/chime3background_train" ];then
+	kaldi_augmentation/aug_step1_prepare_noise_rir_data.sh data/rirs_info
+    fi
 fi
 
 if [ $stage -le 2 ]; then
@@ -76,11 +77,6 @@ if [ $stage -le 4 ];then
     do
 	combine_str="$combine_str data/${name}_sub"
 	utils/subset_data_dir.sh data/${name} $(wc -l data/voxceleb/utt2spk | awk '{ print int($1)}') data/${name}_sub
-
-	# if [ ! -f data/$name/utt2num_frames ];then
-	#     awk '{ print $1,int($2*100)}' data/$name/reco2dur > data/$name/utt2num_frames
-	# fi
-	# hyp_utils/remove_short_utts.sh --min-len 400 data/$name
     done
     utils/combine_data.sh data/voxceleb_aug_sub $combine_str 
 fi
