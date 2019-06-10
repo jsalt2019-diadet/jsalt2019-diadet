@@ -50,7 +50,7 @@ if [ $stage -le 2 ];then
     done
     wait
 fi
-exit
+
 
 if [ $stage -le 3 ];then
     for subset in dev eval

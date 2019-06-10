@@ -129,4 +129,9 @@ This is a summary of the recipe steps:
     - Evals back-end for original sitw data
     - Evals back-end for augmented sitw data
 
+- run_050_make_res_tables.sh
+    - Prints 2 tables in format easy to copy to google docs
+        - EER
+	- MinDCF at P_target=0.05
+	
 	
