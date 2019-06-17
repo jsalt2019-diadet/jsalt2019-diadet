@@ -29,29 +29,29 @@ jsalt2019-diadet/tools
   - Anaconda3.5:
      - Make a link to your anaconda installation in the tools directory:
      ```bash
-     cd jsalt2019-diatdet/tools/anaconda
+     cd jsalt2019-diadet/tools/anaconda
      ln -s <your-anaconda-3.5> anaconda3.5
      ```
-     - or follow instructions in jsalt2019-diatdet/tools/anaconda/full_install.sh to install anaconda from scratch
+     - or follow instructions in jsalt2019-diadet/tools/anaconda/full_install.sh to install anaconda from scratch
   - Kaldi speech recognition toolkit
      - Make link to an existing kaldi installation
      ```bash
-     cd jsalt2019-diatdet/tools/kaldi
+     cd jsalt2019-diadet/tools/kaldi
      ln -s <your-kaldi> kaldi
      ```
-     - or follow instructions in jsalt2019-diatdet/tools/anaconda/install_kaldi.sh to install kaldi from scratch
+     - or follow instructions in jsalt2019-diadet/tools/anaconda/install_kaldi.sh to install kaldi from scratch
 
   - CuDNN: tensorflow and pytorch will need some version of cudnn
      - Make a link to some existing cudnn version that matches the requirements of your tf or pytorch, e.g.:
      ```bash
-     cd jsalt2019-diatdet/tools/cudnn
+     cd jsalt2019-diadet/tools/cudnn
      #cudnn v7.4 for cuda 9.0 needed by pytorch 1.0 
      ln -s /home/janto/usr/local/cudnn-9.0-v7.4 cudnn-9.0-v7.4
      ```
   - Recommended: use some preinstalled versions of anaconda and kaldi in the grid to avoid each person having its own.
      - To create links to preinstalled kaldi, anaconda and cudnn, run:
      ```bash
-     cd jsalt2019-diatdet/
+     cd jsalt2019-diadet/
      ./make_clsp_links.sh
      ```
      - The anaconda that you will link with this has several environments:
@@ -83,9 +83,12 @@ jsalt2019-diadet/tools
  - Directories:
     - tools: contains external repos and tools like kaldi, python, pyannotate, hyperion, cudnn, etc.
     - src: it can be used to place code that we create specifically for this repo.
-    - egs: cotains the recipes
+       - src/kaldi_augmentation: some scripts to perform data augmentation using the wav-reverberate kaldi tool
+    - egs: contains the recipes
        - egs/jsalt2019-diadet: recipe for speaker diarization/detection/tracking for all datasets that we use in the workshop.
           - v1: Version 1 is based on kaldi x-vectors
+       - egs/sitw_noisy: recipe for SITW with added noise and reverberation in the dev/eval test. Used to measure performance of enhancement methods at different noise types, noise levels, RT60 reveration times.
+          - v1: Based on kaldi x-vectors.
 
 
 

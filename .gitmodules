@@ -4,3 +4,6 @@
 [submodule "tools/hyperion/hyperion"]
 	path = tools/hyperion/hyperion
 	url = https://github.com/jsalt2019-diadet/hyperion.git
+[submodule "tools/pyannote/pyannote-core"]
+	path = tools/pyannote/pyannote-core
+	url = https://github.com/pyannote/pyannote-core.git

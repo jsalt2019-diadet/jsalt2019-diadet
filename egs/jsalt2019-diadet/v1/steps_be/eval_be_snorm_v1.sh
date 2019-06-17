@@ -47,9 +47,7 @@ NF=$(awk '{ c=NF } END{ print c}' $ndx_file)
 if [ $NF -eq 3 ];then
     # ndx file is is actuall key file, creates ndx
     hyp_ndx_file=$output_file.ndx
-    if [ ! -f $hyp_ndx_file ]; then
-	awk '{ print $1,$2}' $ndx_file > $hyp_ndx_file
-    fi
+    awk '{ print $1,$2}' $ndx_file > $hyp_ndx_file
 else
     hyp_ndx_file=$ndx_file
 fi

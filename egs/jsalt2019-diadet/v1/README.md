@@ -60,6 +60,11 @@ The recipe contains the following directories:
    /export/fs01/jsalt19/resources/embeddings_nnets/kaldi_xvec/mfcc40/xvector_nnet_2a.1.voxceleb_div2
    ```
 
+   This is the baseline kaldi x-vector network trained with voxceleb plus x2 augmentations with augmentations created in step run_003_prepare_augment.sh:
+   ```bash
+   /export/fs01/jsalt19/resources/embeddings_nnets/kaldi_xvec/mfcc40/xvector_nnet_2a.1.voxceleb_combined
+   ```
+
 ## Auxiliary scripts
 
  - cmd.sh: define different commands to submit jobs to the SGE queue

@@ -17,7 +17,7 @@ score_dir=$4
 # keys
 trials=$data_dir/trials/trials_enr$enr_dur
 trials_sub=$data_dir/trials/trials_sub_enr$enr_dur
-db_name=jsalt19_spkdet_babytrain_${dev_eval}
+db_name=jsalt19_spkdet_ami_${dev_eval}
 
 score_file_base=$score_dir/${db_name}_enr${enr_dur}
 

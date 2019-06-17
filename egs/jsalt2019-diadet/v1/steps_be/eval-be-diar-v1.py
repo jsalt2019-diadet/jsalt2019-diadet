@@ -22,7 +22,7 @@ from hyperion.hyp_defs import float_cpu, config_logger
 #from hyperion.utils.scp_list import SCPList
 from hyperion.utils.trial_ndx import TrialNdx
 from hyperion.utils.trial_scores import TrialScores
-from hyperion.helpers import MultiTestTrialDataReader as TDR
+from hyperion.helpers.multi_test_trial_data_reader import MultiTestTrialDataReader as TDR
 from hyperion.helpers import PLDAFactory as F
 from hyperion.transforms import TransformList
 
@@ -91,7 +91,7 @@ def combine_diar_scores(ndx, orig_seg, subseg_scores):
 
 
 
-def eval_plda(iv_file, ndx_file, diar_ndx_file, enroll_file, test_subseg2orig_file,
+def eval_plda(iv_file, ndx_file, enroll_file, test_subseg2orig_file,
               preproc_file,
               model_file, score_file, plda_type,
               **kwargs):
@@ -102,7 +102,7 @@ def eval_plda(iv_file, ndx_file, diar_ndx_file, enroll_file, test_subseg2orig_fi
     else:
         preproc = None
 
-    tdr = TDR(iv_file, ndx_file, enroll_file, None, test_subseg2orig, preproc)
+    tdr = TDR(iv_file, ndx_file, enroll_file, None, test_subseg2orig_file, preproc)
     x_e, x_t, enroll, ndx, orig_seg = tdr.read()
 
     logging.info('loading plda model: %s' % (model_file))
@@ -139,7 +139,8 @@ if __name__ == "__main__":
     #parser.add_argument('--diar-ndx-file', dest='diar_ndx_file', required=True)
     parser.add_argument('--enroll-file', dest='enroll_file', required=True)
     #parser.add_argument('--diar2orig', dest='diar2orig', required=True)
-    parser.add_argument('--test-subseg2orig-fie', dest='test_subseg2orig_file', required=True)
+    parser.add_argument('--test-subseg2orig-file', dest='test_subseg2orig_file',
+                        required=True)
     parser.add_argument('--preproc-file', dest='preproc_file', default=None)
 
     TDR.add_argparse_args(parser)

@@ -40,9 +40,11 @@ fi
 
 if [ $stage -le 3 ]; then
     # Extracts x-vectors for adaptation data
-    for name in jsalt19_spkdet_babytrain_train
+    for name in jsalt19_spkdet_{chime5,ami}_train #jsalt19_spkdet_{babytrain,chime5,ami}_train
     do
-	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \
+	num_spk=$(wc -l data/${name}/spk2utt | cut -d " " -f 1)
+	nj=$(($num_spk < 40 ? $num_spk:40))
+	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj $nj \
 					      $nnet_dir data/$name \
 					      $xvector_dir/$name
     done
@@ -51,12 +53,15 @@ fi
 
 if [ $stage -le 4 ]; then
     # Extracts x-vectors for enrollment
-    for db in jsalt19_spkdet_babytrain_dev jsalt19_spkdet_babytrain_eval
+    #for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
+    for db in jsalt19_spkdet_ami_{dev,eval}
     do
 	for d in 5 15 30
 	do
 	    name=${db}_enr$d
-	    steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \
+	    num_spk=$(wc -l data/${name}/spk2utt | cut -d " " -f 1)
+	    nj=$(($num_spk < 40 ? $num_spk:40))
+	    steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj $nj \
 						 $nnet_dir data/$name \
 						 $xvector_dir/$name
 	done
@@ -65,7 +70,7 @@ fi
 
 if [ $stage -le 5 ]; then
     # Extracts x-vectors for test with ground truth VAD
-    for db in jsalt19_spkdet_babytrain_dev jsalt19_spkdet_babytrain_eval
+    for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
     do
 	name=${db}_test_gtvad
 	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \
@@ -76,7 +81,7 @@ fi
 
 if [ $stage -le 6 ]; then
     # Extracts x-vectors for test with energy VAD
-    for db in jsalt19_spkdet_babytrain_dev jsalt19_spkdet_babytrain_eval
+    for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
     do
 	name=${db}_test
 	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \

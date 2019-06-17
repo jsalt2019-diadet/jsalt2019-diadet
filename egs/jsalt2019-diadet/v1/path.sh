@@ -11,12 +11,15 @@ export LC_ALL=C
 #sctk
 PATH=$KALDI_ROOT/tools/sctk-2.4.10/src/md-eval:$PATH
 
-KERAS_PATH=$TOOLS_ROOT/keras
+#hyperion
 HYP_ROOT=$TOOLS_ROOT/hyperion/hyperion
+
+#pyannote
+#PYANNOTE=$TOOLS_ROOT/pyannonte/pyannote-core:$TOOLS_ROOT/pyannonte/pyannote-metrics
 
 #Anaconda env
 CONDA_ROOT=$TOOLS_ROOT/anaconda/anaconda3.5
-if [ -f "CONDA_ROOT/etc/profile.d/conda.sh" ]; then
+if [ -f "$CONDA_ROOT/etc/profile.d/conda.sh" ]; then
     #for conda version >=4.4 do    
     . $CONDA_ROOT/etc/profile.d/conda.sh
     conda activate
@@ -36,7 +39,7 @@ fi
 
 export MPLBACKEND="agg"
 export PATH=$HYP_ROOT/hyperion/bin:/usr/local/cuda/bin:$PATH
-export PYTHONPATH=$HYP_ROOT:$KERAS_PATH:$PYTHONPATH
+export PYTHONPATH=$HYP_ROOT:$PYTHONPATH
 export LD_LIBRARY_PATH
 export LC_ALL=C
 

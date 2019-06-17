@@ -23,19 +23,19 @@ xvector_dir=exp/xvectors/$nnet_name
 if [ $stage -le 1 ]; then
     # prepared datasets with subsegments based on ground truth diarization clusters
     # each subsegment is defined by a binary vad
-    for db in jsalt19_spkdet_babytrain_dev jsalt19_spkdet_babytrain_eval
+    for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
     do
 	name=${db}_test
 	rttm=data/${name}/diarization.rttm
-	local/make_diar_data.sh --cmd "$train_cmd" --nj 5 --min_dur $min_dur_spkdet_subsegs data/$name $rttm data/${name}_spkdetgtdiar $vad_gtdiar
+	local/make_diar_data.sh --cmd "$train_cmd" --nj 5 --min_dur $min_dur_spkdet_subsegs data/$name $rttm data/${name}_spkdetgtdiar $vaddir_gtdiar
     done
-
+    exit
 fi
-exit
+
 
 if [ $stage -le 2 ]; then
     # Extracts x-vectors for test with ground truth diarization
-    for db in jsalt19_spkdet_babytrain_dev jsalt19_spkdet_babytrain_eval
+    for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
     do
 	name=${db}_test_spkdetgtdiar
 	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \

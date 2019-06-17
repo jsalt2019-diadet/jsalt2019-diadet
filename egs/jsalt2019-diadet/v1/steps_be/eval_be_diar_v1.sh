@@ -11,14 +11,14 @@ if [ -f path.sh ]; then . ./path.sh; fi
 set -e 
 
 if [ $# -ne 7 ]; then
-  echo "Usage: $0 <ndx> <enroll-file> <vector-file> <diar-segments-to-orig-utt> <preproc-file> <plda-file> <output-scores>"
+  echo "Usage: $0 <ndx> <enroll-file> <diar-segments-to-orig-utt> <vector-file> <preproc-file> <plda-file> <output-scores>"
   exit 1;
 fi
 
 ndx_file=$1
 enroll_file=$2
-vector_file=$3
-diar2orig=$4
+diar2orig=$3
+vector_file=$4
 preproc_file=$5
 plda_file=$6
 output_file=$7
@@ -34,9 +34,7 @@ NF=$(awk '{ c=NF } END{ print c}' $ndx_file)
 if [ $NF -eq 3 ];then
     # ndx file is is actuall key file, creates ndx
     hyp_ndx_file=$output_file.ndx
-    if [ ! -f $hyp_ndx_file ]; then
-	awk '{ print $1,$2}' $ndx_file > $hyp_ndx_file
-    fi
+    awk '{ print $1,$2}' $ndx_file > $hyp_ndx_file
 else
     hyp_ndx_file=$ndx_file
 fi

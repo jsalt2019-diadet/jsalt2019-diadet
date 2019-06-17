@@ -20,6 +20,7 @@ def find_audios(wav_path):
     command = 'find %s -name "*.wav"' % (wav_path)
     wavs = subprocess.check_output(command, shell=True).decode('utf-8').splitlines()
     keys = [ os.path.splitext(os.path.basename(wav))[0] for wav in wavs ]
+    keys = [re.sub(r'\.CH1$','', k) for k in keys]
     data = {'key': keys, 'file_path': wavs}
     df_wav = pd.DataFrame(data)
     return df_wav
@@ -66,17 +67,55 @@ def read_trials(list_path, partition, test_length):
 
     return df_trials, df_trials_sub
 
+def rttm_is_sorted_by_tbeg(rttm):
+    tbeg=rttm['tbeg'].values
+    file_id=rttm['file_id'].values
+    return np.all(np.logical_or(tbeg[1:]-tbeg[:-1]>=0,
+                                file_id[1:] != file_id[:-1]))
 
-def read_rttm(list_path):
+def sort_rttm(rttm):
+    return rttm.sort_values(by=['file_id','tbeg'])
 
-    rttm_file='%s/all.rttm' % (list_path)
-    rttm = pd.read_csv(rttm_file, sep='\t', header=None,
+
+def read_rttm(list_path, sep=' ', rttm_suffix=''):
+
+    rttm_file='%s/all%s.rttm' % (list_path, rttm_suffix)
+    rttm = pd.read_csv(rttm_file, sep=sep, header=None,
                        names=['segment_type','file_id','chnl','tbeg','tdur',
                               'ortho','stype','name','conf','slat'])
     #remove empty lines:
     index = (rttm['tdur']>= 0.025)
     rttm = rttm[index]
+    rttm['ortho'] = '<NA>'
     rttm['stype'] = '<NA>'
+    if not rttm_is_sorted_by_tbeg(rttm):
+        print('RTTM %s not properly sorted, sorting it' % (rttm_file))
+        rttm = sort_rttm(rttm)
+
+
+    #cross with uem
+    uem_file='%s/all%s.uem' % (list_path, rttm_suffix)
+    uem = pd.read_csv(uem_file, sep=' ', header=None,
+                      names=['file_id','chnl','file_tbeg','file_tend'])
+    rttm_uem = pd.merge(left=rttm, right=uem, on=['file_id', 'chnl'])
+
+    assert rttm_uem.shape[0] == rttm.shape[0]
+
+    index_fix=(rttm_uem['tbeg'] < rttm_uem['file_tend']) & (rttm_uem['tbeg'] + rttm_uem['tdur']> rttm_uem['file_tend'])
+    if np.sum(index_fix) > 0:
+        print('fixing %d segments with exceding file duration' % (np.sum(index_fix)))
+        print(rttm_uem[index_fix])
+        rttm_uem.loc[index_fix, 'tdur'] = 0 # rttm_uem[index_fix].file_tend - rttm_uem[index_fix].tbeg
+              
+    index_keep=(rttm_uem['tbeg'] < rttm_uem['file_tend']) 
+    n_rm = rttm.shape[0] - np.sum(index_keep)
+    if n_rm > 0:
+        print('removing %d segments outside file duration' % (n_rm))
+        print(rttm_uem[~index_keep])
+        rttm_uem = rttm_uem[index_keep]
+
+    rttm = rttm_uem.drop(columns=['file_tbeg', 'file_tend'])
+    
     return rttm
 
 
@@ -103,7 +142,7 @@ def make_train_segments_from_rttm(df_rttm, min_dur, max_dur):
             while ( total_length > min_dur ):
                 # select number of utterances for this segment
                 cur_dur = min(rng.randint(min_dur, max_dur), total_length)
-                print('\t\t extract segment %d of length %.2f, remaining length %.2f' % (count, cur_dur, total_length-cur_dur))
+                # print('\t\t extract segment %d of length %.2f, remaining length %.2f' % (count, cur_dur, total_length-cur_dur))
                 last_utt = np.where(cum_length>=cur_dur)[0][0]
                 tbeg = df_rttm_ij.iloc[first_utt].tbeg-1
                 tbeg = tbeg if tbeg > 0 else 0
@@ -163,7 +202,8 @@ def enr_to_segm(df):
         segment_id_i = '%s-%s-%07d-%07d' % (
             row.speaker, row.filename, int(tbeg_i*100), int(tend_i*100))
 
-        print('\tsegment %d/%d %s' % (i,df_seg.shape[0],segment_id_i))
+        if i%100==0:
+            print('\tsegment %d/%d %s' % (i,df_seg.shape[0],segment_id_i))
 
         segment_ids.append(segment_id_i)
         
@@ -229,7 +269,7 @@ def trials_to_segm(df_trials):
         
     segm_merged = pd.concat(segm_merged, ignore_index=True)
     segm_merged = segm_merged.drop_duplicates()
-    segment_id = ['%s-%07d-%07d' % (fn,tbeg,tend)
+    segment_id = ['%s-%07d-%07d' % (fn,int(tbeg*100),int(tend*100))
                   for fn,tbeg,tend in zip(
                           segm_merged['filename'],
                           segm_merged['beginning_time'],
@@ -273,9 +313,12 @@ def make_test_rttm_diar(rttm, segm):
             (tend <= tend_i) | ((tend > tend_i) & (tbeg < tend_i)))
 
         rttm_i = rttm[mask].copy()
+        if rttm_i.empty:
+            print('segment empty %s' % row.segment_id)
+            continue
+
         # change filename by segment_id
         rttm_i['file_id'] = row.segment_id
-        #print(rttm_i.head())
         #fix rttm lines that are not completely in the segment
         if rttm_i.iloc[0, index_tbeg].item() < tbeg_i:
             rttm_i.iloc[0, index_tbeg] = tbeg_i
@@ -305,9 +348,10 @@ def remove_overlap_from_rttm_vad(rttm):
         if rttm['file_id'].iloc[p] == rttm['file_id'].iloc[i]:
             if tend[p] > rttm.iloc[i, tbeg_index].item():
                 index[i] = False
-                tend[p] = tend[i]
-                new_dur = tend[i] - rttm.iloc[p, tbeg_index].item()
-                rttm.iloc[p, tdur_index] = new_dur
+                if tend[i] > tend[p]:
+                    tend[p] = tend[i]
+                    new_dur = tend[i] - rttm.iloc[p, tbeg_index].item()
+                    rttm.iloc[p, tdur_index] = new_dur
             else:
                 p = i
         else:
@@ -322,11 +366,14 @@ def filter_wavs(df_wav, file_names):
     return df_wav
 
 
-def write_wav(df_wav, output_path):
+def write_wav(df_wav, output_path, bin_wav=False):
 
     with open(output_path + '/wav.scp', 'w') as f:
         for key,file_path in zip(df_wav['key'], df_wav['file_path']):
-            f.write('%s %s\n' % (key, file_path))
+            if bin_wav:
+                f.write('%s sox %s -t wav - remix 1 | \n' % (key, file_path))
+            else:
+                f.write('%s %s\n' % (key, file_path))
 
 
             
@@ -389,9 +436,13 @@ def write_key(trials, file_path):
             f.write('%s %s %s\n' % (model, segm, t))
     
 
-def make_train(df_wav, df_rttm, output_path, data_name, min_dur, max_dur):
+def make_train(df_wav, df_rttm, output_path, data_name, min_dur, max_dur, mic, bin_wav):
 
-    output_path = '%s/%s_train' % (output_path, data_name)
+    if mic == '':
+        output_path = '%s/%s_train' % (output_path, data_name)
+    else:
+        output_path = '%s/%s_train_%s' % (output_path, data_name, mic)
+    
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
@@ -399,7 +450,7 @@ def make_train(df_wav, df_rttm, output_path, data_name, min_dur, max_dur):
     print('make wav.scp')
     file_names = df_rttm['file_id'].sort_values().unique()
     df_wav = filter_wavs(df_wav, file_names)
-    write_wav(df_wav, output_path)
+    write_wav(df_wav, output_path, bin_wav)
 
     #make train segments and vad
     print('make training segments')
@@ -414,7 +465,7 @@ def make_train(df_wav, df_rttm, output_path, data_name, min_dur, max_dur):
     
     
     
-def make_deveval(df_wav, df_enr, df_trials, df_trials_sub, rttm, output_path, data_name, partition):
+def make_deveval(df_wav, df_enr, df_trials, df_trials_sub, rttm, output_path, data_name, partition, mic):
 
     # enroll
     for dur in [5, 15, 30]:
@@ -493,22 +544,25 @@ def make_deveval(df_wav, df_enr, df_trials, df_trials_sub, rttm, output_path, da
 
     
 
-def make_jsalt19_spkdet(list_path, wav_path, output_path, data_name, partition, min_dur, max_dur, test_dur):
+def make_jsalt19_spkdet(list_path, wav_path, output_path, data_name, partition, min_dur, max_dur, test_dur, rttm_suffix, wav_suffix, mic, bin_wav):
 
     print('read audios')
     df_wav = find_audios(wav_path)
     print('read rttm')
-    rttm = read_rttm(list_path)
+    rttm = read_rttm(list_path, rttm_suffix=rttm_suffix)
 
+    if wav_suffix != '':
+        rttm['file_id'] = rttm['file_id'].astype(str) + wav_suffix
+    
     print('making %s data directory' % (partition))
     if partition == 'train':
-        make_train(df_wav, rttm, output_path, data_name, min_dur, max_dur)
+        make_train(df_wav, rttm, output_path, data_name, min_dur, max_dur, mic, bin_wav)
     else:
         print('read enr list')
         df_enr = read_enroll_lists(list_path, partition)
         print('read trials')
         df_trials, df_trials_sub = read_trials(list_path, partition, test_dur)
-        make_deveval(df_wav, df_enr, df_trials, df_trials_sub, rttm, output_path, data_name, partition)
+        make_deveval(df_wav, df_enr, df_trials, df_trials_sub, rttm, output_path, data_name, partition, mic)
     
     
 
@@ -526,7 +580,12 @@ if __name__ == "__main__":
     parser.add_argument('--partition', dest='partition', choices=['train', 'dev', 'eval'], required=True)
     parser.add_argument('--min-train-dur', dest='min_dur', default=15, type=float)
     parser.add_argument('--max-train-dur', dest='max_dur', default=60, type=float)
-    parser.add_argument('--test-dur', dest='test_dur', default=60, type=int)        
+    parser.add_argument('--test-dur', dest='test_dur', default=60, type=int)
+    parser.add_argument('--rttm-suffix', dest='rttm_suffix', default='')
+    parser.add_argument('--wav-suffix', dest='wav_suffix', default='')
+    parser.add_argument('--mic', dest='mic', default='')
+    parser.add_argument('--bin-wav', dest='bin_wav', default=False, action='store_true')
+
     args=parser.parse_args()
     
     make_jsalt19_spkdet(**vars(args))

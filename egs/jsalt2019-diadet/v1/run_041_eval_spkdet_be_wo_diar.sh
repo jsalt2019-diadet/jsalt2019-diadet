@@ -28,105 +28,110 @@ score_plda_adapt_gtvad_dir=$score_dir/plda_adapt_gtvad
 score_plda_adapt_snorm_dir=$score_dir/plda_adapt_snorm
 score_plda_adapt_snorm_gtvad_dir=$score_dir/plda_adapt_snorm_gtvad
 
+name_vec=(babytrain ami)
+be_vec=($be_babytrain_dir $be_ami_dir)
+coh_vec=(jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train)
+num_dbs=${#name_vec[@]}
 
 #train_cmd=run.pl
 
 if [ $stage -le 1 ];then
 
-    echo "Eval Babytrain wo diarization"
-    for part in dev eval
+    for((i=0;i<$num_dbs;i++))
     do
-	db=jsalt19_spkdet_babytrain_${part}
-	coh_data=jsalt19_spkdet_babytrain_train
-	be_dir=$be_babytrain_dir
-	
-	for dur in 5 15 30
+	echo "Eval ${name_vec[$i]} wo diarization"
+	for part in dev eval
 	do
-	    # energy VAD
-	    (
-		steps_be/eval_be_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
-				       data/${db}_test/trials/trials_enr$dur \
-				       data/${db}_enr${dur}/utt2model \
-				       $xvector_dir/${db}_enr${dur}_test/xvector.scp \
-				       $be_dir/lda_lnorm.h5 \
-				       $be_dir/plda.h5 \
-				       $score_plda_dir/${db}_enr${dur}_scores
+	    db=jsalt19_spkdet_${name_vec[$i]}_${part}
+	    coh_data=${coh_vec[$i]}
+	    be_dir=${be_vec[$i]}
+	    scorer=local/score_${name_vec[$i]}_spkdet.sh
+	
+	    for dur in 5 15 30
+	    do
+		# energy VAD
+		(
+		    steps_be/eval_be_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
+					   data/${db}_test/trials/trials_enr$dur \
+					   data/${db}_enr${dur}/utt2model \
+					   $xvector_dir/${db}_enr${dur}_test/xvector.scp \
+					   $be_dir/lda_lnorm.h5 \
+					   $be_dir/plda.h5 \
+					   $score_plda_dir/${db}_enr${dur}_scores
+		    
+		    $scorer data/${db}_test $part $dur $score_plda_dir 
+		) &
 		
-		local/score_babytrain_spkdet.sh data/${db}_test/trials $part $dur $score_plda_dir 
-	    ) #&
-
-	    # ground truth VAD
-	    (
-		steps_be/eval_be_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
-				       data/${db}_test/trials/trials_enr$dur \
-				       data/${db}_enr${dur}/utt2model \
-				       $xvector_dir/${db}_enr${dur}_test_gtvad/xvector.scp \
-				       $be_dir/lda_lnorm.h5 \
-				       $be_dir/plda.h5 \
-				       $score_plda_gtvad_dir/${db}_enr${dur}_scores
+		# ground truth VAD
+		(
+		    steps_be/eval_be_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
+					   data/${db}_test/trials/trials_enr$dur \
+					   data/${db}_enr${dur}/utt2model \
+					   $xvector_dir/${db}_enr${dur}_test_gtvad/xvector.scp \
+					   $be_dir/lda_lnorm.h5 \
+					   $be_dir/plda.h5 \
+					   $score_plda_gtvad_dir/${db}_enr${dur}_scores
+		    
+		    $scorer data/${db}_test $part $dur $score_plda_gtvad_dir 
+		) &
 		
-		local/score_babytrain_spkdet.sh data/${db}_test/trials $part $dur $score_plda_gtvad_dir 
-	    ) #&
-
-
-	    # energy VAD + PLDA adapt
-	    (
-		steps_be/eval_be_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
-				       data/${db}_test/trials/trials_enr$dur \
-				       data/${db}_enr${dur}/utt2model \
-				       $xvector_dir/${db}_enr${dur}_test/xvector.scp \
-				       $be_dir/lda_lnorm_adapt.h5 \
-				       $be_dir/plda_adapt.h5 \
-				       $score_plda_adapt_dir/${db}_enr${dur}_scores
 		
-		local/score_babytrain_spkdet.sh data/${db}_test/trials $part $dur $score_plda_adapt_dir 
-	    ) #&
-
-	    # ground truth VAD + PLDA adapt
-	    (
-		steps_be/eval_be_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
-				       data/${db}_test/trials/trials_enr$dur \
-				       data/${db}_enr${dur}/utt2model \
-				       $xvector_dir/${db}_enr${dur}_test_gtvad/xvector.scp \
-				       $be_dir/lda_lnorm_adapt.h5 \
-				       $be_dir/plda_adapt.h5 \
-				       $score_plda_adapt_gtvad_dir/${db}_enr${dur}_scores
+		# energy VAD + PLDA adapt
+		(
+		    steps_be/eval_be_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
+					   data/${db}_test/trials/trials_enr$dur \
+					   data/${db}_enr${dur}/utt2model \
+					   $xvector_dir/${db}_enr${dur}_test/xvector.scp \
+					   $be_dir/lda_lnorm_adapt.h5 \
+					   $be_dir/plda_adapt.h5 \
+					   $score_plda_adapt_dir/${db}_enr${dur}_scores
+		    
+		    $scorer data/${db}_test $part $dur $score_plda_adapt_dir 
+		) &
 		
-		local/score_babytrain_spkdet.sh data/${db}_test/trials $part $dur $score_plda_adapt_gtvad_dir 
-	    ) #&
-
-	    # energy VAD + PLDA adapt + AS-Norm
-	    (
-		steps_be/eval_be_snorm_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
-				       data/${db}_test/trials/trials_enr$dur \
-				       data/${db}_enr${dur}/utt2model \
-				       $xvector_dir/${db}_enr${dur}_test/xvector.scp \
-				       data/${coh_data}/utt2spk \
-				       $xvector_dir/${coh_data}/xvector.scp \
-				       $be_dir/lda_lnorm_adapt.h5 \
-				       $be_dir/plda_adapt.h5 \
-				       $score_plda_adapt_snorm_dir/${db}_enr${dur}_scores
+		# ground truth VAD + PLDA adapt
+		(
+		    steps_be/eval_be_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
+					   data/${db}_test/trials/trials_enr$dur \
+					   data/${db}_enr${dur}/utt2model \
+					   $xvector_dir/${db}_enr${dur}_test_gtvad/xvector.scp \
+					   $be_dir/lda_lnorm_adapt.h5 \
+					   $be_dir/plda_adapt.h5 \
+					   $score_plda_adapt_gtvad_dir/${db}_enr${dur}_scores
+		    
+		    $scorer data/${db}_test $part $dur $score_plda_adapt_gtvad_dir 
+		) &
 		
-		local/score_babytrain_spkdet.sh data/${db}_test/trials $part $dur $score_plda_adapt_snorm_dir 
-	    ) #&
-
-	    # ground truth VAD + PLDA adapt + AS-Norm
-	    (
-		steps_be/eval_be_snorm_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
-					     data/${db}_test/trials/trials_enr$dur \
-					     data/${db}_enr${dur}/utt2model \
-					     $xvector_dir/${db}_enr${dur}_test_gtvad/xvector.scp \
-					     data/${coh_data}/utt2spk \
-					     $xvector_dir/${coh_data}/xvector.scp \
-					     $be_dir/lda_lnorm_adapt.h5 \
-					     $be_dir/plda_adapt.h5 \
-					     $score_plda_adapt_snorm_gtvad_dir/${db}_enr${dur}_scores
+		# energy VAD + PLDA adapt + AS-Norm
+		(
+		    steps_be/eval_be_snorm_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
+						 data/${db}_test/trials/trials_enr$dur \
+						 data/${db}_enr${dur}/utt2model \
+						 $xvector_dir/${db}_enr${dur}_test/xvector.scp \
+						 data/${coh_data}/utt2spk \
+						 $xvector_dir/${coh_data}/xvector.scp \
+						 $be_dir/lda_lnorm_adapt.h5 \
+						 $be_dir/plda_adapt.h5 \
+						 $score_plda_adapt_snorm_dir/${db}_enr${dur}_scores
+		    
+		    $scorer data/${db}_test $part $dur $score_plda_adapt_snorm_dir 
+		) &
 		
-		local/score_babytrain_spkdet.sh data/${db}_test/trials $part $dur $score_plda_adapt_snorm_gtvad_dir 
-	    ) #&
-
-
-	    
+		# ground truth VAD + PLDA adapt + AS-Norm
+		(
+		    steps_be/eval_be_snorm_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
+						 data/${db}_test/trials/trials_enr$dur \
+						 data/${db}_enr${dur}/utt2model \
+						 $xvector_dir/${db}_enr${dur}_test_gtvad/xvector.scp \
+						 data/${coh_data}/utt2spk \
+						 $xvector_dir/${coh_data}/xvector.scp \
+						 $be_dir/lda_lnorm_adapt.h5 \
+						 $be_dir/plda_adapt.h5 \
+						 $score_plda_adapt_snorm_gtvad_dir/${db}_enr${dur}_scores
+		    
+		    $scorer data/${db}_test $part $dur $score_plda_adapt_snorm_gtvad_dir 
+		) &
+	    done
 	done
     done
     wait
@@ -135,16 +140,19 @@ fi
 exit
 if [ $stage -le 2 ];then
 
-    db=jsalt19_spkdet_babytrain
-    for plda in plda plda_gtvad plda_adapt plda_adapt_gtvad plda_adapt_snorm plda_adapt_snorm_gtvad
+    for((i=0;i<$num_dbs;i++))
     do
-	for dur in 5 15 30
+	db=jsalt19_spkdet_${name_vec[$i]}
+	for plda in plda plda_gtvad plda_adapt plda_adapt_gtvad plda_adapt_snorm plda_adapt_snorm_gtvad
 	do
-	    (
-		local/calibrate_babytrain_spkdet_v1.sh --cmd "$train_cmd" $dur $score_dir/$plda
-		local/score_babytrain_spkdet.sh data/${db}_test/trials dev $dur $score_dir/${plda}_cal_v1
-		local/score_babytrain_spkdet.sh data/${db}_test/trials eval $dur $score_dir/${plda}_cal_v1
-	    ) &
+	    for dur in 5 15 30
+	    do
+		(
+		    local/calibrate_${name_vec[$i]}_spkdet_v1.sh --cmd "$train_cmd" $dur $score_dir/$plda
+		    $scorer data/${db}_test dev $dur $score_dir/${plda}_cal_v1
+		    $scorer data/${db}_test eval $dur $score_dir/${plda}_cal_v1
+		) &
+	    done
 	done
     done
 

@@ -68,7 +68,7 @@ fi
 
 #Spk detection training data
 if [ $stage -le 4 ];then 
-    for name in jsalt19_spkdet_babytrain_train
+    for name in jsalt19_spkdet_{babytrain,chime5,ami}_train 
     do
 	steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj 40 --cmd "$train_cmd" \
 			   data/${name} exp/make_mfcc $mfccdir
@@ -82,7 +82,7 @@ fi
 #Spk detection enrollment and test data
 if [ $stage -le 5 ];then
 
-    for db in jsalt19_spkdet_babytrain_dev jsalt19_spkdet_babytrain_eval
+    for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
     do
 	# enrollment 
 	for d in 5 15 30
@@ -116,20 +116,25 @@ fi
 
 #Spk diarization data
 if [ $stage -le 6 ];then 
-    for name in jsalt19_spkdiar_babytrain_train jsalt19_spkdiar_babytrain_dev jsalt19_spkdiar_babytrain_eval
+    for name in jsalt19_spkdiar_babytrain_{train,dev,eval} \
+    					  jsalt19_spkdiar_chime5_train jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06} \
+    					  jsalt19_spkdiar_ami_train jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}
     do
-	steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj 40 --cmd "$train_cmd" \
+	num_utt=$(wc -l data/$name/utt2spk | cut -d " " -f 1)
+	nj=$(($num_utt < 40 ? 2:40))
+	steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj $nj --cmd "$train_cmd" \
 			   data/${name} exp/make_mfcc $mfccdir
 	utils/fix_data_dir.sh data/${name}
 	# energy VAD
-	steps_fe/compute_vad_decision.sh --nj 30 --cmd "$train_cmd" \
+	steps_fe/compute_vad_decision.sh --nj $nj --cmd "$train_cmd" \
 					 data/${name} exp/make_vad $vaddir
 	utils/fix_data_dir.sh data/${name}
 
 	#create ground truth version of test data
+	nj=$(($num_utt < 5 ? 1:5))
 	rm -rf data/${name}_gtvad
 	cp -r data/$name data/${name}_gtvad
-	hyp_utils/rttm_to_bin_vad.sh --nj 5 data/$name/vad.rttm data/${name}_gtvad $vaddir_gt
+	hyp_utils/rttm_to_bin_vad.sh --nj $nj data/$name/vad.rttm data/${name}_gtvad $vaddir_gt
 	utils/fix_data_dir.sh data/${name}_gtvad
     done
 fi
