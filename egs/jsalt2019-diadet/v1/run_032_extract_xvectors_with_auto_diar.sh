@@ -96,7 +96,7 @@ if [ $stage -le 5 ]; then
 	    db=${dset}_${part}
 	    for dur in 5 15 30
 	    do
-		echo "combining ${db}_enr${dur}_test"
+		echo "combining ${db}_enr${dur}_test_${spkdet_diar_name}"
 		mkdir -p $xvector_dir/${db}_enr${dur}_test_${spkdet_diar_name}
 		cat $xvector_dir/${db}_{enr${dur},test_${spkdet_diar_name}}/xvector.scp \
 		    > $xvector_dir/${db}_enr${dur}_test_${spkdet_diar_name}/xvector.scp
@@ -116,7 +116,7 @@ if [ $stage -le 6 ]; then
 	    db=${dset}_${part}
 	    for dur in 5 15 30
 	    do
-		echo "combining ${db}_enr${dur}_test"
+		echo "combining ${db}_enr${dur}_test_${spkdet_diar_name}_gtvad"
 		mkdir -p $xvector_dir/${db}_enr${dur}_test_${spkdet_diar_name}_gtvad
 		cat $xvector_dir/${db}_{enr${dur},test_${spkdet_diar_name}_gtvad}/xvector.scp \
 		    > $xvector_dir/${db}_enr${dur}_test_${spkdet_diar_name}_gtvad/xvector.scp
