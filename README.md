@@ -25,7 +25,23 @@ git submodule update --init --recursive --remote
 jsalt2019-diadet/tools
 ```
 
-## Dependencies that you need to install yourself:
+## Other Dependencies:
+  - The recipes also depend on Anaconda3.5, Kaldi, cuDNN, etc.
+
+  - Recommended: use some preinstalled versions of the dependencies in the grid to avoid each person having its own.
+     - To create links to preinstalled kaldi, anaconda and cudnn, run:
+     ```bash
+     cd jsalt2019-diadet/
+     ./make_clsp_links.sh
+     ```
+     - The anaconda that you will link with this has several environments:
+        - base: numpy, h5py, pandas, etc.
+	- tensorflow1.8g_cpu: tensorflow 1.8 for cpu
+	- tensorflow1.8g_gpu: tensorflow 1.8 for gpu
+	- pytorch1.0_cuda9.0: pytorch 1.0 with cuda 9.0
+	- pyannote: python3.6 with pyannote-metrics installed.
+
+
   - Anaconda3.5:
      - Make a link to your anaconda installation in the tools directory:
      ```bash
@@ -48,17 +64,6 @@ jsalt2019-diadet/tools
      #cudnn v7.4 for cuda 9.0 needed by pytorch 1.0 
      ln -s /home/janto/usr/local/cudnn-9.0-v7.4 cudnn-9.0-v7.4
      ```
-  - Recommended: use some preinstalled versions of anaconda and kaldi in the grid to avoid each person having its own.
-     - To create links to preinstalled kaldi, anaconda and cudnn, run:
-     ```bash
-     cd jsalt2019-diadet/
-     ./make_clsp_links.sh
-     ```
-     - The anaconda that you will link with this has several environments:
-        - base: numpy, h5py, pandas, etc.
-	- tensorflow1.8g_cpu: tensorflow 1.8 for cpu
-	- tensorflow1.8g_gpu: tensorflow 1.8 for gpu
-	- pytorch1.0_cuda9.0: pytorch 1.0 with cuda 9.0
      
 ## Directory structure:
  - The directory structure of the repo looks like this:
