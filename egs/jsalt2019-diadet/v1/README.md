@@ -140,14 +140,14 @@ This is a summary of the recipe steps:
  - run_023_eval_diar_be.sh
      - Evaluates AHC using out-of-domain PLDA
          - Optains optimum AHC threshold from dev part
-	 - Results are left in, e.g.,
+	 - Results are left in, for example:
 	 ```bash
 	 exp/diarization/2a.1.voxceleb_div2/lda120_plda_voxceleb/jsalt19_spkdet_babytrain_eval_test_gtvad/plda_scores_tbest/result.md-eval
 	 ```
 
  - run_024_eval_diar_be_adapt.sh
     - Evaluates AHC using mixed-domain PLDA
-        - Results are left in e.g.,
+        - Results are left in, for example,
 	```bash
 	exp/diarization/2a.1.voxceleb_div2/lda120_plda_voxceleb_babytrain/jsalt19_spkdiar_babytrain_eval_gtvad/plda_scores_tbest/result.md-eval
 	```
@@ -159,16 +159,92 @@ This is a summary of the recipe steps:
        - Enrollment datasets for dev/eval with ground truth VAD
        - Test datasets for dev/eval with energy and ground truth VAD
 
+ - run_031_extract_xvectors_with_gt_diar.sh
+    - Extracts x-vectors for spk detection test data using ground truth diarization
+       - Test datasets for dev/eval with ground truth diarization
+
+ - run_032_extract_xvectors_with_auto_diar.sh
+    - Extracts x-vectors for spk detection test data using automatic diarization
+       - Test datasets for dev/eval with automatic diarization based on ground truth VAD
+       - Test datasets for dev/eval with automatic diarization based on energy VAD
+    
+ - run_033_extract_xvectors_for_tracking_with_gt_diar.sh
+     - Extracts x-vectors for spk tracking test data using ground truth diarization
+       - Test datasets for dev/eval with ground truth diarization
+    
+ - run_034_extract_xvectors_for_tracking_with_auto_diar.sh
+    - Extracts x-vectors for spk tracking test data using automatic diarization
+       - Test datasets for dev/eval with automatic diarization based on ground truth VAD
+       - Test datasets for dev/eval with automatic diarization based on energy VAD
+
+
  - run_040_train_spkdet_be.sh
     - Trains PLDA back-end for speaker detection
     - With/Without PLDA adaptation
        - Adapted to each dataset: babytrain, ami, chime5
+    - Trained models are left in, for example:
+    ```bash
+    exp/be/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2_babytrain
+    ```
+
 
  - run_041_eval_spkdet_be_wo_diar.sh
     - Evals speaker detection back-end for the three datasets without any speaker diarization
     - Two VADs: ground truth and energy VAD
     - Three back-end versions:
         - PLDA without domain adaptation
-	- PLDA with domain adaptatio
+	- PLDA with domain adaptation
 	- PLDA with domain adaptation + adaptive S-Norm
+    - Calibrates scores
+    - Score files and results (EER, DCF) are left in, for example:
+    ```bash
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_cal_v1
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_gtvad_cal_v1
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_cal_v1
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_gtvad_cal_v1
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_snorm_cal_v1
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_snorm_gtvad_cal_v1
+    ```
+    - Results files for different enroll and test durations are named as: 
+    ```bash
+    jsalt19_spkdet_ami_eval_enr30_results
+    jsalt19_spkdet_ami_eval_enr30_test15_results
+    jsalt19_spkdet_ami_eval_enr30_test30_results
+    jsalt19_spkdet_ami_eval_enr30_test5_results
+    ```
+    
 	
+ - run_042_eval_spkdet_be_with_gt_diar.sh
+    - Evals speaker detection back-end for the three datasets using the ground truth diarization
+    - Three back-end versions:
+        - PLDA without domain adaptation
+	- PLDA with domain adaptation
+	- PLDA with domain adaptation + adaptive S-Norm
+    - Calibrates scores
+    - Score files and results (EER, DCF) are left in, for example:
+    ```bash
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_gtdiar_cal_v1
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_snorm_gtdiar_cal_v1
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_gtdiar_cal_v1
+    ```
+
+ - run_043_eval_spkdet_be_with_auto_diar.sh
+    - Evals speaker detection back-end for the three datasets using automatic diarization
+    - Two diarization versions:
+          - Ground truth
+	  - Energy VAD
+    - Three back-end versions:
+        - PLDA without domain adaptation
+	- PLDA with domain adaptation
+	- PLDA with domain adaptation + adaptive S-Norm
+    - Calibrates scores
+        - Score files and results (EER, DCF) are left in, for example:
+    ```bash
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_spkdetdiar_nnet2a.1.voxceleb_div2_thrbest_cal_v1
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_spkdetdiar_nnet2a.1.voxceleb_div2_thrbest_gtvad_cal_v1
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_spkdetdiar_nnet2a.1.voxceleb_div2_thrbest_cal_v1
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_spkdetdiar_nnet2a.1.voxceleb_div2_thrbest_gtvad_cal_v1
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_snorm_spkdetdiar_nnet2a.1.voxceleb_div2_thrbest_cal_v1
+    exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_snorm_spkdetdiar_nnet2a.1.voxceleb_div2_thrbest_gtvad_cal_v1
+    ```
+
