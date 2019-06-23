@@ -9,13 +9,14 @@
 . ./cmd.sh
 . ./path.sh
 set -e
-vaddir_diar=./vad_${spkdet_diar_name}
+
 stage=1
 config_file=default_config.sh
 
 . parse_options.sh || exit 1;
 . $config_file
 
+vaddir_diar=./vad_${spkdet_diar_name}
 xvector_dir=exp/xvectors/$nnet_name
 
 # create automatic diarization datasets

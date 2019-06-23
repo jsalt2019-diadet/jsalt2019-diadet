@@ -9,14 +9,14 @@
 . ./cmd.sh
 . ./path.sh
 set -e
-vad_diar
-vaddir_diar=./vad_${track_diar_name}
+
 stage=1
 config_file=default_config.sh
 
 . parse_options.sh || exit 1;
 . $config_file
 
+vaddir_diar=./vad_${track_diar_name}
 xvector_dir=exp/xvectors/$nnet_name
 
 # create automatic diarization datasets
@@ -30,7 +30,7 @@ if [ $stage -le 1 ]; then
 	if [[ "$db" =~ .*_babytrain_.* ]];then
 	    rttm=$rttm_babytrain_dir/$name/plda_scores_t${diar_thr}/rttm
 	elif [[ "$db" =~ .*_ami_.* ]];then
-	    rttm=$rttm_babytrain_dir/$name/plda_scores_t${diar_thr}/rttm
+	    rttm=$rttm_ami_dir/$name/plda_scores_t${diar_thr}/rttm
 	else
 	    echo "rttm for $db not found"
 	    exit 1
@@ -51,7 +51,7 @@ if [ $stage -le 2 ]; then
 	if [[ "$db" =~ .*_babytrain_.* ]];then
 	    rttm=$rttm_babytrain_dir/$name_gt/plda_scores_t${diar_thr}/rttm
 	elif [[ "$db" =~ .*_ami_.* ]];then
-	    rttm=$rttm_babytrain_dir/$name_gt/plda_scores_t${diar_thr}/rttm
+	    rttm=$rttm_ami_dir/$name_gt/plda_scores_t${diar_thr}/rttm
 	else
 	    echo "rttm for $db not found"
 	    exit 1
@@ -62,11 +62,9 @@ if [ $stage -le 2 ]; then
 fi
 
 
-exit
-
 if [ $stage -le 3 ]; then
     # Extracts x-vectors for test with automatic diarization and energy VAD
-    for db in jsalt19_spkdet_babytrain_dev jsalt19_spkdet_babytrain_eval
+    for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
     do
 	name=${db}_test_${track_diar_name}
 	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \
@@ -78,7 +76,7 @@ fi
 
 if [ $stage -le 4 ]; then
     # Extracts x-vectors for test with automatic diarization and ground truth VAD
-    for db in jsalt19_spkdet_babytrain_dev jsalt19_spkdet_babytrain_eval
+    for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
     do
 	name=${db}_test_${track_diar_name}_gtvad
 	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \
@@ -86,3 +84,45 @@ if [ $stage -le 4 ]; then
 					     $xvector_dir/$name
     done
 fi
+
+
+
+if [ $stage -le 5 ]; then
+    # combine enroll and test xvectors for step 043
+    # with automatic diarization energy vad
+    for dset in jsalt19_spkdet_{babytrain,ami}
+    do
+	for part in dev eval
+	do
+	    db=${dset}_${part}
+	    for dur in 5 15 30
+	    do
+		echo "combining ${db}_enr${dur}_test"
+		mkdir -p $xvector_dir/${db}_enr${dur}_test_${track_diar_name}
+		cat $xvector_dir/${db}_{enr${dur},test_${track_diar_name}}/xvector.scp \
+		    > $xvector_dir/${db}_enr${dur}_test_${track_diar_name}/xvector.scp
+	    done
+	done
+    done
+fi
+
+
+if [ $stage -le 6 ]; then
+    # combine enroll and test xvectors for step 043
+    # with automatic diarization ground truth vad
+    for dset in jsalt19_spkdet_{babytrain,ami}
+    do
+	for part in dev eval
+	do
+	    db=${dset}_${part}
+	    for dur in 5 15 30
+	    do
+		echo "combining ${db}_enr${dur}_test"
+		mkdir -p $xvector_dir/${db}_enr${dur}_test_${track_diar_name}_gtvad
+		cat $xvector_dir/${db}_{enr${dur},test_${track_diar_name}_gtvad}/xvector.scp \
+		    > $xvector_dir/${db}_enr${dur}_test_${track_diar_name}_gtvad/xvector.scp
+	    done
+	done
+    done
+fi
+

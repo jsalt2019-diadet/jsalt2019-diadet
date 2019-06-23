@@ -27,11 +27,11 @@ if [ $stage -le 1 ]; then
     do
 	name=${db}_test
 	rttm=data/${name}/diarization.rttm
-	local/make_diar_data.sh --cmd "$train_cmd" --nj 5 --min_dur $min_dur_track_subsegs data/$name $rttm data/${name}_trackgtdiar $vad_gtdiar
+	local/make_diar_data.sh --cmd "$train_cmd" --nj 5 --min_dur $min_dur_track_subsegs data/$name $rttm data/${name}_trackgtdiar $vaddir_gtdiar
     done
 
 fi
-exit
+
 
 if [ $stage -le 2 ]; then
     # Extracts x-vectors for test with ground truth diarization
@@ -41,6 +41,26 @@ if [ $stage -le 2 ]; then
 	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \
 					     $nnet_dir data/$name \
 					     $xvector_dir/$name
+    done
+fi
+
+
+if [ $stage -le 3 ]; then
+    # combine enroll and test xvectors for step 042
+    # with ground truth diarization
+    for dset in jsalt19_spkdet_{babytrain,ami}
+    do
+	for part in dev eval
+	do
+	    db=${dset}_${part}
+	    for dur in 5 15 30
+	    do
+		echo "combining ${db}_enr${dur}_test_trackgtdiar"
+		mkdir -p $xvector_dir/${db}_enr${dur}_test_trackgtdiar
+		cat $xvector_dir/${db}_{enr${dur},test_trackgtdiar}/xvector.scp \
+		    > $xvector_dir/${db}_enr${dur}_test_trackgtdiar/xvector.scp
+	    done
+	done
     done
 fi
 
