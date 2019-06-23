@@ -18,8 +18,8 @@ xvector_dir=exp/xvectors_diar/$nnet_name
 dsets_adapt=(jsalt19_spkdiar_{babytrain,chime5,ami}_train_gtvad)
 dsets_spkdiar_test_evad=(jsalt19_spkdiar_babytrain_{dev,eval} jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06} jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01})
 dsets_spkdiar_test_gtvad=(jsalt19_spkdiar_babytrain_{dev,eval}_gtvad jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06}_gtvad jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_gtvad)
-dsets_spkdet_test_evad=(jsalt19_spkdet_babytrain_{dev,eval}_test jsalt19_spkdet_chime5_{dev,eval}_{U01,U06}_test jsalt19_spkdet_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_test)
-dsets_spkdet_test_gtvad=(jsalt19_spkdet_babytrain_{dev,eval}_test_gtvad jsalt19_spkdet_chime5_{dev,eval}_{U01,U06}_test_gtvad jsalt19_spkdet_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_test_gtvad)
+dsets_spkdet_test_evad=(jsalt19_spkdet_babytrain_{dev,eval}_test jsalt19_spkdet_ami_{dev,eval}_test)
+dsets_spkdet_test_gtvad=(jsalt19_spkdet_babytrain_{dev,eval}_test_gtvad jsalt19_spkdet_ami_{dev,eval}_test_gtvad)
 
 #datasets from array to string list
 dsets_adapt="${dsets_adapt[@]}"
@@ -64,7 +64,7 @@ if [ $stage -le 3 ]; then
     do
 	num_spk=$(wc -l data_diar/${name}_cmn_segmented/spk2utt | cut -d " " -f 1)
 	nj=$(($num_spk < 40 ? $num_spk:40))
-	steps_kaldi_diar/extract_xvectors.sh --cmd "$train_cmd --mem 5G" \
+	steps_kaldi_diar/extract_xvectors.sh --cmd "$train_cmd --mem 10G" \
 					     --nj $nj --window 1.5 --period 0.75 --apply-cmn false \
 					     --min-segment 0.5 $nnet_dir \
 					     data_diar/${name}_cmn_segmented $xvector_dir/$name

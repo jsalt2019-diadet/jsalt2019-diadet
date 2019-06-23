@@ -9,7 +9,7 @@ if [ $# -ne 3 ]; then
   exit 1;
 fi
 
-export PYANNOTE_DATABASE_CONFIG=/export/fs01/jsalt19/databases/database_all1.yml
+export PYANNOTE_DATABASE_CONFIG=/export/fs01/jsalt19/databases/database.yml
 
 dataset=$1
 dev_eval=$2

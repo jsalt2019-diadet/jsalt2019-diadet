@@ -59,7 +59,8 @@ if [ $stage -le 1 ];then
 					   $be_dir/plda.h5 \
 					   $score_plda_dir/${db}_enr${dur}_scores
 		    
-		    $scorer data/${db}_test $part $dur $score_plda_dir 
+		    $scorer --cmd "$train_cmd --mem 10G" \
+			    data/${db}_test $part $dur $score_plda_dir 
 		) &
 		
 		# ground truth VAD
@@ -72,7 +73,8 @@ if [ $stage -le 1 ];then
 					   $be_dir/plda.h5 \
 					   $score_plda_gtvad_dir/${db}_enr${dur}_scores
 		    
-		    $scorer data/${db}_test $part $dur $score_plda_gtvad_dir 
+		    $scorer --cmd "$train_cmd --mem 10G" \
+			    data/${db}_test $part $dur $score_plda_gtvad_dir 
 		) &
 		
 		
@@ -86,7 +88,8 @@ if [ $stage -le 1 ];then
 					   $be_dir/plda_adapt.h5 \
 					   $score_plda_adapt_dir/${db}_enr${dur}_scores
 		    
-		    $scorer data/${db}_test $part $dur $score_plda_adapt_dir 
+		    $scorer --cmd "$train_cmd --mem 10G" \
+			    data/${db}_test $part $dur $score_plda_adapt_dir 
 		) &
 		
 		# ground truth VAD + PLDA adapt
@@ -99,12 +102,13 @@ if [ $stage -le 1 ];then
 					   $be_dir/plda_adapt.h5 \
 					   $score_plda_adapt_gtvad_dir/${db}_enr${dur}_scores
 		    
-		    $scorer data/${db}_test $part $dur $score_plda_adapt_gtvad_dir 
+		    $scorer --cmd "$train_cmd --mem 10G" \
+			    data/${db}_test $part $dur $score_plda_adapt_gtvad_dir 
 		) &
 		
 		# energy VAD + PLDA adapt + AS-Norm
 		(
-		    steps_be/eval_be_snorm_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
+		    steps_be/eval_be_snorm_v1.sh --cmd "$train_cmd" --plda_type $plda_type --ncoh $ncoh \
 						 data/${db}_test/trials/trials_enr$dur \
 						 data/${db}_enr${dur}/utt2model \
 						 $xvector_dir/${db}_enr${dur}_test/xvector.scp \
@@ -114,12 +118,13 @@ if [ $stage -le 1 ];then
 						 $be_dir/plda_adapt.h5 \
 						 $score_plda_adapt_snorm_dir/${db}_enr${dur}_scores
 		    
-		    $scorer data/${db}_test $part $dur $score_plda_adapt_snorm_dir 
+		    $scorer --cmd "$train_cmd --mem 10G" \
+			    data/${db}_test $part $dur $score_plda_adapt_snorm_dir 
 		) &
 		
 		# ground truth VAD + PLDA adapt + AS-Norm
 		(
-		    steps_be/eval_be_snorm_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
+		    steps_be/eval_be_snorm_v1.sh --cmd "$train_cmd" --plda_type $plda_type --ncoh $ncoh \
 						 data/${db}_test/trials/trials_enr$dur \
 						 data/${db}_enr${dur}/utt2model \
 						 $xvector_dir/${db}_enr${dur}_test_gtvad/xvector.scp \
@@ -129,7 +134,8 @@ if [ $stage -le 1 ];then
 						 $be_dir/plda_adapt.h5 \
 						 $score_plda_adapt_snorm_gtvad_dir/${db}_enr${dur}_scores
 		    
-		    $scorer data/${db}_test $part $dur $score_plda_adapt_snorm_gtvad_dir 
+		    $scorer --cmd "$train_cmd --mem 10G" \
+			    data/${db}_test $part $dur $score_plda_adapt_snorm_gtvad_dir 
 		) &
 	    done
 	done
@@ -149,8 +155,10 @@ if [ $stage -le 2 ];then
 	    do
 		(
 		    local/calibrate_${name_vec[$i]}_spkdet_v1.sh --cmd "$train_cmd" $dur $score_dir/$plda
-		    $scorer data/${db}_test dev $dur $score_dir/${plda}_cal_v1
-		    $scorer data/${db}_test eval $dur $score_dir/${plda}_cal_v1
+		    $scorer --cmd "$train_cmd --mem 10G" \
+			    data/${db}_test dev $dur $score_dir/${plda}_cal_v1
+		    $scorer --cmd "$train_cmd --mem 10G" \
+			    data/${db}_test eval $dur $score_dir/${plda}_cal_v1
 		) &
 	    done
 	done

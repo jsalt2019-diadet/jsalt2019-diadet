@@ -91,4 +91,32 @@ if [ $stage -le 6 ]; then
 fi
 
 
+if [ $stage -le 7 ]; then
+    # combine enroll and test xvectors for step 041
+    # no diarization, energy and GT VAD
+    for dset in jsalt19_spkdet_{babytrain,ami}
+    do
+	for part in dev eval
+	do
+	    db=${dset}_${part}
+	    for dur in 5 15 30
+	    do
+		#for energy VAD
+		echo "combining ${db}_enr${dur}_test"
+		mkdir -p $xvector_dir/${db}_enr${dur}_test
+		cat $xvector_dir/${db}_{enr${dur},test}/xvector.scp \
+		    > $xvector_dir/${db}_enr${dur}_test/xvector.scp
+		
+		#for ground truth VAD
+		echo "combining ${db}_enr${dur}_test_gtvad"
+		mkdir -p $xvector_dir/${db}_enr${dur}_test_gtvad
+		cat $xvector_dir/${db}_{enr${dur},test_gtvad}/xvector.scp \
+		    > $xvector_dir/${db}_enr${dur}_test_gtvad/xvector.scp
+	    done
+	done
+    done
+   
+fi
+
+
 exit

@@ -26,6 +26,13 @@ python local/score_dcf.py --key-file $trials --score-file ${score_file_base}_sco
 echo "babytrain $dev_eval enr-$enr_dur subsampled"
 python local/score_dcf.py --key-file $trials_sub --score-file ${score_file_base}_scores --output-path ${score_file_base}_sub  &
 
+for test_dur in 5 15 30
+do
+    echo "babytrain $dev_eval enr-$enr_dur test-$test_dur"
+    python local/score_dcf.py --key-file ${trials}_test${test_dur} --score-file ${score_file_base}_scores --output-path ${score_file_base}_test${test_dur} &
+
+done
+
 wait
 
 

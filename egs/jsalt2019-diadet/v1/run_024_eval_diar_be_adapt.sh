@@ -19,10 +19,10 @@ be_babytrain_dir=exp/be_diar/$nnet_name/$be_diar_babytrain_name
 be_chime5_dir=exp/be_diar/$nnet_name/$be_diar_chime5_name
 be_ami_dir=exp/be_diar/$nnet_name/$be_diar_ami_name
 
-declare -A be_dirs
-be_dirs[babytrain]=$be_babytrain_dir
-be_dirs[chime5]=$be_chime5_dir
-be_dirs[ami]=$be_ami_dir
+# declare -A be_dirs
+# be_dirs[babytrain]=$be_babytrain_dir
+# be_dirs[chime5]=$be_chime5_dir
+# be_dirs[ami]=$be_ami_dir
 
 score_babytrain_dir=exp/diarization/$nnet_name/$be_diar_babytrain_name
 score_chime5_dir=exp/diarization/$nnet_name/$be_diar_chime5_name
@@ -41,10 +41,10 @@ dsets_spkdiar_eval_gtvad=($(echo ${dsets_spkdiar_dev_gtvad[@]} | sed 's@_dev@_ev
 dsets_spkdet_eval_evad=($(echo ${dsets_spkdet_dev_evad[@]} | sed 's@_dev@_eval@g'))
 dsets_spkdet_eval_gtvad=($(echo ${dsets_spkdet_dev_gtvad[@]} | sed 's@_dev@_eval@g'))
 
-#dsets_dev=(${dsets_spkdiar_dev_evad[@]} ${dsets_spkdiar_dev_gtvad[@]} ${dsets_spkdet_dev_evad[@]} ${dsets_spkdet_dev_gtvad[@]})
-#dsets_eval=(${dsets_spkdiar_eval_evad[@]} ${dsets_spkdiar_eval_gtvad[@]} ${dsets_spkdet_eval_evad[@]} ${dsets_spkdet_eval_gtvad[@]})
-dsets_dev=(${dsets_spkdiar_dev_evad[@]} ${dsets_spkdiar_dev_gtvad[@]})
-dsets_eval=(${dsets_spkdiar_eval_evad[@]} ${dsets_spkdiar_eval_gtvad[@]})
+dsets_dev=(${dsets_spkdiar_dev_evad[@]} ${dsets_spkdiar_dev_gtvad[@]} ${dsets_spkdet_dev_evad[@]} ${dsets_spkdet_dev_gtvad[@]})
+dsets_eval=(${dsets_spkdiar_eval_evad[@]} ${dsets_spkdiar_eval_gtvad[@]} ${dsets_spkdet_eval_evad[@]} ${dsets_spkdet_eval_gtvad[@]})
+#dsets_dev=(${dsets_spkdiar_dev_evad[@]} ${dsets_spkdiar_dev_gtvad[@]})
+#dsets_eval=(${dsets_spkdiar_eval_evad[@]} ${dsets_spkdiar_eval_gtvad[@]})
 
 dsets_test="${dsets_dev[@]} ${dsets_eval[@]}"
 
@@ -149,8 +149,11 @@ if [ $stage -le 2 ]; then
 	    ln -s plda_scores_t${best_threshold} $score_dir_i/$eval_dataset_i/plda_scores_tbest
 
 	    # eval best with pyannote
-	    local/pyannote_score_diar.sh $dev_dataset_i dev $score_dir/$dev_dataset_i/plda_scores_tbest
-	    local/pyannote_score_diar.sh $eval_dataset_i eval $score_dir/$eval_dataset_i/plda_scores_tbest
+	    $train_cmd $score_dir_i/$dev_dataset_i/pyannote.log \
+		       local/pyannote_score_diar.sh $dev_dataset_i dev $score_dir_i/$dev_dataset_i/plda_scores_tbest &
+	    $train_cmd $score_dir_i/$eval_dataset_i/pyannote.log \
+		       local/pyannote_score_diar.sh $eval_dataset_i eval $score_dir_i/$eval_dataset_i/plda_scores_tbest
+	    wait
 	    
 	) &
     done

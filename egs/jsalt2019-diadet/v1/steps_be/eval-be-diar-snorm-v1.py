@@ -22,7 +22,7 @@ from hyperion.hyp_defs import float_cpu, config_logger
 from hyperion.utils.scp_list import SCPList
 from hyperion.utils.trial_ndx import TrialNdx
 from hyperion.utils.trial_scores import TrialScores
-from hyperion.helpers import TrialDataReader as TDR
+from hyperion.helpers.multi_test_trial_data_reader import MultiTestTrialDataReader as TDR
 from hyperion.helpers import PLDAFactory as F
 from hyperion.transforms import TransformList
 from hyperion.score_norm import AdaptSNorm as SNorm
@@ -126,7 +126,7 @@ def eval_plda(iv_file, ndx_file, enroll_file, test_subseg2orig_file,
     else:
         preproc = None
 
-    tdr = TDR(iv_file, diar_ndx_file, enroll_file, None, test_subseg2orig_file, preproc)
+    tdr = TDR(iv_file, ndx_file, enroll_file, None, test_subseg2orig_file, preproc)
     x_e, x_t, enroll, ndx, orig_seg = tdr.read()
 
     logging.info('loading plda model: %s' % (model_file))

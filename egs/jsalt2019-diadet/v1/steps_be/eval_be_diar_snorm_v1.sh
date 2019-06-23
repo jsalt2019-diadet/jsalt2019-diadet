@@ -13,7 +13,7 @@ if [ -f path.sh ]; then . ./path.sh; fi
 
 set -e
 
-if [ $# -ne 10 ]; then
+if [ $# -ne 9 ]; then
   echo "Usage: $0 <ndx> <enroll-file>  <diar-segments-to-orig-utt> <vector-file> <cohort-list> <cohort-vector-file> <preproc-file> <plda-file> <output-scores>"
   exit 1;
 fi

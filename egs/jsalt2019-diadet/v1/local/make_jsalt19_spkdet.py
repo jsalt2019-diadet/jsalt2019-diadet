@@ -320,11 +320,17 @@ def make_test_rttm_diar(rttm, segm):
         # change filename by segment_id
         rttm_i['file_id'] = row.segment_id
         #fix rttm lines that are not completely in the segment
-        if rttm_i.iloc[0, index_tbeg].item() < tbeg_i:
-            rttm_i.iloc[0, index_tbeg] = tbeg_i
-            
-        if rttm_i.iloc[-1, index_tbeg].item() + rttm_i.iloc[-1, index_tdur].item() > tend_i:
-            rttm_i.iloc[-1, index_tdur] = tend_i - rttm_i.iloc[-1, index_tbeg].item()
+        mask = (rttm_i['tbeg'] < tbeg_i)
+        rttm_i.loc[mask, 'tdur'] = rttm_i.loc[mask].tbeg + rttm_i.loc[mask].tdur - tbeg_i
+        rttm_i.loc[mask, 'tbeg'] = tbeg_i
+
+        #if rttm_i.iloc[0, index_tbeg].item() < tbeg_i:
+        #    rttm_i.iloc[0, index_tbeg] = tbeg_i
+
+        mask = (rttm_i['tbeg'] + rttm_i['tdur'] > tend_i)
+        rttm_i.loc[mask,'tdur'] = tend_i - rttm_i.loc[mask].tbeg
+        #if rttm_i.iloc[-1, index_tbeg].item() + rttm_i.iloc[-1, index_tdur].item() > tend_i:
+        #    rttm_i.iloc[-1, index_tdur] = tend_i - rttm_i.iloc[-1, index_tbeg].item()
 
         #align tbeg with the beginning of the segment
         rttm_i['tbeg'] -= tbeg_i
@@ -426,14 +432,16 @@ def write_rttm_spk(df_vad, output_path):
                 index=False, header=False)
 
 
-def write_key(trials, file_path):
+def write_key(trials, file_path, min_test_dur=0):
 
     with open(file_path, 'w') as f:
         for row in trials.itertuples():
             model = '%s-%d' % (row.target_speaker, row.enrollment_number)
             segm = '%s-%07d-%07d' % (row.filename, int(row.beginning_time*100), int(row.end_time*100))
-            t = 'target' if row.duration_total_speech>0 else 'nontarget'
-            f.write('%s %s %s\n' % (model, segm, t))
+            if row.duration_total_speech > min_test_dur:
+                f.write('%s %s target\n' % (model, segm))
+            elif row.duration_total_speech <= 0:
+                f.write('%s %s nontarget\n' % (model, segm))
     
 
 def make_train(df_wav, df_rttm, output_path, data_name, min_dur, max_dur, mic, bin_wav):
@@ -538,9 +546,10 @@ def make_deveval(df_wav, df_enr, df_trials, df_trials_sub, rttm, output_path, da
         os.makedirs(trial_path)
 
     for d in [5, 15, 30]:
-        write_key(df_trials[d], '%s/trials_enr%d' % (trial_path, d))
+        write_key(df_trials[d], '%s/trials_enr%d' % (trial_path, d), 0)
         write_key(df_trials_sub[d], '%s/trials_sub_enr%d' % (trial_path, d))
-
+        for min_d in [5, 15, 30]:
+            write_key(df_trials[d], '%s/trials_enr%d_test%d' % (trial_path, d, min_d), min_d)
 
     
 

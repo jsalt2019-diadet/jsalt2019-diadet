@@ -19,8 +19,8 @@ config_file=default_config.sh
 dsets_adapt=(jsalt19_spkdiar_{babytrain,chime5,ami}_train_gtvad)
 dsets_spkdiar_test_evad=(jsalt19_spkdiar_babytrain_{dev,eval} jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06} jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01})
 dsets_spkdiar_test_gtvad=(jsalt19_spkdiar_babytrain_{dev,eval}_gtvad jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06}_gtvad jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_gtvad)
-dsets_spkdet_test_evad=(jsalt19_spkdet_babytrain_{dev,eval}_test jsalt19_spkdet_chime5_{dev,eval}_{U01,U06}_test jsalt19_spkdet_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_test)
-dsets_spkdet_test_gtvad=(jsalt19_spkdet_babytrain_{dev,eval}_test_gtvad jsalt19_spkdet_chime5_{dev,eval}_{U01,U06}_test_gtvad jsalt19_spkdet_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_test_gtvad)
+dsets_spkdet_test_evad=(jsalt19_spkdet_babytrain_{dev,eval}_test jsalt19_spkdet_ami_{dev,eval}_test)
+dsets_spkdet_test_gtvad=(jsalt19_spkdet_babytrain_{dev,eval}_test_gtvad jsalt19_spkdet_ami_{dev,eval}_test_gtvad)
 
 #datasets from array to string list"
 dsets_adapt="${dsets_adapt[@]}"
@@ -39,9 +39,10 @@ if [ $stage -le 1 ];then
     	steps_kaldi_diar/prepare_feats.sh --nj $nj --cmd "$train_cmd" --storage_name $storage_name \
     					  data/$name data_diar/${name}_cmn $feats_diar/${name}_cmn
     	cp data/$name/vad.scp data_diar/${name}_cmn/
-    	# if [ -f data/$name/segments ]; then
-    	#     cp data/$name/segments data_diar/${name}_cmn/
-    	# fi
+    	if [ -f data/$name/segments ]; then
+	    #we need a segments file to aboid fail in fix_data_dir
+    	    cp data/$name/segments data_diar/${name}_cmn/
+    	fi
     	utils/fix_data_dir.sh data_diar/${name}_cmn
     done
 fi
