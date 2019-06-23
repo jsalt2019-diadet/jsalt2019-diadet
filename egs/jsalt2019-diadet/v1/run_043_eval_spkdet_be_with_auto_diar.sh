@@ -152,21 +152,27 @@ if [ $stage -le 1 ];then
     wait
 
 fi
-exit
+
 if [ $stage -le 2 ];then
 
     for((i=0;i<$num_dbs;i++))
     do
 	db=jsalt19_spkdet_${name_vec[$i]}
-
-        for plda in plda_${spkdet_diar_name} plda_adapt_${spkdet_diar_name} plda_adapt_snorm_${spkdet_diar_name}
+	scorer=local/score_${name_vec[$i]}_spkdet.sh
+        for plda in plda_${spkdet_diar_name}{,_gtvad} plda_adapt_${spkdet_diar_name}{,_gtvad} \
+			 plda_adapt_snorm_${spkdet_diar_name}{,_gtvad} 
 	do
 	    for dur in 5 15 30
 	    do
 		(
-		    local/calibrate_${name_vec[$i]}_spkdet_v1.sh --cmd "$train_cmd" $dur $score_dir/$plda
-		    $scorer data/${db}_test/trials dev $dur $score_dir/${plda}_cal_v1
-		    $scorer data/${db}_test/trials eval $dur $score_dir/${plda}_cal_v1
+		    local/calibrate_jsalt19_spkdet_v1.sh --cmd "$train_cmd" \
+							 $db $dur $score_dir/$plda
+
+		    $scorer --cmd "$train_cmd --mem 10G" \
+			    data/${db}_dev_test dev $dur $score_dir/${plda}_cal_v1
+		    $scorer --cmd "$train_cmd --mem 10G" \
+			    data/${db}_eval_test eval $dur $score_dir/${plda}_cal_v1
+
 		) &
 	    done
 	done

@@ -24,10 +24,10 @@ dsets_spkdet_test_gtvad=(jsalt19_spkdet_babytrain_{dev,eval}_test_gtvad jsalt19_
 
 #datasets from array to string list"
 dsets_adapt="${dsets_adapt[@]}"
-#dsets_test_evad="${dsets_spkdiar_test_evad[@]} ${dsets_spkdet_test_evad[@]}"
-#dsets_test_gtvad="${dsets_spkdiar_test_gtvad[@]} ${dsets_spkdet_test_gtvad[@]}"
-dsets_test_evad="${dsets_spkdiar_test_evad[@]}"
-dsets_test_gtvad="${dsets_spkdiar_test_gtvad[@]}"
+dsets_test_evad="${dsets_spkdiar_test_evad[@]} ${dsets_spkdet_test_evad[@]}"
+dsets_test_gtvad="${dsets_spkdiar_test_gtvad[@]} ${dsets_spkdet_test_gtvad[@]}"
+#dsets_test_evad="${dsets_spkdiar_test_evad[@]}"
+#dsets_test_gtvad="${dsets_spkdiar_test_gtvad[@]}"
 
 
 if [ $stage -le 1 ];then
