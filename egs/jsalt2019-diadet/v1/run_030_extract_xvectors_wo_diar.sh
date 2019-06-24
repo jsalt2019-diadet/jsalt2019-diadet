@@ -40,7 +40,7 @@ fi
 
 if [ $stage -le 3 ]; then
     # Extracts x-vectors for adaptation data
-    for name in jsalt19_spkdet_{chime5,ami}_train #jsalt19_spkdet_{babytrain,chime5,ami}_train
+    for name in jsalt19_spkdet_{babytrain,chime5,ami}_train
     do
 	num_spk=$(wc -l data/${name}/spk2utt | cut -d " " -f 1)
 	nj=$(($num_spk < 40 ? $num_spk:40))
@@ -53,8 +53,7 @@ fi
 
 if [ $stage -le 4 ]; then
     # Extracts x-vectors for enrollment
-    #for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
-    for db in jsalt19_spkdet_ami_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
     do
 	for d in 5 15 30
 	do

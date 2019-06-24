@@ -29,6 +29,7 @@ name_vec=(babytrain ami)
 be_vec=($be_babytrain_dir $be_ami_dir)
 coh_vec=(jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train)
 num_dbs=${#name_vec[@]}
+mem_scorer_vec=(30G 10G)
 
 #train_cmd=run.pl
 
@@ -36,13 +37,14 @@ if [ $stage -le 1 ];then
 
     for((i=0;i<$num_dbs;i++))
     do
-	echo "Eval ${name_vec[$i]} wo diarization"
+	echo "Eval ${name_vec[$i]} with ground truth diarization"
 	for part in dev eval
 	do
 	    db=jsalt19_spkdet_${name_vec[$i]}_${part}
 	    coh_data=${coh_vec[$i]}
 	    be_dir=${be_vec[$i]}
 	    scorer=local/score_${name_vec[$i]}_spkdet.sh
+	    mem_scorer=${mem_scorer_vec[$i]}
 
 	    for dur in 5 15 30
 	    do
@@ -57,7 +59,7 @@ if [ $stage -le 1 ];then
 					   $be_dir/plda.h5 \
 					   $score_plda_dir/${db}_enr${dur}_scores
 		    
-		    $scorer --cmd "$train_cmd --mem 10G" \
+		    $scorer --cmd "$train_cmd --mem $mem_scorer" \
 			    data/${db}_test $part $dur $score_plda_dir 
 		) &
 
@@ -72,7 +74,7 @@ if [ $stage -le 1 ];then
 					   $be_dir/lda_lnorm_adapt.h5 \
 					   $be_dir/plda_adapt.h5 \
 					   $score_plda_adapt_dir/${db}_enr${dur}_scores
-		    $scorer --cmd "$train_cmd --mem 10G" \
+		    $scorer --cmd "$train_cmd --mem $mem_scorer" \
 			    data/${db}_test $part $dur $score_plda_adapt_dir 
 		) &
 
@@ -88,9 +90,9 @@ if [ $stage -le 1 ];then
 						 $be_dir/lda_lnorm_adapt.h5 \
 						 $be_dir/plda_adapt.h5 \
 						 $score_plda_adapt_snorm_dir/${db}_enr${dur}_scores
-		   $scorer --cmd "$train_cmd --mem 10G" \
+		   $scorer --cmd "$train_cmd --mem $mem_scorer" \
 		    data/${db}_test $part $dur $score_plda_adapt_snorm_dir 
-		) #&
+		) &
 
 	    done
 	done
@@ -103,6 +105,7 @@ if [ $stage -le 2 ];then
 
     for((i=0;i<$num_dbs;i++))
     do
+	echo "Calibrate scores of ${name_vec[$i]} with ground truth diarization"
 	db=jsalt19_spkdet_${name_vec[$i]}
 	scorer=local/score_${name_vec[$i]}_spkdet.sh
         for plda in plda_gtdiar plda_adapt_gtdiar plda_adapt_snorm_gtdiar
@@ -113,9 +116,9 @@ if [ $stage -le 2 ];then
 		    local/calibrate_jsalt19_spkdet_v1.sh --cmd "$train_cmd" \
 							 $db $dur $score_dir/$plda
 
-		    $scorer --cmd "$train_cmd --mem 10G" \
+		    $scorer --cmd "$train_cmd --mem $mem_scorer" \
 			    data/${db}_dev_test dev $dur $score_dir/${plda}_cal_v1
-		    $scorer --cmd "$train_cmd --mem 10G" \
+		    $scorer --cmd "$train_cmd --mem $mem_scorer" \
 			    data/${db}_eval_test eval $dur $score_dir/${plda}_cal_v1
 
 		) &

@@ -50,7 +50,7 @@ The recipe contains the following directories:
 
 ## Resources
 
-   There are precomputed networks, features, etc in this path of the CLSE grid
+   There are precomputed networks, features, etc in this path of the CLSP grid
    ```bash
    /export/fs01/jsalt19/resources
    ```
@@ -64,6 +64,12 @@ The recipe contains the following directories:
    ```bash
    /export/fs01/jsalt19/resources/embeddings_nnets/kaldi_xvec/mfcc40/xvector_nnet_2a.1.voxceleb_combined
    ```
+
+   This are the data directory and MFCC40 precomputed features for the baseline
+   ```bash
+   /export/fs01/jsalt19/resources/feats/jsalt19-diadet/baseline_mfcc40/data
+   ```
+   You can copy this data directory to your egs/jsalt2019-diadet/v1 and skip steps 001 to 004 
 
 ## Auxiliary scripts
 
