@@ -24,13 +24,15 @@ if [ $stage -le 1 ]; then
 
     # prepared datasets with subsegments based on automatic diarization with energy VAD
     # each subsegment is defined by a binary vad
-    for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami,sri}_{dev,eval}
     do
 	name=${db}_test
 	if [[ "$db" =~ .*_babytrain_.* ]];then
 	    rttm=$rttm_babytrain_dir/$name/plda_scores_t${diar_thr}/rttm
 	elif [[ "$db" =~ .*_ami_.* ]];then
 	    rttm=$rttm_ami_dir/$name/plda_scores_t${diar_thr}/rttm
+	elif [[ "$db" =~ .*_sri_.* ]];then
+	    rttm=$rttm_sri_dir/$name/plda_scores_t${diar_thr}/rttm
 	else
 	    echo "rttm for $db not found"
 	    exit 1
@@ -43,7 +45,7 @@ if [ $stage -le 2 ]; then
 
     # prepared datasets with subsegments based on automatic diarization with ground truth VAD
     # each subsegment is defined by a binary vad
-    for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami,sri}_{dev,eval}
     do
 	name=${db}_test
 	name_gt=${db}_test_gtvad
@@ -51,6 +53,8 @@ if [ $stage -le 2 ]; then
 	    rttm=$rttm_babytrain_dir/$name_gt/plda_scores_t${diar_thr}/rttm
 	elif [[ "$db" =~ .*_ami_.* ]];then
 	    rttm=$rttm_ami_dir/$name_gt/plda_scores_t${diar_thr}/rttm
+	elif [[ "$db" =~ .*_sri_.* ]];then
+	    rttm=$rttm_sri_dir/$name_gt/plda_scores_t${diar_thr}/rttm
 	else
 	    echo "rttm for $db not found"
 	    exit 1
@@ -61,10 +65,9 @@ if [ $stage -le 2 ]; then
 fi
 
 
-
 if [ $stage -le 3 ]; then
     # Extracts x-vectors for test with automatic diarization and energy VAD
-    for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami,sri}_{dev,eval}
     do
 	name=${db}_test_${spkdet_diar_name}
 	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \
@@ -76,7 +79,7 @@ fi
 
 if [ $stage -le 4 ]; then
     # Extracts x-vectors for test with automatic diarization and ground truth VAD
-    for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami,sri}_{dev,eval}
     do
 	name=${db}_test_${spkdet_diar_name}_gtvad
 	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \
@@ -89,13 +92,16 @@ fi
 if [ $stage -le 5 ]; then
     # combine enroll and test xvectors for step 043
     # with automatic diarization energy vad
-    for dset in jsalt19_spkdet_{babytrain,ami}
+    for dset in jsalt19_spkdet_{babytrain,ami,sri}
     do
 	for part in dev eval
 	do
 	    db=${dset}_${part}
 	    for dur in 5 15 30
 	    do
+		if [ ! -d data/${db}_enr${dur} ];then
+		    continue
+		fi
 		echo "combining ${db}_enr${dur}_test_${spkdet_diar_name}"
 		mkdir -p $xvector_dir/${db}_enr${dur}_test_${spkdet_diar_name}
 		cat $xvector_dir/${db}_{enr${dur},test_${spkdet_diar_name}}/xvector.scp \
@@ -109,13 +115,16 @@ fi
 if [ $stage -le 6 ]; then
     # combine enroll and test xvectors for step 043
     # with automatic diarization ground truth vad
-    for dset in jsalt19_spkdet_{babytrain,ami}
+    for dset in jsalt19_spkdet_{babytrain,ami,sri}
     do
 	for part in dev eval
 	do
 	    db=${dset}_${part}
 	    for dur in 5 15 30
 	    do
+		if [ ! -d data/${db}_enr${dur} ];then
+		    continue
+		fi
 		echo "combining ${db}_enr${dur}_test_${spkdet_diar_name}_gtvad"
 		mkdir -p $xvector_dir/${db}_enr${dur}_test_${spkdet_diar_name}_gtvad
 		cat $xvector_dir/${db}_{enr${dur},test_${spkdet_diar_name}_gtvad}/xvector.scp \

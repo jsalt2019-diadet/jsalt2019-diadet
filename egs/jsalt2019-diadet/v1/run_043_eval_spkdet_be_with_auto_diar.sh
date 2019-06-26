@@ -19,6 +19,7 @@ xvector_dir=exp/xvectors/$nnet_name
 be_babytrain_dir=exp/be/$nnet_name/$be_babytrain_name
 be_chime5_dir=exp/be/$nnet_name/$be_chime5_name
 be_ami_dir=exp/be/$nnet_name/$be_ami_name
+be_sri_dir=$be_chime5_dir
 
 score_dir=exp/scores/$nnet_name/${be_name}
 score_plda_dir=$score_dir/plda_${spkdet_diar_name}
@@ -28,11 +29,11 @@ score_plda_gtvad_dir=$score_dir/plda_${spkdet_diar_name}_gtvad
 score_plda_adapt_gtvad_dir=$score_dir/plda_adapt_${spkdet_diar_name}_gtvad
 score_plda_adapt_snorm_gtvad_dir=$score_dir/plda_adapt_snorm_${spkdet_diar_name}_gtvad
 
-name_vec=(babytrain ami)
-be_vec=($be_babytrain_dir $be_ami_dir)
-coh_vec=(jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train)
+name_vec=(babytrain ami sri)
+be_vec=($be_babytrain_dir $be_ami_dir $be_sri_dir)
+coh_vec=(jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train jsalt19_spkdet_sri_train)
 num_dbs=${#name_vec[@]}
-mem_scorer_vec=(30G 10G)
+mem_scorer_vec=(30G 10G 10G)
 
 
 if [ $stage -le 1 ];then
@@ -50,6 +51,10 @@ if [ $stage -le 1 ];then
 
 	    for dur in 5 15 30
 	    do
+		if [ ! -d data/${db}_enr${dur} ];then
+		    continue
+		fi
+		
 		# auto diar + energy VAD
 		(
 		    steps_be/eval_be_diar_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
@@ -166,6 +171,10 @@ if [ $stage -le 2 ];then
 	do
 	    for dur in 5 15 30
 	    do
+		if [ ! -d data/${db}_dev_enr${dur} ];then
+		    continue
+		fi
+
 		(
 		    local/calibrate_jsalt19_spkdet_v1.sh --cmd "$train_cmd" \
 							 $db $dur $score_dir/$plda

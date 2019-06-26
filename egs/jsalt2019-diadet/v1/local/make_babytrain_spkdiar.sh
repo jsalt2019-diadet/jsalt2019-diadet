@@ -29,7 +29,7 @@ python local/make_jsalt19_spkdiar.py \
        --rttm-suffix _train \
        --partition train
 
-cp $list_path/train/all.uem $output_path/${data_name}_train/diarization.uem
+cp $list_path/train/all_train.uem $output_path/${data_name}_train/diarization.uem
 
 #make spk2utt so kaldi don't complain
 utils/utt2spk_to_spk2utt.pl $output_path/${data_name}_train/utt2spk \
@@ -47,7 +47,7 @@ python local/make_jsalt19_spkdiar.py \
        --rttm-suffix _dev \
        --partition dev
 
-cp $list_path/train/all.uem $output_path/${data_name}_dev/diarization.uem
+cp $list_path/dev/all_dev.uem $output_path/${data_name}_dev/diarization.uem
 
 #make spk2utt so kaldi don't complain
 utils/utt2spk_to_spk2utt.pl $output_path/${data_name}_dev/utt2spk \
@@ -66,7 +66,7 @@ python local/make_jsalt19_spkdiar.py \
        --rttm-suffix _test \
        --partition eval
 
-cp $list_path/eval/all.uem $output_path/${data_name}_eval/diarization.uem
+cp $list_path/eval/all_test.uem $output_path/${data_name}_eval/diarization.uem
 #make spk2utt so kaldi don't complain
 utils/utt2spk_to_spk2utt.pl $output_path/${data_name}_eval/utt2spk \
 			    > $output_path/${data_name}_eval/spk2utt

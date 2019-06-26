@@ -32,11 +32,11 @@ $cmd $log_file_base.log \
      --score-file ${score_file_base}_scores \
      --output-path ${score_file_base} &
 
-echo "babytrain $dev_eval enr-$enr_dur subsampled"
-$cmd ${log_file_base}_sub.log \
-     python local/score_dcf.py --key-file $trials_sub \
-     --score-file ${score_file_base}_scores \
-     --output-path ${score_file_base}_sub  &
+# echo "babytrain $dev_eval enr-$enr_dur subsampled"
+# $cmd ${log_file_base}_sub.log \
+#      python local/score_dcf.py --key-file $trials_sub \
+#      --score-file ${score_file_base}_scores \
+#      --output-path ${score_file_base}_sub  &
 
 for test_dur in 5 15 30
 do

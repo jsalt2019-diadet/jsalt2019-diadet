@@ -47,11 +47,12 @@ if [ $stage -le 4 ];then
     local/make_ami_spkdet.sh $ami_root $ami_list_dir ./data
     local/make_ami_spkdiar.sh $ami_root $ami_list_dir ./data
 fi
-exit
+
 if [ $stage -le 5 ];then
     # Prepare SRI
     local/make_sri_spkdet.sh $sri_root $sri_list_dir ./data
     local/make_sri_spkdiar.sh $sri_root $sri_list_dir ./data
 fi
+
 
 

@@ -17,6 +17,7 @@ import time
 import logging
 
 import numpy as np
+import pandas as pd
 
 from hyperion.hyp_defs import float_cpu, config_logger
 from hyperion.utils import SCPList, TrialNdx, TrialScores, ExtSegmentList, RTTM
@@ -25,15 +26,43 @@ from hyperion.helpers import PLDAFactory as F
 from hyperion.transforms import TransformList
 
 
-def classify_segments(ndx_seg, scores):
+def flatten_segment_scores(ndx_seg, scores):
 
     scores = scores.align_with_ndx(ndx_seg)
-    scores.scores[ndx_seg.trial_mask==False] = - np.inf
-    pred_model_idx = np.argmax(scores.scores, axis=0)
-    pred_scores = scores.scores[(pred_model_idx, np.arange(scores.num_tests))]
-    pred_model = scores.model_set[pred_model_idx]
+    idx=(ndx_seg.trial_mask.T == True).nonzero()
+    new_segment_ids = []
+    segment_ids = []
+    model_ids = []
+    flat_scores = np.zeros((len(idx[0]),), dtype=float)
+    k = 0
+    for item in zip(idx[0], idx[1]):
+        model_ids.append(ndx_seg.model_set[item[1]])
+        segment_ids.append(ndx_seg.seg_set[item[0]])
+        new_segment_ids.append('%s-%08d' % (ndx_seg.seg_set[item[0]],k))
+        flat_scores[k] = scores.scores[item[1], item[0]]
+        k +=1
 
-    return ndx_seg.seg_set, pred_model, pred_scores
+    new_segment_ids = np.array(new_segment_ids)
+    segment_ids = np.array(segment_ids)
+    model_ids = np.array(model_ids)
+
+    return new_segment_ids, segment_ids, model_ids, flat_scores
+
+
+def prepare_output_ext_segments(ext_segments_in, new_ext_segment_ids, ext_segment_ids, model_ids, scores):
+
+    df_map = pd.DataFrame({'new_ext_segment_id': new_ext_segment_ids, 'ext_segment_id': ext_segment_ids})
+    new_segments = pd.merge(ext_segments_in.segments, df_map)
+    new_segments.drop(columns=['ext_segment_id'], inplace=True)
+    new_segments.rename(index=str, columns={'new_ext_segment_id': 'ext_segment_id'}, inplace=True)
+    new_segments.sort_values(by=['file_id','tbeg'], inplace=True)
+    ext_segments = ExtSegmentList(new_segments)
+    ext_segments.assign_names(new_ext_segment_ids, model_ids, scores)
+    print(model_ids)
+    print(ext_segments.segments)
+    print(ext_segments.ext_segments)
+    return ext_segments
+
 
 
 
@@ -65,11 +94,11 @@ def tracking_plda(iv_file, ndx_file, enroll_file, segments_file,
           % (dt, dt/num_trials*1000))
 
     scores = TrialScores(enroll, ndx_seg.seg_set, scores)
-    ext_segment_ids, pred_model, pred_scores = classify_segments(ndx_seg, scores)
-    ext_segments.assign_names(ext_segment_ids, pred_model, pred_scores)
-    print(pred_model)
-    print(ext_segments.ext_segments)
-    rttm = RTTM.create_spkdiar_from_ext_segments(ext_segments)
+    new_ext_segment_ids, ext_segment_ids, model_ids, scores = flatten_segment_scores(ndx_seg, scores)
+    new_ext_segments = prepare_output_ext_segments(
+        ext_segments, new_ext_segment_ids, ext_segment_ids, model_ids, scores)
+    new_ext_segments.save(rttm_file + '_es')
+    rttm = RTTM.create_spkdiar_from_ext_segments(new_ext_segments)
     rttm.save(rttm_file)
 
     

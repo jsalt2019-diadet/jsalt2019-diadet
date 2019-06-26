@@ -25,6 +25,7 @@ min_dur_track_subsegs=0.25 # minimum duration for the diarization clusters used 
 rttm_babytrain_dir=./exp/diarization/$nnet_name/$be_diar_babytrain_name
 rttm_chime5_dir=./exp/diarization/$nnet_name/$be_diar_chime5_name
 rttm_ami_dir=./exp/diarization/$nnet_name/$be_diar_ami_name
+rttm_sri_dir=$rttm_chime5_dir
 spkdet_diar_name=spkdetdiar_nnet${nnet_name}_thr${diar_thr}
 track_diar_name=trackdiar_nnet${nnet_name}_thr${diar_thr}
 
@@ -44,8 +45,8 @@ be_chime5_name=${be_name}_chime5
 be_ami_name=${be_name}_ami
 
 #adaptation weights for plda between-class and within-class covs
-w_B_babytrain=0.1
-w_W_babytrain=0.25
+w_B_babytrain=0
+w_W_babytrain=0
 w_B_chime5=0.1
 w_W_chime5=0.25
 w_B_ami=0.1

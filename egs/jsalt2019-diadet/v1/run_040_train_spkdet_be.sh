@@ -51,6 +51,22 @@ if [ $stage -le 2 ]; then
 
 fi
 
+if [ $stage -le 3 ]; then
+
+    echo "Training back-end for sri/chime"
+    steps_be/train_be_v1.sh --cmd "$train_cmd" \
+    				--lda_dim $lda_dim \
+    				--plda_type $plda_type \
+    				--y_dim $plda_y_dim --z_dim $plda_z_dim \
+    				--w_B $w_B_ami --w_W $w_W_ami \
+    				$xvector_dir/${plda_data}_15s/xvector.scp \
+    				data/${plda_data}_15s \
+    				$xvector_dir/jsalt19_spkdet_chime5_train/xvector.scp \
+    				data/jsalt19_spkdet_chime5_train $be_chime5_dir &
+
+fi
+
+
 wait
 
 

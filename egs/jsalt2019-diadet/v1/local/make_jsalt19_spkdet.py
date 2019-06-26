@@ -35,6 +35,8 @@ def read_enroll_lists(list_path, partition):
     df_enr = {}
     for dur in [5, 15, 30]:
         list_file = '%s_%d.txt' % (list_file_bn, dur)
+        if not os.path.isfile(list_file):
+            continue
         df_enr[dur] = pd.read_csv(list_file, sep='\t')
 
     return df_enr
@@ -60,6 +62,8 @@ def read_trials(list_path, partition, test_length):
     df_trials_sub = {}
     for dur in [5, 15, 30]:
         trial_file = '%s_unsampled_enr_%d_test_%d.txt' % (prefix, dur, test_length)
+        if not os.path.isfile(trial_file):
+            continue
         df_trials[dur] = pd.read_csv(trial_file, sep='\t')
 
         trial_file = '%s_natural_enr_%d_test_%d_N_1000.txt' % (prefix, dur, test_length)
@@ -260,9 +264,10 @@ def segm_vad_to_rttm_vad(segments):
 def trials_to_segm(df_trials):
 
     #merge all segments
-    #segm_merged = pd.DataFrame()
     segm_merged = []
     for d in [5, 15, 30]:
+        if not (d in df_trials):
+            continue
         segm_d = df_trials[d][['filename','beginning_time','end_time']].drop_duplicates()
         #segm_merged = pd.concat([segm_merged, segm_d], ignore_index=True)
         segm_merged.append(segm_d)
@@ -477,6 +482,8 @@ def make_deveval(df_wav, df_enr, df_trials, df_trials_sub, rttm, output_path, da
 
     # enroll
     for dur in [5, 15, 30]:
+        if not (dur in df_enr):
+            continue
         print('make enrollment dir for duration=%d' % (dur))
         # create directories
         enr_path = '%s/%s_%s_enr%d' % (output_path, data_name, partition, dur)
@@ -546,6 +553,8 @@ def make_deveval(df_wav, df_enr, df_trials, df_trials_sub, rttm, output_path, da
         os.makedirs(trial_path)
 
     for d in [5, 15, 30]:
+        if not (d in df_trials):
+            continue
         write_key(df_trials[d], '%s/trials_enr%d' % (trial_path, d), 0)
         write_key(df_trials_sub[d], '%s/trials_sub_enr%d' % (trial_path, d))
         for min_d in [5, 15, 30]:

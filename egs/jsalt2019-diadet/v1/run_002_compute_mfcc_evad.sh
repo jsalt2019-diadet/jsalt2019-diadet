@@ -82,13 +82,18 @@ fi
 #Spk detection enrollment and test data
 if [ $stage -le 5 ];then
 
-    for db in jsalt19_spkdet_{babytrain,ami}_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami,sri}_{dev,eval}
     do
 	# enrollment 
 	for d in 5 15 30
 	do
 	    name=${db}_enr$d
-	    steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj 40 --cmd "$train_cmd" \
+	    if [ ! -d data/$name ];then
+		continue
+	    fi
+	    num_spk=$(wc -l data/$name/spk2utt | cut -d " " -f 1)
+	    nj=$(($num_spk < 40 ? $num_spk:40))
+	    steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj $nj --cmd "$train_cmd" \
 			       data/${name} exp/make_mfcc $mfccdir
 	    utils/fix_data_dir.sh data/${name}
 	    # ground truth VAD
@@ -96,7 +101,7 @@ if [ $stage -le 5 ];then
 	    utils/fix_data_dir.sh data/${name}
 	done
 	
-	# #test
+	# test
 	name=${db}_test
 	steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj 40 --cmd "$train_cmd" \
 			   data/${name} exp/make_mfcc $mfccdir
@@ -118,7 +123,8 @@ fi
 if [ $stage -le 6 ];then 
     for name in jsalt19_spkdiar_babytrain_{train,dev,eval} \
     					  jsalt19_spkdiar_chime5_train jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06} \
-    					  jsalt19_spkdiar_ami_train jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}
+    					  jsalt19_spkdiar_ami_train jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01} \
+					  jsalt19_spkdiar_sri_{dev,eval}
     do
 	num_utt=$(wc -l data/$name/utt2spk | cut -d " " -f 1)
 	nj=$(($num_utt < 40 ? 2:40))

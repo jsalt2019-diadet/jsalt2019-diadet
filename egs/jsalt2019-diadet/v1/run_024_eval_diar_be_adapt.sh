@@ -18,6 +18,7 @@ xvector_dir=exp/xvectors_diar/$nnet_name
 be_babytrain_dir=exp/be_diar/$nnet_name/$be_diar_babytrain_name
 be_chime5_dir=exp/be_diar/$nnet_name/$be_diar_chime5_name
 be_ami_dir=exp/be_diar/$nnet_name/$be_diar_ami_name
+be_sri_dir=$be_chime5_dir
 
 # declare -A be_dirs
 # be_dirs[babytrain]=$be_babytrain_dir
@@ -27,13 +28,13 @@ be_ami_dir=exp/be_diar/$nnet_name/$be_diar_ami_name
 score_babytrain_dir=exp/diarization/$nnet_name/$be_diar_babytrain_name
 score_chime5_dir=exp/diarization/$nnet_name/$be_diar_chime5_name
 score_ami_dir=exp/diarization/$nnet_name/$be_diar_ami_name
+score_sri_dir=$score_chime5_dir
 
 #dev datasets
-dsets_spkdiar_dev_evad=(jsalt19_spkdiar_babytrain_dev jsalt19_spkdiar_chime5_dev_{U01,U06} jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01})
-dsets_spkdiar_dev_gtvad=(jsalt19_spkdiar_babytrain_dev_gtvad jsalt19_spkdiar_chime5_dev_{U01,U06}_gtvad jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01}_gtvad)
-dsets_spkdet_dev_evad=(jsalt19_spkdet_babytrain_dev_test jsalt19_spkdet_ami_dev_test)
-dsets_spkdet_dev_gtvad=(jsalt19_spkdet_babytrain_dev_test_gtvad jsalt19_spkdet_ami_dev_test_gtvad)
-
+dsets_spkdiar_dev_evad=(jsalt19_spkdiar_babytrain_dev jsalt19_spkdiar_chime5_dev_{U01,U06} jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01} jsalt19_spkdiar_sri_dev)
+dsets_spkdiar_dev_gtvad=(jsalt19_spkdiar_babytrain_dev_gtvad jsalt19_spkdiar_chime5_dev_{U01,U06}_gtvad jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01}_gtvad jsalt19_spkdiar_sri_dev_gtvad)
+dsets_spkdet_dev_evad=(jsalt19_spkdet_{babytrain,ami,sri}_dev_test)
+dsets_spkdet_dev_gtvad=(jsalt19_spkdet_{babytrain,ami,sri}_dev_test_gtvad)
 
 #eval datasets
 dsets_spkdiar_eval_evad=($(echo ${dsets_spkdiar_dev_evad[@]} | sed 's@_dev@_eval@g'))
@@ -57,7 +58,7 @@ if [ $stage -le 1 ]; then
 	if [[ "$name" =~ .*babytrain.* ]];then
 	    be_dir_i=$be_babytrain_dir
 	    score_dir_i=$score_babytrain_dir
-	elif [[ "$name" =~ .*chime5.* ]];then
+	elif [[ "$name" =~ .*chime5.* ]] || [[ "$name" =~ .*sri.* ]];then
 	    be_dir_i=$be_chime5_dir
 	    score_dir_i=$score_chime5_dir
 	elif [[ "$name" =~ .*ami.* ]];then
@@ -96,7 +97,7 @@ if [ $stage -le 2 ]; then
 	eval_dataset_i=${dsets_eval[$i]}
 	if [[ "$dev_dataset_i" =~ .*babytrain.* ]];then
 	    score_dir_i=$score_babytrain_dir
-	elif [[ "$dev_dataset_i" =~ .*chime5.* ]];then
+	elif [[ "$dev_dataset_i" =~ .*chime5.* ]] || [[ "$name" =~ .*sri.* ]];then
 	    score_dir_i=$score_chime5_dir
 	elif [[ "$dev_dataset_i" =~ .*ami.* ]];then
 	    score_dir_i=$score_ami_dir
