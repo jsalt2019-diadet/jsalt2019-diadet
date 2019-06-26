@@ -96,8 +96,14 @@ if [ $stage -le 5 ];then
 	    steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj $nj --cmd "$train_cmd" \
 			       data/${name} exp/make_mfcc $mfccdir
 	    utils/fix_data_dir.sh data/${name}
-	    # ground truth VAD
-	    hyp_utils/rttm_to_bin_vad.sh --nj 5 data/$name/vad.rttm data/$name $vaddir_gt
+	    if [[ "$db" =~ .*sri.* ]];then
+		#for sri we run the energy vad
+		steps_fe/compute_vad_decision.sh --nj $nj --cmd "$train_cmd" \
+						 data/${name} exp/make_vad $vaddir
+	    else
+		# ground truth VAD
+		hyp_utils/rttm_to_bin_vad.sh --nj 5 data/$name/vad.rttm data/$name $vaddir_gt
+	    fi
 	    utils/fix_data_dir.sh data/${name}
 	done
 	
