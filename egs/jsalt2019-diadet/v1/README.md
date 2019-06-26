@@ -7,6 +7,7 @@ It will run for the workshop tasks based on datasets:
  - BabyTrain
  - Chime5
  - Ami
+ - SRI
 
 ## How to run
 
@@ -65,11 +66,21 @@ The recipe contains the following directories:
    /export/fs01/jsalt19/resources/embeddings_nnets/kaldi_xvec/mfcc40/xvector_nnet_2a.1.voxceleb_combined
    ```
 
-   This are the data directory and MFCC40 precomputed features for the baseline
+   This is the data directory and MFCC40 precomputed features for the baseline
    ```bash
    /export/fs01/jsalt19/resources/feats/jsalt19-diadet/baseline_mfcc40/data
    ```
-   You can copy this data directory to your egs/jsalt2019-diadet/v1 and skip steps 001 to 004 
+   You can copy this data directory to your egs/jsalt2019-diadet/v1 and skip steps 001 to 004
+
+   These are precomputed xvectors to be used as input to the AHC diarization
+   ```bash
+   /export/fs01/jsalt19/resources/xvectors/jsalt19-diadet/baseline_mfcc40/xvectors_diar
+   ```
+
+   These are precomputed xvectors to be used as input to speaker detection back-end
+   ```bash
+   /export/fs01/jsalt19/resources/xvectors/jsalt19-diadet/baseline_mfcc40/xvectors
+   ```
 
 ## Auxiliary scripts
 
