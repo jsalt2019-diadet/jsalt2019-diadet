@@ -58,7 +58,7 @@ if [ $stage -le 3 ]; then
     				--lda_dim $lda_dim \
     				--plda_type $plda_type \
     				--y_dim $plda_y_dim --z_dim $plda_z_dim \
-    				--w_B $w_B_ami --w_W $w_W_ami \
+    				--w_B $w_B_chime5 --w_W $w_W_chime5 \
     				$xvector_dir/${plda_data}_15s/xvector.scp \
     				data/${plda_data}_15s \
     				$xvector_dir/jsalt19_spkdet_chime5_train/xvector.scp \

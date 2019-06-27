@@ -47,8 +47,8 @@ be_ami_name=${be_name}_ami
 #adaptation weights for plda between-class and within-class covs
 w_B_babytrain=0
 w_W_babytrain=0
-w_B_chime5=0.1
-w_W_chime5=0.25
+w_B_chime5=0
+w_W_chime5=0.1
 w_B_ami=0.1
 w_W_ami=0.25
 
