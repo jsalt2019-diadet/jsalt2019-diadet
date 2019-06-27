@@ -53,7 +53,7 @@ w_B_ami=0.1
 w_W_ami=0.25
 
 #score norm, number of cohort recordings
-ncoh_babytrain=300
-ncoh_chime5=300
-ncoh_ami=300
+#ncoh_babytrain=300
+#ncoh_chime5=300
+#ncoh_ami=300
 ncoh=500
