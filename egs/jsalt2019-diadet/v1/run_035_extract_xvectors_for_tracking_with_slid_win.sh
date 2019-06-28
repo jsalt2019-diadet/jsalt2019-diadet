@@ -52,5 +52,24 @@ if [ $stage -le 2 ]; then
     done
 fi
 
+if [ $stage -le 3 ]; then
+    # create utt2orig 
+    for dsetname in babytrain ami
+    do
+    dset=jsalt19_spkdet_${dsetname}
+	for part in dev eval
+	do
+	    db=${dset}_${part}_slid_win
+        echo "Creating utt2orig for ${db}"
+        if [ $dsetname = "babytrain" ]; then
+            cut -d' ' -f1 $xvector_dir/${db}/segments | awk '{split($1,a,"-"); print $1" "a[1]"-"a[2]"-"a[3]}' > $xvector_dir/${db}/utt2orig
+        fi
+        if [ $dsetname = "ami" ]; then
+            cut -d' ' -f1 $xvector_dir/${db}/segments | awk '{split($1,a,"-"); print $1" "a[1]"-"a[2]"-"a[3]"-"a[4]}' > $xvector_dir/${db}/utt2orig
+        fi
+        
+	done
+    done
+fi
 
 exit
