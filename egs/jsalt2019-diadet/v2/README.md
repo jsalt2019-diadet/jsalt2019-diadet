@@ -1,4 +1,4 @@
-# jsalt2019-diadet/v1
+# jsalt2019-diadet/v2
 
 Recipe for speaker diarization detection and tracking for JSALT2019 workshop on
 "Speaker Detection in Adverse Scenarios with a Single Microphone"
