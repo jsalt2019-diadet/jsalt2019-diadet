@@ -12,6 +12,8 @@ tests/data_out/*
 #*.swp
 
 /tools/
+egs/*/*/data
+egs/*/*/exp
 
 #temp/*
 #dist/*

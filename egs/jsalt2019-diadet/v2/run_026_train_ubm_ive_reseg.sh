@@ -21,8 +21,10 @@ config_file=default_config.sh
 . parse_options.sh || exit 1;
 . $config_file
 
-num_components=1024 # the number of UBM components (used for VB resegmentation)
-ivector_dim=400 # the dimension of i-vector (used for VB resegmentation)
+# num_components=1024 # the number of UBM components (used for VB resegmentation)
+num_components=128 # the number of UBM components (used for VB resegmentation)
+# ivector_dim=400 # the dimension of i-vector (used for VB resegmentation)
+ivector_dim=100 # the dimension of i-vector (used for VB resegmentation)
 
 
 
@@ -30,16 +32,16 @@ ivector_dim=400 # the dimension of i-vector (used for VB resegmentation)
 # Please see https://speech.fit.vutbr.cz/software/vb-diarization-eigenvoice-and-hmm-priors 
 # for details
 if [ $stage -le 1 ]; then
-  # utils/subset_data_dir.sh data/jsalt19_spkdiar_ami_train 32000 data/jsalt19_spkdiar_ami_train_32k
+  utils/subset_data_dir.sh data/jsalt19_spkdiar_ami_train 20 data/jsalt19_spkdiar_ami_train_20
   # Train the diagonal UBM.
   mkdir -p exp/VB || exit 1;
   kaldi_sid/train_diag_ubm.sh --cmd "$train_cmd --mem 10G" \
     --nj 40 --num-threads 8 --subsample 1 --delta-order 0 --apply-cmn false \
-    data/jsalt19_spkdiar_ami_train \
+    data/jsalt19_spkdiar_ami_train_20 \
     $num_components exp/VB/diag_ubm_ami_train_$num_components
   
   # Train the i-vector extractor. The UBM is assumed to be diagonal.
-  steps_kaldi_diar/train_ivector_extractor_diag.sh \
+  VB/diarization/train_ivector_extractor_diag.sh \
     --cmd "$train_cmd --mem 10G" \
     --ivector-dim $ivector_dim --num-iters 5 --apply-cmn false \
     --num-threads 1 --num-processes 1 --nj 40 \
