@@ -265,3 +265,23 @@ This is a summary of the recipe steps:
     exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_snorm_spkdetdiar_nnet2a.1.voxceleb_div2_thrbest_gtvad_cal_v1
     ```
 
+ - run_06{0,1,2}_make_res_tables_spkdet_*.sh
+    - Prints result tables for speaker detection for BabyTrain, AMI and SRI dataset.
+    - Creates 3 tables for each dataset:
+        - Automatic VAD and automatic diarization.
+	- Ground truth VAD and automatic diarization.
+        - Ground truth VAD + diarization.
+    - Easy to paste in Google spreadsheets:
+        - Paste special -> values only.
+	- Push split text to columns.
+
+
+ - run_06{3,4,5,6}_make_res_tables_spkdiar_*.sh
+    - Prints result tables for speaker diarization for BabyTrain, AMI, CHiME5 and SRI dataset.
+    - Creates 2 tables for each dataset:
+        - Automatic VAD.
+	- Ground truth VAD.
+    - Easy to paste in Google spreadsheets:
+        - Paste special -> values only.
+	- Push split text to columns.
+

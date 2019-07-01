@@ -31,7 +31,7 @@ score_plda_adapt_snorm_gtvad_dir=$score_dir/plda_adapt_snorm_${spkdet_diar_name}
 
 name_vec=(babytrain ami sri)
 be_vec=($be_babytrain_dir $be_ami_dir $be_sri_dir)
-coh_vec=(jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train jsalt19_spkdet_sri_train)
+coh_vec=(jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train jsalt19_spkdet_chime5_train)
 num_dbs=${#name_vec[@]}
 mem_scorer_vec=(30G 10G 10G)
 
