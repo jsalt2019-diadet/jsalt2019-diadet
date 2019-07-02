@@ -21,23 +21,26 @@ config_file=default_config.sh
 . parse_options.sh || exit 1;
 . $config_file
 
-num_components=1024 # the number of UBM components (used for VB resegmentation)
-ivector_dim=400 # the dimension of i-vector (used for VB resegmentation)
+# num_components=1024 # the number of UBM components (used for VB resegmentation)
+num_components=128 # the number of UBM components (used for VB resegmentation)
+# ivector_dim=400 # the dimension of i-vector (used for VB resegmentation)
+ivector_dim=100 # the dimension of i-vector (used for VB resegmentation)
+
 
 if [ $stage -le 1 ]; then
   output_rttm_dir=exp/VB/rttm
   mkdir -p $output_rttm_dir || exit 1;
-  cat $nnet_dir/xvectors_callhome1/plda_scores/rttm \
-    $nnet_dir/xvectors_callhome2/plda_scores/rttm > $output_rttm_dir/x_vector_rttm
-  init_rttm_file=$output_rttm_dir/x_vector_rttm
+  exp/diarization/2a.1.voxceleb_div2/lda120_plda_voxceleb/jsalt19_spkdiar_ami_dev_Mix-Headset/plda_scores_tbest/rttm \ 
+    > $output_rttm_dir/pre_VB_rttm
+  init_rttm_file=$output_rttm_dir/pre_VB_rttm
 
   # VB resegmentation. In this script, I use the x-vector result to 
   # initialize the VB system. You can also use i-vector result or random 
   # initize the VB system. The following script uses kaldi_io. 
   # You could use `sh ../../../tools/extras/install_kaldi_io.sh` to install it
-  diarization/VB_resegmentation.sh --nj 20 --cmd "$train_cmd --mem 10G" \
-    --initialize 1 data/callhome $init_rttm_file exp/VB \
-    exp/diag_ubm_$num_components/final.dubm exp/extractor_diag_c${num_components}_i${ivector_dim}/final.ie || exit 1; 
+  VB/diarization/VB_resegmentation.sh --nj 20 --cmd "$train_cmd --mem 10G" \
+    --initialize 1 data/jsalt19_spkdiar_ami_dev_Mix-Headset $init_rttm_file exp/VB \
+    exp/VB/diag_ubm_ami_train_$num_components/final.dubm exp/extractor_diag_ami_train_c${num_components}_i${ivector_dim}/final.ie || exit 1; 
 
   # Compute the DER after VB resegmentation
   mkdir -p exp/VB/results || exit 1;
