@@ -29,7 +29,7 @@ if [ $stage -le 1 ];then
     # the list.
     for name in voxceleb_aug_sub
     do
-	steps/make_mfcc.sh --mfcc-config conf/mfcc_16k.conf --nj 120 --cmd "$train_cmd" \
+	steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj 120 --cmd "$train_cmd" \
       			   data/$name exp/make_mfcc $mfccdir
 	fix_data_dir.sh data/$name
     done
