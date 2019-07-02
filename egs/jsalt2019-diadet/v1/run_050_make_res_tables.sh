@@ -7,12 +7,12 @@
 . ./path.sh
 set -e
 
-diar_name=diar3b_t-0.9
-net_name=3b
+diar_name=slid_win
+net_name=2a.1.voxceleb_div2
 
 . parse_options.sh || exit 1;
 
-be_name=lda300_splday175_v1_train_combined
+be_name=lda200_splday150_v1_voxceleb_div2
 score_dir=exp/scores/$net_name/${be_name}
 
 #Video table
