@@ -36,8 +36,7 @@ ivector_dim=100 # the dimension of i-vector (used for VB resegmentation)
 if [ $stage -le 1 ]; then
   output_rttm_dir=exp/VB/rttm
   mkdir -p $output_rttm_dir || exit 1;
-  cat exp/diarization//plda_scores_tbest/rttm \ 
-    > $output_rttm_dir/pre_VB_rttm
+  cat $score_dir/$ami_dev_Mix/plda_scores_tbest/rttm > $output_rttm_dir/pre_VB_rttm
   init_rttm_file=$output_rttm_dir/pre_VB_rttm
 
   # VB resegmentation. In this script, I use the x-vector result to 
