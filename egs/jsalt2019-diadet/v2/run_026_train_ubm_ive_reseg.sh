@@ -32,12 +32,12 @@ ivector_dim=100 # the dimension of i-vector (used for VB resegmentation)
 # Please see https://speech.fit.vutbr.cz/software/vb-diarization-eigenvoice-and-hmm-priors 
 # for details
 if [ $stage -le 1 ]; then
-  utils/subset_data_dir.sh data/jsalt19_spkdiar_ami_train 20 data/jsalt19_spkdiar_ami_train_20
+  utils/subset_data_dir.sh data/jsalt19_spkdiar_ami_train 40 data/jsalt19_spkdiar_ami_train_40
   # Train the diagonal UBM.
   mkdir -p exp/VB || exit 1;
-  kaldi_sid/train_diag_ubm.sh --cmd "$train_cmd --mem 10G" \
+  VB/sid/train_diag_ubm.sh --cmd "$train_cmd --mem 10G" \
     --nj 40 --num-threads 8 --subsample 1 --delta-order 0 --apply-cmn false \
-    data/jsalt19_spkdiar_ami_train_20 \
+    data/jsalt19_spkdiar_ami_train_40 \
     $num_components exp/VB/diag_ubm_ami_train_$num_components
   
   # Train the i-vector extractor. The UBM is assumed to be diagonal.
