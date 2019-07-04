@@ -1,9 +1,3 @@
-[submodule "tools/pyannote/pyannote-metrics"]
-	path = tools/pyannote/pyannote-metrics
-	url = https://github.com/jsalt2019-diadet/pyannote-metrics.git
 [submodule "tools/hyperion/hyperion"]
 	path = tools/hyperion/hyperion
 	url = https://github.com/jsalt2019-diadet/hyperion.git
-[submodule "tools/pyannote/pyannote-core"]
-	path = tools/pyannote/pyannote-core
-	url = https://github.com/pyannote/pyannote-core.git

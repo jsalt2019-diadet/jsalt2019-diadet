@@ -7,6 +7,7 @@ It will run for the workshop tasks based on datasets:
  - BabyTrain
  - Chime5
  - Ami
+ - SRI
 
 ## How to run
 
@@ -65,11 +66,21 @@ The recipe contains the following directories:
    /export/fs01/jsalt19/resources/embeddings_nnets/kaldi_xvec/mfcc40/xvector_nnet_2a.1.voxceleb_combined
    ```
 
-   This are the data directory and MFCC40 precomputed features for the baseline
+   This is the data directory and MFCC40 precomputed features for the baseline
    ```bash
    /export/fs01/jsalt19/resources/feats/jsalt19-diadet/baseline_mfcc40/data
    ```
-   You can copy this data directory to your egs/jsalt2019-diadet/v1 and skip steps 001 to 004 
+   You can copy this data directory to your egs/jsalt2019-diadet/v1 and skip steps 001 to 004
+
+   These are precomputed xvectors to be used as input to the AHC diarization
+   ```bash
+   /export/fs01/jsalt19/resources/xvectors/jsalt19-diadet/baseline_mfcc40/xvectors_diar
+   ```
+
+   These are precomputed xvectors to be used as input to speaker detection back-end
+   ```bash
+   /export/fs01/jsalt19/resources/xvectors/jsalt19-diadet/baseline_mfcc40/xvectors
+   ```
 
 ## Auxiliary scripts
 
@@ -253,4 +264,24 @@ This is a summary of the recipe steps:
     exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_snorm_spkdetdiar_nnet2a.1.voxceleb_div2_thrbest_cal_v1
     exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_snorm_spkdetdiar_nnet2a.1.voxceleb_div2_thrbest_gtvad_cal_v1
     ```
+
+ - run_06{0,1,2}\_make_res_tables_spkdet\_\*.sh
+    - Prints result tables for speaker detection for BabyTrain, AMI and SRI dataset.
+    - Creates 3 tables for each dataset:
+        - Automatic VAD and automatic diarization.
+	- Ground truth VAD and automatic diarization.
+        - Ground truth VAD + diarization.
+    - Easy to paste in Google spreadsheets:
+        - Paste special -> values only.
+	- Push split text to columns.
+
+
+ - run_06{3,4,5,6}\_make_res_tables_spkdiar\_\*.sh
+    - Prints result tables for speaker diarization for BabyTrain, AMI, CHiME5 and SRI dataset.
+    - Creates 2 tables for each dataset:
+        - Automatic VAD.
+	- Ground truth VAD.
+    - Easy to paste in Google spreadsheets:
+        - Paste special -> values only.
+	- Push split text to columns.
 
