@@ -1,6 +1,7 @@
 #!/bin/bash
 # Copyright 2017-2018  David Snyder
 #           2017-2018  Matthew Maciejewski
+#           2019 Latané Bullock, Paola Garcia (JSALT 2019) 
 #
 # Apache 2.0.
 #
@@ -24,35 +25,61 @@ config_file=default_config.sh
 
 be_dir=exp/be_diar/$nnet_name/$be_diar_name
 score_dir=exp/diarization/$nnet_name/$be_diar_name
-ami_dev_Mix="jsalt19_spkdiar_ami_dev_Mix-Headset"
 
 
-# num_components=1024 # the number of UBM components (used for VB resegmentation)
-num_components=128 # the number of UBM components (used for VB resegmentation)
-# ivector_dim=400 # the dimension of i-vector (used for VB resegmentation)
-ivector_dim=100 # the dimension of i-vector (used for VB resegmentation)
+# dsets_spkdiar_dev_evad=(jsalt19_spkdiar_babytrain_dev jsalt19_spkdiar_chime5_dev_{U01,U06} jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01} jsalt19_spkdiar_sri_dev)
+dsets_spkdiar_dev_evad=(jsalt19_spkdiar_babytrain_dev)
+dsets_spkdiar_eval_evad=($(echo ${dsets_spkdiar_dev_evad[@]} | sed 's@_dev@_eval@g'))
+
+dsets_test="${dsets_spkdiar_dev_evad[@]} ${dsets_spkdiar_eval_evad[@]}"
+echo $dsets_test
+
+VB_dir=exp/VB
+
+trained_dir=jsalt19_spkdiar_babytrain_train
+
+num_components=1024 # the number of UBM components (used for VB resegmentation)
+# num_components=128 # the number of UBM components (used for VB resegmentation)
+ivector_dim=400 # the dimension of i-vector (used for VB resegmentation)
+# ivector_dim=50 # the dimension of i-vector (used for VB resegmentation)
 
 
 if [ $stage -le 1 ]; then
-  output_rttm_dir=exp/VB/rttm
-  mkdir -p $output_rttm_dir || exit 1;
-  cat $score_dir/$ami_dev_Mix/plda_scores_tbest/rttm > $output_rttm_dir/pre_VB_rttm
-  init_rttm_file=$output_rttm_dir/pre_VB_rttm
 
-  # VB resegmentation. In this script, I use the x-vector result to 
-  # initialize the VB system. You can also use i-vector result or random 
-  # initize the VB system. The following script uses kaldi_io. 
-  # You could use `sh ../../../tools/extras/install_kaldi_io.sh` to install it
-  VB/diarization/VB_resegmentation.sh --nj 20 --cmd "$train_cmd --mem 10G" \
-    --initialize 1 data/$ami_dev_Mix $init_rttm_file exp/VB \
-    exp/VB/diag_ubm_ami_train_$num_components/final.dubm exp/extractor_diag_ami_train_c${num_components}_i${ivector_dim}/final.ie || exit 1; 
+  for name in $dsets_test
+    do
+    output_rttm_dir=$VB_dir/$name/rttm
+    mkdir -p $output_rttm_dir || exit 1;
+    cat $score_dir/$name/plda_scores_tbest/rttm > $output_rttm_dir/pre_VB_rttm
+    cat $score_dir/$name/plda_scores_tbest/result.md-eval > $output_rttm_dir/pre_result.md-eval
+    init_rttm_file=$output_rttm_dir/pre_VB_rttm
 
-  # Compute the DER after VB resegmentation
-  mkdir -p exp/VB/results || exit 1;
-  md-eval.pl -1 -c 0.25 -r data/$nnet_name/$be_diar_name/$ami_dev_Mix/diarization.rttm \
-    -s $output_rttm_dir/VB_rttm 2> exp/VB/log/VB_DER.log \
-    > exp/VB/results/VB_DER.txt
-  der=$(grep -oP 'DIARIZATION\ ERROR\ =\ \K[0-9]+([.][0-9]+)?' \
-    exp/VB/results/VB_DER.txt)
-  echo "After VB resegmentation, DER: $der%"
+    # VB resegmentation. In this script, I use the x-vector result to 
+    # initialize the VB system. You can also use i-vector result or random 
+    # initize the VB system. The following script uses kaldi_io. 
+    # You could use `sh ../../../tools/extras/install_kaldi_io.sh` to install it
+    VB/diarization/VB_resegmentation.sh --nj 20 --cmd "$train_cmd --mem 10G" \
+      --initialize 1 data/$name $init_rttm_file $VB_dir/$name \
+      $VB_dir/$trained_dir/diag_ubm_$num_components/final.dubm $VB_dir/$trained_dir/extractor_diag_c${num_components}_i${ivector_dim}/final.ie || exit 1; 
+    done
+fi
+
+if [ $stage -le 2 ]; then
+  
+  for name in $dsets_test
+    do
+    # change channel from 0 to 1
+    awk '{$3 = 1 ; print}' $VB_dir/$name/rttm/VB_rttm > $VB_dir/$name/rttm/VB_rttm_v2
+    
+    # Compute the DER after VB resegmentation
+    echo "starting DER analysis"
+    mkdir -p $VB_dir/$name/rttm || exit 1;
+    md-eval.pl -1 -r data/$name/diarization.rttm\
+      -s $VB_dir/$name/rttm/VB_rttm_v2 2> $VB_dir/$name/log/VB_DER.log \
+      > $VB_dir/$name/rttm/results.md-eval
+    der=$(grep -oP 'DIARIZATION\ ERROR\ =\ \K[0-9]+([.][0-9]+)?' \
+      $VB_dir/$name/rttm/results.md-eval)
+    echo "After VB resegmentation, DER: $der%"
+    done
+
 fi
