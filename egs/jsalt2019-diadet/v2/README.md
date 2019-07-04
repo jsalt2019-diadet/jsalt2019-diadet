@@ -194,6 +194,13 @@ This is a summary of the recipe steps:
        - Test datasets for dev/eval with automatic diarization based on ground truth VAD
        - Test datasets for dev/eval with automatic diarization based on energy VAD
 
+ - run_035_extract_xvectors_for_tracking_with_slid_win.sh
+    - Extract x-vectors for spk tracking test data using a sliding window of 1.5s adn 50% overlap
+        - Test datasets for dev/eval based on energy VAD
+
+ - run_036_extract_xvectors_for_tracking_with_slid_win_gtvad.sh
+    - Extract x-vectors for spk tracking test data using a sliding window of 1.5s adn 50% overlap
+        - Test datasets for dev/eval based on grountruth VAD
 
  - run_040_train_spkdet_be.sh
     - Trains PLDA back-end for speaker detection
@@ -264,11 +271,13 @@ This is a summary of the recipe steps:
     exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_snorm_spkdetdiar_nnet2a.1.voxceleb_div2_thrbest_cal_v1
     exp/scores/2a.1.voxceleb_div2/lda200_splday150_v1_voxceleb_div2/plda_adapt_snorm_spkdetdiar_nnet2a.1.voxceleb_div2_thrbest_gtvad_cal_v1
     ```
+ - run_04{4,5}_eval_spkdet_be_with_slid_wi*.sh
+    - Evals speaker detection back-end for the three datasets using energy VAD and GTVAD
 
  - run_06{0,1,2}\_make_res_tables_spkdet\_\*.sh
     - Prints result tables for speaker detection for BabyTrain, AMI and SRI dataset.
-    - Creates 3 tables for each dataset:
-        - Automatic VAD and automatic diarization.
+    - Creates 5 tables for each dataset:
+        - Automatic, VAD, automatic diarization, sliding window and sliding window with ground truth VAD.
 	- Ground truth VAD and automatic diarization.
         - Ground truth VAD + diarization.
     - Easy to paste in Google spreadsheets:
