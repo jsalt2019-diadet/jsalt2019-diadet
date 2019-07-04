@@ -7,6 +7,3 @@
 [submodule "tools/pyannote/pyannote-core"]
 	path = tools/pyannote/pyannote-core
 	url = https://github.com/pyannote/pyannote-core.git
-[submodule "tools/speech_denoising_tools"]
-	path = tools/speech_denoising_tools
-	url = https://github.com/jsalt2019-diadet/speech_denoising_tools.git
