@@ -11,7 +11,7 @@
 set -e
 
 vaddir_gtdiar=vad_trackgtdiar
-stage=1
+stage=2
 config_file=default_config.sh
 
 . parse_options.sh || exit 1;
@@ -24,12 +24,13 @@ if [ $stage -le 1 ]; then
     # Extracts x-vectors for test with sliding window
     for db in jsalt19_spkdet_{babytrain,ami,sri}_{dev,eval}
     do
-      name=${db}_test_cmn_segmented
-      namexv=${db}_slid_win_w${window}_s${period}
+      name=${db}_test_gtvad_cmn_segmented
+      namexv=${db}_slid_win_w${window}_s${period}_gtvad
     	steps_kaldi_diar/extract_xvectors.sh --cmd "$train_cmd --mem 10G" \
     					     --window ${window} --period ${period} --apply-cmn false \
     					     --min-segment 0.5 $nnet_dir \
     					     data_diar/${name} $xvector_dir/${namexv} &
+
     done
 fi
 wait
@@ -48,9 +49,9 @@ if [ $stage -le 2 ]; then
             continue
         fi
 		echo "combining ${db}_enr${dur}_test_trackgtdiar"
-		mkdir -p $xvector_dir/${db}_enr${dur}_slid_win_w${window}_s${period}_test_track
-		cat $xvector_dir/${db}_{enr${dur},slid_win_w${window}_s${period}}/xvector.scp \
-		    > $xvector_dir/${db}_enr${dur}_slid_win_w${window}_s${period}_test_track/xvector.scp
+		mkdir -p $xvector_dir/${db}_enr${dur}_slid_win_w${window}_s${period}_test_track_gtvad
+		cat $xvector_dir/${db}_{enr${dur},slid_win_w${window}_s${period}_gtvad}/xvector.scp \
+		    > $xvector_dir/${db}_enr${dur}_slid_win_w${window}_s${period}_test_track_gtvad/xvector.scp
 	    done
 	done
     done
@@ -63,7 +64,7 @@ if [ $stage -le 3 ]; then
     dset=jsalt19_spkdet_${dsetname}
 	for part in dev eval
 	do
-	    db=${dset}_${part}_slid_win_w${window}_s${period}
+	    db=${dset}_${part}_slid_win_w${window}_s${period}_gtvad
         echo "Creating utt2orig for ${db}"
         if [ $dsetname = "babytrain" ]; then
             cut -d' ' -f1 $xvector_dir/${db}/segments | awk '{split($1,a,"-"); print $1" "a[1]"-"a[2]"-"a[3]}' > $xvector_dir/${db}/utt2orig

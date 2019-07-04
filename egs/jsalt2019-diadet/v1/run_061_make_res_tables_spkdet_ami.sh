@@ -15,6 +15,9 @@ config_file=default_config.sh
 score_dir0=exp/scores/$nnet_name/${be_name}
 name0="$nnet_name $be_name"
 
+stage=5
+
+if [ $stage -le 1 ]; then
 #energy VAD
 conds=(plda plda_adapt plda_adapt_snorm \
 	    plda_spkdetdiar_nnet${nnet_name}_thrbest \
@@ -34,9 +37,11 @@ do
     args=""
 done
 echo ""
+fi
 
 #####
 
+if [ $stage -le 2 ]; then
 #GT VAD
 conds=(plda_gtvad plda_adapt_gtvad plda_adapt_snorm_gtvad \
 	    plda_spkdetdiar_nnet${nnet_name}_thrbest_gtvad \
@@ -57,9 +62,11 @@ do
     args=""
 done
 echo ""
+fi
 
 #####
 
+if [ $stage -le 3 ]; then
 #GT diarization
 conds=(plda_gtdiar plda_adapt_gtdiar plda_adapt_snorm_gtdiar)
 conds_name=("no-adapt gt-diar" "adapt gt-diar" "adapt-snorm gt-diar")
@@ -75,4 +82,45 @@ do
     args=""
 done
 echo ""
+fi
+###########
 
+if [ $stage -le 4 ]; then
+#SLIDING WIND
+conds=(plda_slid_win_w1.5_s0.75 plda_adapt_slid_win_w1.5_s0.75)
+conds_name=("no-adapt-slid-win" "adap-slid-win")
+
+
+echo "Sliding Window Diarization"
+args="--print-header true"
+#print EER table
+for((i=0;i<${#conds[*]};i++))
+do
+    score_dir=$score_dir0/${conds[$i]}_cal_v1
+    name="$name0 ${conds_name[$i]}"
+    local/make_table_line_spkdet_jsalt19_xxx.sh $args "$name" ami $score_dir
+    args=""
+done
+echo ""
+fi
+
+########
+
+if [ $stage -le 5 ]; then
+#SLIDING WIND with GT VAD
+conds=(plda_slid_win_w1.5_s0.75_gtvad plda_adapt_slid_win_w1.5_s0.75_gtvad)
+conds_name=("no-adapt-slid-win-gtvad" "adap-slid-win-gtvad")
+
+
+echo "Sliding Window Diarization"
+args="--print-header true"
+#print EER table
+for((i=0;i<${#conds[*]};i++))
+do
+    score_dir=$score_dir0/${conds[$i]}_cal_v1
+    name="$name0 ${conds_name[$i]}"
+    local/make_table_line_spkdet_jsalt19_xxx.sh $args "$name" ami $score_dir
+    args=""
+done
+echo ""
+fi
