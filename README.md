@@ -80,6 +80,7 @@ jsalt2019-diadet/tools
 ./jsalt2019-diadet/tools/pyannote/pyannote-metrics
 ./jsalt2019-diadet/tools/hyperion
 ./jsalt2019-diadet/tools/hyperion/hyperion
+./jsalt2019-diadet/tools/speech_denoising_tools
 ./jsalt2019-diadet/egs
 ./jsalt2019-diadet/egs/jsalt2019-diadet
 ./jsalt2019-diadet/egs/jsalt2019-diadet/v1
