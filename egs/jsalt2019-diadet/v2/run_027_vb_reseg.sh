@@ -36,8 +36,6 @@ echo $dsets_test
 
 VB_dir=exp/VB
 
-trained_dir=jsalt19_spkdiar_babytrain_train
-
 num_components=1024 # the number of UBM components (used for VB resegmentation)
 # num_components=128 # the number of UBM components (used for VB resegmentation)
 ivector_dim=400 # the dimension of i-vector (used for VB resegmentation)
@@ -48,6 +46,19 @@ if [ $stage -le 1 ]; then
 
   for name in $dsets_test
     do
+
+    if [[ "$db" =~ .*_babytrain_.* ]];then
+	    trained_dir=jsalt19_spkdiar_babytrain_train
+    elif [[ "$db" =~ .*_ami_.* ]];then
+        trained_dir=jsalt19_spkdiar_ami_train
+    elif [[ "$db" =~ .*_chime5_.* ]];then
+        trained_dir=jsalt19_spkdiar_chime5_train
+    else
+        echo "$db not found"
+        exit 1
+    fi
+
+
     output_rttm_dir=$VB_dir/$name/rttm
     mkdir -p $output_rttm_dir || exit 1;
     cat $score_dir/$name/plda_scores_tbest/rttm > $output_rttm_dir/pre_VB_rttm
