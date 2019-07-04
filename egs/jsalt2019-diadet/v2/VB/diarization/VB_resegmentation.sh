@@ -1,7 +1,8 @@
 #!/bin/bash
-
+#
 # Copyright 2019  Zili Huang
-
+#
+#
 # This script is a wrapper for Variational Bayes resegmentation.
 # It shows how to use the code from Brno University of Technology 
 # to do resegmentation.
@@ -20,7 +21,7 @@ minDur=1
 loopProb=0.9
 statScale=0.2
 llScale=1.0
-channel=0
+channel=1
 initialize=1
 # End configuration section.
 
@@ -89,13 +90,13 @@ utils/split_data.sh $data_dir $nj || exit 1;
 
 if [ $stage -le 0 ]; then
   # Dump the diagonal UBM model into txt format.
-  "$train_cmd" $output_dir/log/convert_diag_ubm.log \
+  # "$train_cmd" $output_dir/log/convert_diag_ubm.log \
     gmm-global-copy --binary=false \
       $dubm_model \
       $output_dir/tmp/dubm.tmp || exit 1;
 
   # Dump the ivector extractor model into txt format.
-  "$train_cmd" $output_dir/log/convert_ie.log \
+  # "$train_cmd" $output_dir/log/convert_ie.log \
     ivector-extractor-copy --binary=false \
       $ie_model \
       $output_dir/tmp/ie.tmp || exit 1;
@@ -104,7 +105,7 @@ fi
 if [ $stage -le 1 ]; then
     # VB resegmentation
     $cmd JOB=1:$nj $output_dir/log/VB_resegmentation.JOB.log \
-      python3 diarization/VB_resegmentation.py --max-speakers $max_speakers \
+      python3 VB/diarization/VB_resegmentation.py --max-speakers $max_speakers \
         --max-iters $max_iters --downsample $downsample --alphaQInit $alphaQInit \
 	--sparsityThr $sparsityThr --epsilon $epsilon --minDur $minDur \
 	--loopProb $loopProb --statScale $statScale --llScale $llScale \
