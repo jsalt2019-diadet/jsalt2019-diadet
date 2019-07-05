@@ -11,7 +11,7 @@
 set -e
 
 vaddir_gtdiar=vad_trackgtdiar
-stage=2
+stage=1
 config_file=default_config.sh
 
 . parse_options.sh || exit 1;
