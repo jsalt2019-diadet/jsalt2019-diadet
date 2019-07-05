@@ -11,7 +11,6 @@ git clone --recursive https://github.com/jsalt2019-diadet/jsalt2019-diadet.git
 
 - The recursive option downloads some dependencies:
     - hyperion: python code for spk detection back-end
-    - pyannotate.metrics: python code to calculate metrics
 
 - If you want to update the sumodules to the last commit, run
 ```bash
@@ -76,8 +75,6 @@ jsalt2019-diadet/tools
 ./jsalt2019-diadet/tools/cudnn/cudnn-9.0-v7.4
 ./jsalt2019-diadet/tools/kaldi
 ./jsalt2019-diadet/tools/kaldi/kaldi
-./jsalt2019-diadet/tools/pyannote
-./jsalt2019-diadet/tools/pyannote/pyannote-metrics
 ./jsalt2019-diadet/tools/hyperion
 ./jsalt2019-diadet/tools/hyperion/hyperion
 ./jsalt2019-diadet/egs
