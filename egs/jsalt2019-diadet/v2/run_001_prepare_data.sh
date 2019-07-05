@@ -31,6 +31,13 @@ if [ $stage -le 2 ];then
     # Prepare babytrain
     local/make_babytrain_spkdet.sh $baby_root $babytrain_list_dir ./data
     local/make_babytrain_spkdiar.sh $baby_root $babytrain_list_dir ./data
+
+    # Prepare enhancement version of babytrain-eval
+    echo "running enhancement may take much time, you can use precomputed audios."
+    #tools/speech_denoising_tools/run_enhancement_interface.sh  $baby_root/test/wav/  ./enhanced_audio/babytrain_eval
+    echo "baby_root_enhanced=/export/fs01/jsalt19/leisun/dataset/BabyTrain/test/SE_1000h_model_m3_s3" >> ./datapath.sh
+    . datapath.sh
+    local/make_babytrain_spkdiar_enhanced_eval.sh $baby_root_enhanced $babytrain_list_dir ./data
     
 fi
 
@@ -38,6 +45,7 @@ if [ $stage -le 3 ];then
     # Prepare chime5
     local/make_chime5_spkdet_jsalt19.sh $chime5_root $chime5_list_dir ./data
     local/make_chime5_spkdiar_jsalt19.sh $chime5_root $chime5_list_dir ./data
+
 
 fi
 
