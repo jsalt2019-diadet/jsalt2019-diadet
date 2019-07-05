@@ -49,8 +49,10 @@ dsets_test="${dsets_dev[@]} ${dsets_eval[@]}"
 # consists of all DIAR-EVAL_GT datasets
 # dsets_test="${dsets_eval_gt[@]}"
 
+# for testing purposes
+# dsets_test=jsalt19_spkdiar_ami_dev_Array1-01
 
-# echo $dsets_test
+echo $dsets_test
 
 
 num_components=1024 # the number of UBM components (used for VB resegmentation)
@@ -114,21 +116,46 @@ if [ $stage -le 2 ]; then
 
     # Compute the DER after VB resegmentation wtih 
     # PYANNOTE
+    echo "Starting Pyannote rttm evaluation for $name ... "
     $train_cmd $VB_dir/$name/pyannote.log \
         local/pyannote_score_diar.sh $name $dev_eval $VB_dir/$name/rttm
   
     
-    # Compute the DER after VB resegmentation wtih 
-    # MD-EVAL
-    mkdir -p $VB_dir/$name/rttm || exit 1;
-    md-eval.pl -1 -r data/$name/diarization.rttm\
-      -s $VB_dir/$name/rttm/VB_rttm 2> $VB_dir/$name/log/VB_DER.log \
-      > $VB_dir/$name/rttm/results.md-eval
-    der=$(grep -oP 'DIARIZATION\ ERROR\ =\ \K[0-9]+([.][0-9]+)?' \
-      $VB_dir/$name/rttm/results.md-eval)
-    pre_der=$(grep -oP 'DIARIZATION\ ERROR\ =\ \K[0-9]+([.][0-9]+)?' \
-      $VB_dir/$name/rttm/pre_result.md-eval)
-    echo "$name :   DER (pre_VB, post_VB):   $pre_der, $der%"
+    # # Compute the DER after VB resegmentation wtih 
+    # # MD-EVAL
+    # mkdir -p $VB_dir/$name/rttm || exit 1;
+    # md-eval.pl -1 -r data/$name/diarization.rttm\
+    #   -s $VB_dir/$name/rttm/VB_rttm 2> $VB_dir/$name/log/VB_DER.log \
+    #   > $VB_dir/$name/rttm/results.md-eval
+    # der=$(grep -oP 'DIARIZATION\ ERROR\ =\ \K[0-9]+([.][0-9]+)?' \
+    #   $VB_dir/$name/rttm/results.md-eval)
+    # pre_der=$(grep -oP 'DIARIZATION\ ERROR\ =\ \K[0-9]+([.][0-9]+)?' \
+    #   $VB_dir/$name/rttm/pre_result.md-eval)
+    # echo "$name :   DER (pre_VB, post_VB):   $pre_der, $der%"
+    
+    done
+
+fi
+
+if [ $stage -le 3 ]; then 
+
+  echo "dset,preDER,postDER,,preMiss,postMiss,,preFA,postFA,,preSpkConfusion,postSpkConfusion,,"
+
+  for name in $dsets_test
+    do 
+
+      post_res_f=$VB_dir/$name/rttm/result.pyannote-der
+      pre_res_f=$score_dir/$name/plda_scores_tbest/result.pyannote-der
+
+      # awk '/TOTAL/ { printf "%.2f,%.2f,%.2f,%.2f,", $2,$11,$9,$13}' $res_file
+      paste <(echo "$name,") <(awk '/TOTAL/ { printf "%.2f,", $2}' $pre_res_f) \
+        <(awk '/TOTAL/ { printf "%.2f,,", $2}' $post_res_f) \
+        <(awk '/TOTAL/ { printf "%.2f,", $11}' $pre_res_f) \
+        <(awk '/TOTAL/ { printf "%.2f,,", $11}' $post_res_f) \
+        <(awk '/TOTAL/ { printf "%.2f,", $9}' $pre_res_f) \
+        <(awk '/TOTAL/ { printf "%.2f,,", $9}' $post_res_f) \
+        <(awk '/TOTAL/ { printf "%.2f,", $13}' $pre_res_f) \
+        <(awk '/TOTAL/ { printf "%.2f,,", $13}' $post_res_f)            
     done
 
 fi
