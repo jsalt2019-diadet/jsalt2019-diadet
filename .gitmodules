@@ -1,6 +1,3 @@
 [submodule "tools/hyperion/hyperion"]
 	path = tools/hyperion/hyperion
 	url = https://github.com/jsalt2019-diadet/hyperion.git
-[submodule "tools/speech_denoising_tools"]
-	path = tools/speech_denoising_tools
-	url = https://github.com/jsalt2019-diadet/speech_denoising_tools.git
