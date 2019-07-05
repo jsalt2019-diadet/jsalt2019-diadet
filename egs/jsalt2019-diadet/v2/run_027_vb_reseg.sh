@@ -26,15 +26,32 @@ config_file=default_config.sh
 be_dir=exp/be_diar/$nnet_name/$be_diar_name
 score_dir=exp/diarization/$nnet_name/$be_diar_name
 
-
-# dsets_spkdiar_dev_evad=(jsalt19_spkdiar_babytrain_dev jsalt19_spkdiar_chime5_dev_{U01,U06} jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01} jsalt19_spkdiar_sri_dev)
-dsets_spkdiar_dev_evad=(jsalt19_spkdiar_babytrain_dev)
-dsets_spkdiar_eval_evad=($(echo ${dsets_spkdiar_dev_evad[@]} | sed 's@_dev@_eval@g'))
-
-dsets_test="${dsets_spkdiar_dev_evad[@]} ${dsets_spkdiar_eval_evad[@]}"
-echo $dsets_test
-
 VB_dir=exp/VB
+
+#dev datasets
+dsets_spkdiar_dev_evad=(jsalt19_spkdiar_babytrain_dev jsalt19_spkdiar_chime5_dev_{U01,U06} jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01} )
+dsets_spkdiar_dev_gtvad=(jsalt19_spkdiar_babytrain_dev_gtvad jsalt19_spkdiar_chime5_dev_{U01,U06}_gtvad jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01}_gtvad ) 
+
+#eval datasets
+dsets_spkdiar_eval_evad=($(echo ${dsets_spkdiar_dev_evad[@]} | sed 's@_dev@_eval@g'))
+dsets_spkdiar_eval_gtvad=($(echo ${dsets_spkdiar_dev_gtvad[@]} | sed 's@_dev@_eval@g'))
+
+dsets_dev=(${dsets_spkdiar_dev_evad[@]} ${dsets_spkdiar_dev_gtvad[@]})
+dsets_eval=(${dsets_spkdiar_eval_evad[@]} ${dsets_spkdiar_eval_gtvad[@]})
+
+
+# consists of all DIAR datasets
+dsets_test="${dsets_dev[@]} ${dsets_eval[@]}"
+
+# consists of all DIAR-GT datasets
+# dsets_test="${dsets_dev_gt[@]} ${dsets_eval_gt[@]}"
+
+# consists of all DIAR-EVAL_GT datasets
+# dsets_test="${dsets_eval_gt[@]}"
+
+
+# echo $dsets_test
+
 
 num_components=1024 # the number of UBM components (used for VB resegmentation)
 # num_components=128 # the number of UBM components (used for VB resegmentation)
@@ -47,17 +64,22 @@ if [ $stage -le 1 ]; then
   for name in $dsets_test
     do
 
-    if [[ "$db" =~ .*_babytrain_.* ]];then
-	    trained_dir=jsalt19_spkdiar_babytrain_train
-    elif [[ "$db" =~ .*_ami_.* ]];then
-        trained_dir=jsalt19_spkdiar_ami_train
-    elif [[ "$db" =~ .*_chime5_.* ]];then
-        trained_dir=jsalt19_spkdiar_chime5_train
+    # #jobs differ because of the limited number of utterances and 
+    # speakers for chime5 - there are just two speakers, so it refuses to split
+    # into more than 2
+    if [[ "$name" =~ .*_babytrain_.* ]];then
+      trained_dir=jsalt19_spkdiar_babytrain_train
+      nj=20
+    elif [[ "$name" =~ .*_ami_.* ]];then
+      trained_dir=jsalt19_spkdiar_ami_train
+      nj=20
+    elif [[ "$name" =~ .*_chime5_.* ]];then
+      trained_dir=jsalt19_spkdiar_chime5_train
+      nj=2
     else
-        echo "$db not found"
-        exit 1
+      echo "$name not found"
+      exit 1
     fi
-
 
     output_rttm_dir=$VB_dir/$name/rttm
     mkdir -p $output_rttm_dir || exit 1;
@@ -69,7 +91,7 @@ if [ $stage -le 1 ]; then
     # initialize the VB system. You can also use i-vector result or random 
     # initize the VB system. The following script uses kaldi_io. 
     # You could use `sh ../../../tools/extras/install_kaldi_io.sh` to install it
-    VB/diarization/VB_resegmentation.sh --nj 20 --cmd "$train_cmd --mem 10G" \
+    VB/diarization/VB_resegmentation.sh --nj $nj --cmd "$train_cmd --mem 10G" \
       --initialize 1 data/$name $init_rttm_file $VB_dir/$name \
       $VB_dir/$trained_dir/diag_ubm_$num_components/final.dubm $VB_dir/$trained_dir/extractor_diag_c${num_components}_i${ivector_dim}/final.ie || exit 1; 
     done
@@ -79,18 +101,36 @@ if [ $stage -le 2 ]; then
   
   for name in $dsets_test
     do
-    # change channel from 0 to 1
-    awk '{$3 = 1 ; print}' $VB_dir/$name/rttm/VB_rttm > $VB_dir/$name/rttm/VB_rttm_v2
+
+    if [[ "$name" =~ .*_dev.* ]];then
+      dev_eval=dev
+    elif [[ "$name" =~ .*_eval.* ]];then
+      dev_eval=eval
+    else
+      echo "Dataset dev/eval not found"
+      exit 1
+    fi
+
+
+    # Compute the DER after VB resegmentation wtih 
+    # PYANNOTE
+    $train_cmd $VB_dir/$name/pyannote.log \
+        local/pyannote_score_diar.sh $name $dev_eval $VB_dir/$name/rttm
+  
     
-    # Compute the DER after VB resegmentation
-    echo "starting DER analysis"
+    # Compute the DER after VB resegmentation wtih 
+    # MD-EVAL
     mkdir -p $VB_dir/$name/rttm || exit 1;
     md-eval.pl -1 -r data/$name/diarization.rttm\
-      -s $VB_dir/$name/rttm/VB_rttm_v2 2> $VB_dir/$name/log/VB_DER.log \
+      -s $VB_dir/$name/rttm/VB_rttm 2> $VB_dir/$name/log/VB_DER.log \
       > $VB_dir/$name/rttm/results.md-eval
     der=$(grep -oP 'DIARIZATION\ ERROR\ =\ \K[0-9]+([.][0-9]+)?' \
       $VB_dir/$name/rttm/results.md-eval)
-    echo "After VB resegmentation, DER: $der%"
+    pre_der=$(grep -oP 'DIARIZATION\ ERROR\ =\ \K[0-9]+([.][0-9]+)?' \
+      $VB_dir/$name/rttm/pre_result.md-eval)
+    echo "$name :   DER (pre_VB, post_VB):   $pre_der, $der%"
     done
 
 fi
+
+
