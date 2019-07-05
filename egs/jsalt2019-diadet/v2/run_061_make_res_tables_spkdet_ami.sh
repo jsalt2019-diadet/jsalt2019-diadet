@@ -8,14 +8,13 @@
 set -e
 
 config_file=default_config.sh
+stage=1
 
 . parse_options.sh || exit 1;
 . $config_file
 
 score_dir0=exp/scores/$nnet_name/${be_name}
 name0="$nnet_name $be_name"
-
-stage=5
 
 if [ $stage -le 1 ]; then
 #energy VAD
