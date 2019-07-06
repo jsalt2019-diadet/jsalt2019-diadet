@@ -29,10 +29,10 @@ score_dir=exp/diarization/$nnet_name/$be_diar_name
 VB_dir=exp/VB
 
 #dev datasets
-# dsets_spkdiar_dev_evad=(jsalt19_spkdiar_babytrain_dev jsalt19_spkdiar_chime5_dev_{U01,U06} jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01} jsalt19_spkdiar_sri_dev)
-# dsets_spkdiar_dev_gtvad=(jsalt19_spkdiar_babytrain_dev_gtvad jsalt19_spkdiar_chime5_dev_{U01,U06}_gtvad jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01}_gtvad jsalt19_spkdiar_sri_dev_gtvad) 
-dsets_spkdiar_dev_evad=( jsalt19_spkdiar_sri_dev )
-dsets_spkdiar_dev_gtvad=( jsalt19_spkdiar_sri_dev_gtvad ) 
+dsets_spkdiar_dev_evad=(jsalt19_spkdiar_babytrain_dev jsalt19_spkdiar_chime5_dev_{U01,U06} jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01} jsalt19_spkdiar_sri_dev)
+dsets_spkdiar_dev_gtvad=(jsalt19_spkdiar_babytrain_dev_gtvad jsalt19_spkdiar_chime5_dev_{U01,U06}_gtvad jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01}_gtvad jsalt19_spkdiar_sri_dev_gtvad) 
+# dsets_spkdiar_dev_evad=( jsalt19_spkdiar_sri_dev )
+# dsets_spkdiar_dev_gtvad=( jsalt19_spkdiar_sri_dev_gtvad ) 
 
 
 #eval datasets
@@ -98,18 +98,26 @@ if [ $stage -le 1 ]; then
       exit 1
     fi
 
-    output_rttm_dir=$VB_dir/$name/rttm
-    mkdir -p $output_rttm_dir || exit 1;
-    init_rttm_file=$score_dir/$name/plda_scores_tbest/rttm
+    vb_iters=( 1, 3, 5)
+    for vb_niter in ${vb_iters[@]}; do
 
-    # VB resegmentation. In this script, I use the x-vector result to 
-    # initialize the VB system. You can also use i-vector result or random 
-    # initize the VB system. The following script uses kaldi_io. 
-    # You could use `sh ../../../tools/extras/install_kaldi_io.sh` to install it
-    VB/diarization/VB_resegmentation.sh --nj $nj --cmd "$train_cmd --mem 10G" \
-      --initialize 1 data/$name $init_rttm_file $VB_dir/$name \
-      $VB_dir/$trained_dir/diag_ubm_$num_components/final.dubm $VB_dir/$trained_dir/extractor_diag_c${num_components}_i${ivector_dim}/final.ie || exit 1; 
+      output_rttm_dir=$VB_dir/$name/vb_iter$vb_niter/rttm
+      mkdir -p $output_rttm_dir || exit 1;
+      init_rttm_file=$score_dir/$name/plda_scores_tbest/rttm
+
+      # VB resegmentation. In this script, I use the x-vector result to 
+      # initialize the VB system. You can also use i-vector result or random 
+      # initize the VB system. The following script uses kaldi_io. 
+      # You could use `sh ../../../tools/extras/install_kaldi_io.sh` to install it
+      # Usage: diarization/VB_resegmentation.sh <data_dir> <init_rttm_filename> <output_dir> <dubm_model> <ie_model>
+      VB/diarization/VB_resegmentation.sh --nj $nj --cmd "$train_cmd --mem 10G" \
+        --max-iters $vb_niter --initialize 1 \
+        data/$name $init_rttm_file $VB_dir/$name/vb_iter$vb_niter \
+        $VB_dir/$trained_dir/diag_ubm_$num_components/final.dubm $VB_dir/$trained_dir/extractor_diag_c${num_components}_i${ivector_dim}/final.ie || exit 1; 
+
     done
+    
+  done
 fi
 
 if [ $stage -le 2 ]; then
@@ -130,7 +138,7 @@ if [ $stage -le 2 ]; then
     # PYANNOTE
     echo "Starting Pyannote rttm evaluation for $name ... "
     $train_cmd $VB_dir/$name/pyannote.log \
-        local/pyannote_score_diar.sh $name $dev_eval $VB_dir/$name/rttm
+        local/pyannote_score_diar.sh $name $dev_eval $VB_dir/$name/vb_iter$vb_niter/rttm
   
     
     # # Compute the DER after VB resegmentation wtih 
@@ -160,13 +168,12 @@ if [ $stage -le 3 ]; then
       pre_res_f=$score_dir/$name/plda_scores_tbest/result.pyannote-der
 
       cols=( 2, 11, 9, 13 )  # columns with DER, Miss, FA, Confusion
+      
       line="$name,"
       echo -n $line 
       for num in ${cols[@]}; do 
         awk -v num=$num '/TOTAL/ { printf "%.2f,", $num}' $pre_res_f
         awk -v num=$num '/TOTAL/ { printf "%.2f,", $num}' $post_res_f
-        # line="$line (awk -v num=$num'/TOTAL/ { printf \"%.2f,,\", $num}' $pre_res_f)"
-        # line="$line (awk '/TOTAL/ { printf \"%.2f,,\", $${num}}' $post_res_f)"
       done
       echo
      
@@ -174,4 +181,21 @@ if [ $stage -le 3 ]; then
 
 fi
 
+
+if [ $stage -le 4 ]; then 
+  # directory housingkeeping and manipulation
+
+  for name in $dsets_test
+    do
+
+    # if [[ "$name" =~ .*_babytrain_.*_gtvad ]];then
+    if [[ ! "$name" =~ .*_train.* ]]; then 
+      # mkdir -p $VB_dir/$name/vb_iter10
+      # mv $VB_dir/$name/rttm $VB_dir/$name/vb_iter10
+      rm -r $VB_dir/$name/log $VB_dir/$name/tmp $VB_dir/$name/q $VB_dir/$name/pyannote.log
+    fi
+
+  done
+
+fi
 
