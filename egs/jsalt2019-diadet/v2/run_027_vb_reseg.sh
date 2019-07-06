@@ -29,8 +29,11 @@ score_dir=exp/diarization/$nnet_name/$be_diar_name
 VB_dir=exp/VB
 
 #dev datasets
-dsets_spkdiar_dev_evad=(jsalt19_spkdiar_babytrain_dev jsalt19_spkdiar_chime5_dev_{U01,U06} jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01} )
-dsets_spkdiar_dev_gtvad=(jsalt19_spkdiar_babytrain_dev_gtvad jsalt19_spkdiar_chime5_dev_{U01,U06}_gtvad jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01}_gtvad ) 
+# dsets_spkdiar_dev_evad=(jsalt19_spkdiar_babytrain_dev jsalt19_spkdiar_chime5_dev_{U01,U06} jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01} jsalt19_spkdiar_sri_dev)
+# dsets_spkdiar_dev_gtvad=(jsalt19_spkdiar_babytrain_dev_gtvad jsalt19_spkdiar_chime5_dev_{U01,U06}_gtvad jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01}_gtvad jsalt19_spkdiar_sri_dev_gtvad) 
+dsets_spkdiar_dev_evad=( jsalt19_spkdiar_sri_dev )
+dsets_spkdiar_dev_gtvad=( jsalt19_spkdiar_sri_dev_gtvad ) 
+
 
 #eval datasets
 dsets_spkdiar_eval_evad=($(echo ${dsets_spkdiar_dev_evad[@]} | sed 's@_dev@_eval@g'))
@@ -69,7 +72,16 @@ if [ $stage -le 1 ]; then
     # #jobs differ because of the limited number of utterances and 
     # speakers for chime5 - there are just two speakers, so it refuses to split
     # into more than 2
-    if [[ "$name" =~ .*_babytrain_.* ]];then
+    if [[ "$name" =~ .*_babytrain_.*_gtvad ]];then
+      trained_dir=jsalt19_spkdiar_babytrain_train_gtvad
+      nj=20
+    elif [[ "$name" =~ .*_ami_.*_gtvad ]];then
+      trained_dir=jsalt19_spkdiar_ami_train_gtvad
+      nj=20
+    elif [[ "$name" =~ .*_chime5_.*_gtvad ]];then
+      trained_dir=jsalt19_spkdiar_chime5_train_gtvad
+      nj=2
+    elif [[ "$name" =~ .*_babytrain_.* ]];then
       trained_dir=jsalt19_spkdiar_babytrain_train
       nj=20
     elif [[ "$name" =~ .*_ami_.* ]];then
@@ -78,6 +90,9 @@ if [ $stage -le 1 ]; then
     elif [[ "$name" =~ .*_chime5_.* ]];then
       trained_dir=jsalt19_spkdiar_chime5_train
       nj=2
+    elif [[ "$name" =~ .*_sri_.* ]];then
+      trained_dir=voxceleb2_train_40k
+      nj=20    
     else
       echo "$name not found"
       exit 1
@@ -85,9 +100,7 @@ if [ $stage -le 1 ]; then
 
     output_rttm_dir=$VB_dir/$name/rttm
     mkdir -p $output_rttm_dir || exit 1;
-    cat $score_dir/$name/plda_scores_tbest/rttm > $output_rttm_dir/pre_VB_rttm
-    cat $score_dir/$name/plda_scores_tbest/result.md-eval > $output_rttm_dir/pre_result.md-eval
-    init_rttm_file=$output_rttm_dir/pre_VB_rttm
+    init_rttm_file=$score_dir/$name/plda_scores_tbest/rttm
 
     # VB resegmentation. In this script, I use the x-vector result to 
     # initialize the VB system. You can also use i-vector result or random 
@@ -112,7 +125,6 @@ if [ $stage -le 2 ]; then
       echo "Dataset dev/eval not found"
       exit 1
     fi
-
 
     # Compute the DER after VB resegmentation wtih 
     # PYANNOTE
@@ -139,7 +151,7 @@ fi
 
 if [ $stage -le 3 ]; then 
 
-  echo "dset,preDER,postDER,,preMiss,postMiss,,preFA,postFA,,preSpkConfusion,postSpkConfusion,,"
+  echo "dset,DER_pre,DER_post,DER_dif,Miss_pre,Miss_post,Miss_diff,FA_pre,FA_post,FA_diff,Conf_pre,Conf_post,Conf_diff,"
 
   for name in $dsets_test
     do 
@@ -147,15 +159,17 @@ if [ $stage -le 3 ]; then
       post_res_f=$VB_dir/$name/rttm/result.pyannote-der
       pre_res_f=$score_dir/$name/plda_scores_tbest/result.pyannote-der
 
-      # awk '/TOTAL/ { printf "%.2f,%.2f,%.2f,%.2f,", $2,$11,$9,$13}' $res_file
-      paste <(echo "$name,") <(awk '/TOTAL/ { printf "%.2f,", $2}' $pre_res_f) \
-        <(awk '/TOTAL/ { printf "%.2f,,", $2}' $post_res_f) \
-        <(awk '/TOTAL/ { printf "%.2f,", $11}' $pre_res_f) \
-        <(awk '/TOTAL/ { printf "%.2f,,", $11}' $post_res_f) \
-        <(awk '/TOTAL/ { printf "%.2f,", $9}' $pre_res_f) \
-        <(awk '/TOTAL/ { printf "%.2f,,", $9}' $post_res_f) \
-        <(awk '/TOTAL/ { printf "%.2f,", $13}' $pre_res_f) \
-        <(awk '/TOTAL/ { printf "%.2f,,", $13}' $post_res_f)            
+      cols=( 2, 11, 9, 13 )  # columns with DER, Miss, FA, Confusion
+      line="$name,"
+      echo -n $line 
+      for num in ${cols[@]}; do 
+        awk -v num=$num '/TOTAL/ { printf "%.2f,", $num}' $pre_res_f
+        awk -v num=$num '/TOTAL/ { printf "%.2f,", $num}' $post_res_f
+        # line="$line (awk -v num=$num'/TOTAL/ { printf \"%.2f,,\", $num}' $pre_res_f)"
+        # line="$line (awk '/TOTAL/ { printf \"%.2f,,\", $${num}}' $post_res_f)"
+      done
+      echo
+     
     done
 
 fi
