@@ -32,21 +32,19 @@ if [ $stage -le 2 ];then
     local/make_babytrain_spkdet.sh $baby_root $babytrain_list_dir ./data
     local/make_babytrain_spkdiar.sh $baby_root $babytrain_list_dir ./data
 
-    # Prepare enhancement version of babytrain-eval
-    echo "running enhancement may take much time, you can use precomputed audios."
-    #tools/speech_denoising_tools/run_enhancement_interface.sh  $baby_root/test/wav/  ./enhanced_audio/babytrain_eval
-    echo "baby_root_enhanced=/export/fs01/jsalt19/leisun/dataset/BabyTrain/test/SE_1000h_model_m3_s3" >> ./datapath.sh
-    . datapath.sh
-    local/make_babytrain_spkdiar_enhanced_eval.sh $baby_root_enhanced $babytrain_list_dir ./data
-    
+    # Prepare enhanced data of dev and eval
+    echo "running enhancement on each audio may take much time, we link the precomputed audios here."
+    local/make_babytrain_spkdiar_enhanced_dev_eval.sh $enhanced_eval_root $babytrain_list_dir ./data    
 fi
 
 if [ $stage -le 3 ];then
     # Prepare chime5
     local/make_chime5_spkdet_jsalt19.sh $chime5_root $chime5_list_dir ./data
     local/make_chime5_spkdiar_jsalt19.sh $chime5_root $chime5_list_dir ./data
-
-
+    
+    # Prepare enhanced data of dev and eval
+    echo "running enhancement on each audio may take much time, we link the precomputed audios here."
+    local/make_chime5_spkdiar_jsalt19_enhanced_dev_eval.sh $enhanced_eval_root $chime5_list_dir ./data
 fi
 
 
@@ -54,13 +52,22 @@ if [ $stage -le 4 ];then
     # Prepare ami
     local/make_ami_spkdet.sh $ami_root $ami_list_dir ./data
     local/make_ami_spkdiar.sh $ami_root $ami_list_dir ./data
+    
+    # Prepare enhanced data of dev and eval
+    echo "running enhancement on each audio may take much time, we link the precomputed audios here."
+    local/make_ami_spkdiar_enhanced_dev_eval.sh $enhanced_eval_root $ami_list_dir ./data
 fi
 
 if [ $stage -le 5 ];then
     # Prepare SRI
     local/make_sri_spkdet.sh $sri_root $sri_list_dir ./data
     local/make_sri_spkdiar.sh $sri_root $sri_list_dir ./data
+    
+    # Prepare enhanced data of dev and eval
+    echo "running enhancement on each audio may take much time, we link the precomputed audios here."
+    local/make_sri_spkdiar_enhanced_dev_eval.sh $enhanced_eval_root $sri_list_dir ./data
 fi
+
 
 
 
