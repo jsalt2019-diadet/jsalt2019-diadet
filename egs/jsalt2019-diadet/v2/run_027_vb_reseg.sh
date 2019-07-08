@@ -140,7 +140,7 @@ fi
 if [ $stage -le 3 ]; then 
 
   # echo "dset,DER_pre,DER_post,DER_diff,Miss_pre,Miss_post,Miss_diff,FA_pre,FA_post,FA_diff,Conf_pre,Conf_post,Conf_diff,"
-  # echo "dset,DER_pre,DER_post,DER_diff"
+  echo "dset,DER_pre,DER_post,DER_diff"
 
   for name in $dsets_test
     do 

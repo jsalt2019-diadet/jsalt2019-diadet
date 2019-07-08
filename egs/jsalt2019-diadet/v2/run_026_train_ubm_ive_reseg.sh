@@ -5,12 +5,8 @@
 #
 # Apache 2.0.
 #
-# This recipe demonstrates the use of x-vectors for speaker diarization.
-# The scripts are based on the recipe in ../v1/run.sh, but clusters x-vectors
-# instead of i-vectors.  It is similar to the x-vector-based diarization system
-# described in "Diarization is Hard: Some Experiences and Lessons Learned for
-# the JHU Team in the Inaugural DIHARD Challenge" by Sell et al.  The main
-# difference is that we haven't implemented the VB resegmentation yet.
+# This script trains a UBM and i-vector extractor in preparation
+# for VB resegmentation in run_027
 
 . ./cmd.sh
 . ./path.sh
