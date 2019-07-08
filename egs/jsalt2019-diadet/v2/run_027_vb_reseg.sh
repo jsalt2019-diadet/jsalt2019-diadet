@@ -145,34 +145,14 @@ if [ $stage -le 2 ]; then
       exit 1
     fi
 
-    # if [ -f $VB_dir/$name/vb_iter1/rttm/result.pyannote-der ]; then 
-    #   echo "Pyannote evaluation: skipping $name as iter1 was found"
-    #   continue
-    # fi
-
-    vb_iters=( 10 )
-    for vb_niter in ${vb_iters[@]}; do
       
-      # Compute the DER after VB resegmentation wtih 
-      # PYANNOTE
-      echo "Starting Pyannote rttm evaluation for $name, vb_iter$vb_niter ... "
-      $train_cmd $VB_dir/$name/pyannote.log \
-          local/pyannote_score_diar.sh $name $dev_eval $VB_dir/$name/vb_iter$vb_niter/rttm
+    # Compute the DER after VB resegmentation wtih 
+    # PYANNOTE
+    echo "Starting Pyannote rttm evaluation for $name, vb_iter$vb_niter ... "
+    $train_cmd $VB_dir/$name/pyannote.log \
+        local/pyannote_score_diar.sh $name $dev_eval $VB_dir/$name/vb_iter$vb_niter/rttm
     
-    done
-    
-    # # Compute the DER after VB resegmentation wtih 
-    # # MD-EVAL
-    # mkdir -p $VB_dir/$name/rttm || exit 1;
-    # md-eval.pl -1 -r data/$name/diarization.rttm\
-    #   -s $VB_dir/$name/rttm/VB_rttm 2> $VB_dir/$name/log/VB_DER.log \
-    #   > $VB_dir/$name/rttm/results.md-eval
-    # der=$(grep -oP 'DIARIZATION\ ERROR\ =\ \K[0-9]+([.][0-9]+)?' \
-    #   $VB_dir/$name/rttm/results.md-eval)
-    # pre_der=$(grep -oP 'DIARIZATION\ ERROR\ =\ \K[0-9]+([.][0-9]+)?' \
-    #   $VB_dir/$name/rttm/pre_result.md-eval)
-    # echo "$name :   DER (pre_VB, post_VB):   $pre_der, $der%"
-    
+
     done
 
 fi
@@ -191,23 +171,14 @@ if [ $stage -le 3 ]; then
 
       # cols=( 2 11 9 13 )  # columns with DER, Miss, FA, Confusion
       cols=( 2 )  # columns with DER, Miss, FA, Confusion
-      vb_iters=( 1 3 5 10 )
       
       split=(${name//_/,})
 
       echo -n "$split," 
 
-      # if [ ! -f $VB_dir/$name/vb_iter1/rttm/result.pyannote-der ]; then 
-      #   echo "NA"
-      #   continue
-      # fi
-
       for num in ${cols[@]}; do 
         awk -v num=$num '/TOTAL/ { printf "%.2f,", $num}' $pre_res_f
-        for vb_niter in ${vb_iters[@]}; do
-          awk -v num=$num '/TOTAL/ { printf "%.2f,", $num}' $VB_dir/$name/vb_iter$vb_niter/rttm/result.pyannote-der
-        done
-
+        awk -v num=$num '/TOTAL/ { printf "%.2f,", $num}' $VB_dir/$name/rttm/result.pyannote-der
       done
       echo
      
@@ -215,26 +186,4 @@ if [ $stage -le 3 ]; then
 
 fi
 
-exit 1
-
-if [ $stage -le 4 ]; then 
-  # directory housingkeeping and manipulation
-
-  for name in $dsets_test
-    do
-
-    if [[ ! -d $VB_dir/$name/vb_iter1 $VB_dir/$name/vb_iter3 $VB_dir/$name/vb_iter5 $VB_dir/$name/vb_iter10  ]]; then
-      echo "check out $name"
-    fi
-
-    # if [[ "$name" =~ .*_babytrain_.*_gtvad ]];then
-    # if [[ ! "$name" =~ .*_train.* ]]; then 
-      # mkdir -p $VB_dir/$name/vb_iter10
-      # mv $VB_dir/$name/rttm $VB_dir/$name/vb_iter10
-      # rm -r $VB_dir/$name/log $VB_dir/$name/tmp $VB_dir/$name/q $VB_dir/$name/pyannote.log
-    # fi
-
-  done
-
-fi
 
