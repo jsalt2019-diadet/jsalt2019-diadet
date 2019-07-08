@@ -49,30 +49,11 @@ dsets_test="${dsets_dev[@]} ${dsets_eval[@]}"
 # consists of all DIAR-DEV datasets
 # dsets_test="${dsets_dev[@]}"
 
-
-# consists of all DIAR-GT datasets
-# dsets_test="${dsets_dev_gt[@]} ${dsets_eval_gt[@]}"
-
-# consists of all DIAR-EVAL_GT datasets
-# dsets_test="${dsets_eval_gt[@]}"
-
-# for testing purposes
-dsets_test="jsalt19_spkdiar_sri_dev jsalt19_spkdiar_sri_dev_gtvad jsalt19_spkdiar_sri_eval jsalt19_spkdiar_sri_eval_gtvad"
-
-# subset of all dsets for experimenting with VB max iterations
-# vb_iterations_exp_dsets="jsalt19_spkdiar_babytrain_dev jsalt19_spkdiar_chime5_dev_U01 jsalt19_spkdiar_ami_dev_Mix-Headset jsalt19_spkdiar_sri_dev jsalt19_spkdiar_babytrain_dev_gtvad  jsalt19_spkdiar_ami_dev_Mix-Headset_gtvad jsalt19_spkdiar_sri_dev_gtvad"
-# vb_iterations_exp_dsets="jsalt19_spkdiar_ami_dev_Mix-Headset_gtvad jsalt19_spkdiar_sri_dev_gtvad"
-# dsets_test=$vb_iterations_exp_dsets
-
 echo $dsets_test
 
 
 num_components=1024 # the number of UBM components (used for VB resegmentation)
-# num_components=128 # the number of UBM components (used for VB resegmentation)
 ivector_dim=400 # the dimension of i-vector (used for VB resegmentation)
-# ivector_dim=50 # the dimension of i-vector (used for VB resegmentation)
-
-
 
 
 if [ $stage -le 1 ]; then
