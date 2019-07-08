@@ -92,7 +92,7 @@ if [ $stage -le 1 ]; then
     fi
 
 
-    output_rttm_dir=$VB_dir/$name/vb_iter$vb_niter/rttm
+    output_rttm_dir=$VB_dir/$name/rttm
     mkdir -p $output_rttm_dir || exit 1;
     init_rttm_file=$score_dir/$name/plda_scores_tbest/rttm
 
@@ -103,7 +103,7 @@ if [ $stage -le 1 ]; then
     # Usage: diarization/VB_resegmentation.sh <data_dir> <init_rttm_filename> <output_dir> <dubm_model> <ie_model>
     VB/diarization/VB_resegmentation.sh --nj $nj --cmd "$train_cmd --mem 10G" \
       --max-iters $vb_niter --initialize 1 \
-      data/$name $init_rttm_file $VB_dir/$name/vb_iter$vb_niter \
+      data/$name $init_rttm_file $VB_dir/$name \
       $VB_dir/$trained_dir/diag_ubm_$num_components/final.dubm $VB_dir/$trained_dir/extractor_diag_c${num_components}_i${ivector_dim}/final.ie || exit 1; 
 
 
@@ -129,9 +129,9 @@ if [ $stage -le 2 ]; then
       
     # Compute the DER after VB resegmentation wtih 
     # PYANNOTE
-    echo "Starting Pyannote rttm evaluation for $name, vb_iter$vb_niter ... "
+    echo "Starting Pyannote rttm evaluation for $name ... "
     $train_cmd $VB_dir/$name/pyannote.log \
-        local/pyannote_score_diar.sh $name $dev_eval $VB_dir/$name/vb_iter$vb_niter/rttm
+        local/pyannote_score_diar.sh $name $dev_eval $VB_dir/$name/rttm
     
 
     done
