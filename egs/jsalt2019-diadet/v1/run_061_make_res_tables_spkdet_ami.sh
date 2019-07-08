@@ -8,6 +8,7 @@
 set -e
 
 config_file=default_config.sh
+stage=1
 
 . parse_options.sh || exit 1;
 . $config_file
@@ -15,6 +16,7 @@ config_file=default_config.sh
 score_dir0=exp/scores/$nnet_name/${be_name}
 name0="$nnet_name $be_name"
 
+if [ $stage -le 1 ]; then
 #energy VAD
 conds=(plda plda_adapt plda_adapt_snorm \
 	    plda_spkdetdiar_nnet${nnet_name}_thrbest \
@@ -34,9 +36,11 @@ do
     args=""
 done
 echo ""
+fi
 
 #####
 
+if [ $stage -le 2 ]; then
 #GT VAD
 conds=(plda_gtvad plda_adapt_gtvad plda_adapt_snorm_gtvad \
 	    plda_spkdetdiar_nnet${nnet_name}_thrbest_gtvad \
@@ -57,9 +61,11 @@ do
     args=""
 done
 echo ""
+fi
 
 #####
 
+if [ $stage -le 3 ]; then
 #GT diarization
 conds=(plda_gtdiar plda_adapt_gtdiar plda_adapt_snorm_gtdiar)
 conds_name=("no-adapt gt-diar" "adapt gt-diar" "adapt-snorm gt-diar")
@@ -75,4 +81,6 @@ do
     args=""
 done
 echo ""
+fi
+###########
 

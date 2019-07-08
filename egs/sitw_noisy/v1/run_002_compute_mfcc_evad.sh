@@ -19,6 +19,7 @@ stage=1
 config_file=default_config.sh
 
 . parse_options.sh || exit 1;
+. $config_file
 
 # Make filterbanks and compute the energy-based VAD for each dataset
 
