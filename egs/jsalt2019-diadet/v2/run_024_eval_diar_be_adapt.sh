@@ -40,8 +40,8 @@ dsets_spkdet_dev_evad=(jsalt19_spkdet_{babytrain,ami,sri}_dev_test)
 dsets_spkdet_dev_gtvad=(jsalt19_spkdet_{babytrain,ami,sri}_dev_test_gtvad)
 
 #eval datasets
-dsets_spkdiar_eval_evad=($(echo ${dsets_spkdiar_dev_evad[@]} | sed 's@_dev@_eval@g') jsalt19_spkdiar_babytrain_enhanced_eval)
-dsets_spkdiar_eval_gtvad=($(echo ${dsets_spkdiar_dev_gtvad[@]} | sed 's@_dev@_eval@g') jsalt19_spkdiar_babytrain_enhanced_eval_gtvad)
+dsets_spkdiar_eval_evad=($(echo ${dsets_spkdiar_dev_evad[@]} | sed 's@_dev@_eval@g'))
+dsets_spkdiar_eval_gtvad=($(echo ${dsets_spkdiar_dev_gtvad[@]} | sed 's@_dev@_eval@g'))
 dsets_spkdiar_eval_enhanced_evad=($(echo ${dsets_spkdiar_dev_enhanced_evad[@]} | sed 's@_dev@_eval@g') )
 dsets_spkdiar_eval_enhanced_gtvad=($(echo ${dsets_spkdiar_dev_enhanced_gtvad[@]} | sed 's@_dev@_eval@g') )
 
