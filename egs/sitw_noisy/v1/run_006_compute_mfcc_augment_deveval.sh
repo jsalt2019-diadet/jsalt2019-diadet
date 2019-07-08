@@ -31,7 +31,7 @@ if [ $stage -le 1 ];then
 	    for snr in 15 10 5 0 -5
 	    do
 		name=${dset}_${noise}_snr${snr}
-		steps/make_mfcc.sh --mfcc-config conf/mfcc_16k.conf --nj 40 --cmd "$train_cmd" \
+		steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj 40 --cmd "$train_cmd" \
       				   data/$name exp/make_mfcc $mfccdir
 		fix_data_dir.sh data/$name
 	    done
@@ -40,7 +40,7 @@ if [ $stage -le 1 ];then
 	for rt60 in 0.0-0.5 0.5-1.0 1.0-1.5 1.5-4.0
 	do
 	    name=${dset}_reverb_rt60-$rt60
-	    steps/make_mfcc.sh --mfcc-config conf/mfcc_16k.conf --nj 40 --cmd "$train_cmd" \
+	    steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj 40 --cmd "$train_cmd" \
       			       data/$name exp/make_mfcc $mfccdir
 	    fix_data_dir.sh data/$name
 	done

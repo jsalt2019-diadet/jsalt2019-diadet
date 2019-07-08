@@ -11,9 +11,15 @@ tests/data_out/*
 
 #*.swp
 
-/tools/
-egs/*/*/data
-egs/*/*/exp
+egs/*/v*/data
+egs/*/v*/data_diar
+egs/*/v*/mfcc
+egs/*/v*/exp
+egs/*/v*/vad_*/
+
+tools/anaconda/anaconda3.5
+tools/cudnn/cudnn-*
+tools/kaldi/kaldi
 
 #temp/*
 #dist/*

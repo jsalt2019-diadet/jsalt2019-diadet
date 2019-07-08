@@ -1,6 +1,6 @@
 #!/bin/bash
 # Copyright       2019   Johns Hopkins University (Author: Jesus Villalba)
-#                
+#
 # Apache 2.0.
 #
 . ./cmd.sh
@@ -13,7 +13,7 @@ config_file=default_config.sh
 . parse_options.sh || exit 1;
 . $config_file
 
-. datapath.sh 
+. datapath.sh
 
 xvector_dir=exp/xvectors/$nnet_name
 be_babytrain_dir=exp/be/$nnet_name/$be_babytrain_name
@@ -64,11 +64,11 @@ if [ $stage -le 1 ];then
 					   $be_dir/lda_lnorm.h5 \
 					   $be_dir/plda.h5 \
 					   $score_plda_dir/${db}_enr${dur}_scores
-		    
+	    
 		    $scorer --cmd "$train_cmd --mem $mem_scorer" \
 			    data/${db}_test $part $dur $score_plda_dir 
 		) &
-		
+
 		# ground truth VAD
 		(
 		    steps_be/eval_be_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
@@ -78,12 +78,12 @@ if [ $stage -le 1 ];then
 					   $be_dir/lda_lnorm.h5 \
 					   $be_dir/plda.h5 \
 					   $score_plda_gtvad_dir/${db}_enr${dur}_scores
-		    
+	    
 		    $scorer --cmd "$train_cmd --mem $mem_scorer" \
 			    data/${db}_test $part $dur $score_plda_gtvad_dir 
 		) &
-		
-		
+
+
 		# energy VAD + PLDA adapt
 		(
 		    steps_be/eval_be_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
@@ -97,7 +97,7 @@ if [ $stage -le 1 ];then
 		    $scorer --cmd "$train_cmd --mem $mem_scorer" \
 			    data/${db}_test $part $dur $score_plda_adapt_dir 
 		) &
-		
+
 		# ground truth VAD + PLDA adapt
 		(
 		    steps_be/eval_be_v1.sh --cmd "$train_cmd" --plda_type $plda_type \
@@ -107,11 +107,11 @@ if [ $stage -le 1 ];then
 					   $be_dir/lda_lnorm_adapt.h5 \
 					   $be_dir/plda_adapt.h5 \
 					   $score_plda_adapt_gtvad_dir/${db}_enr${dur}_scores
-		    
+	    
 		    $scorer --cmd "$train_cmd --mem $mem_scorer" \
 			    data/${db}_test $part $dur $score_plda_adapt_gtvad_dir 
 		) &
-		
+
 		# energy VAD + PLDA adapt + AS-Norm
 		(
 		    steps_be/eval_be_snorm_v1.sh --cmd "$train_cmd" --plda_type $plda_type --ncoh $ncoh \
@@ -123,11 +123,11 @@ if [ $stage -le 1 ];then
 						 $be_dir/lda_lnorm_adapt.h5 \
 						 $be_dir/plda_adapt.h5 \
 						 $score_plda_adapt_snorm_dir/${db}_enr${dur}_scores
-		    
+	    
 		    $scorer --cmd "$train_cmd --mem $mem_scorer" \
 			    data/${db}_test $part $dur $score_plda_adapt_snorm_dir 
 		) &
-		
+
 		# ground truth VAD + PLDA adapt + AS-Norm
 		(
 		    steps_be/eval_be_snorm_v1.sh --cmd "$train_cmd" --plda_type $plda_type --ncoh $ncoh \
@@ -139,7 +139,7 @@ if [ $stage -le 1 ];then
 						 $be_dir/lda_lnorm_adapt.h5 \
 						 $be_dir/plda_adapt.h5 \
 						 $score_plda_adapt_snorm_gtvad_dir/${db}_enr${dur}_scores
-		    
+	    
 		    $scorer --cmd "$train_cmd --mem $mem_scorer" \
 			    data/${db}_test $part $dur $score_plda_adapt_snorm_gtvad_dir 
 		) &
@@ -181,4 +181,3 @@ if [ $stage -le 2 ];then
     wait
 
 fi
-
