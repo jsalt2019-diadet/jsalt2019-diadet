@@ -44,7 +44,7 @@ if [ $stage -le 3 ];then
     
     # Prepare enhanced data of dev and eval
     echo "running enhancement on each audio may take much time, we link the precomputed audios here."
-    local/make_chime5_spkdiar_jsalt19_enhanced_dev_eval.sh $enhanced_eval_root $chime5_list_dir ./data
+    local/make_chime5_spkdiar_enhanced_dev_eval.sh $enhanced_eval_root $chime5_list_dir ./data
 fi
 
 
