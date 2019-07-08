@@ -62,27 +62,24 @@ if [ $stage -le 1 ]; then
     # #jobs differ because of the limited number of utterances and 
     # speakers for chime5 - there are just two speakers, so it refuses to split
     # into more than 2
+    num_utt=$(wc -l data/$name/utt2spk | cut -d " " -f 1)
+	  nj=$(($num_utt < 40 ? 2:40))
+
+    # TODO: turn this into switch?
     if [[ "$name" =~ .*_babytrain_.*_gtvad ]];then
       trained_dir=jsalt19_spkdiar_babytrain_train_gtvad
-      nj=20
     elif [[ "$name" =~ .*_ami_.*_gtvad ]];then
       trained_dir=jsalt19_spkdiar_ami_train_gtvad
-      nj=20
     elif [[ "$name" =~ .*_chime5_.*_gtvad ]];then
       trained_dir=jsalt19_spkdiar_chime5_train_gtvad
-      nj=2
     elif [[ "$name" =~ .*_babytrain_.* ]];then
       trained_dir=jsalt19_spkdiar_babytrain_train
-      nj=20
     elif [[ "$name" =~ .*_ami_.* ]];then
       trained_dir=jsalt19_spkdiar_ami_train
-      nj=20
     elif [[ "$name" =~ .*_chime5_.* ]];then
       trained_dir=jsalt19_spkdiar_chime5_train
-      nj=2
     elif [[ "$name" =~ .*_sri_.* ]];then
       trained_dir=voxceleb2_train_40k
-      nj=20    
     else
       echo "$name not found"
       exit 1
