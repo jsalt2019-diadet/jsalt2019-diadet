@@ -23,14 +23,18 @@ config_file=default_config.sh
 . $config_file
 
 num_components=1024 # the number of UBM components (used for VB resegmentation)
-# num_components=128 # the number of UBM components (used for VB resegmentation)
 ivector_dim=400 # the dimension of i-vector (used for VB resegmentation)
-# ivector_dim=50 # the dimension of i-vector (used for VB resegmentation)
 
-dsets_train=(jsalt19_spkdiar_{babytrain,chime5,ami}_train)
+dsets_train_evad=(jsalt19_spkdiar_{babytrain,chime5,ami}_train_evad )
+
+dsets_train_gtvad=($(echo ${dsets_train_evad[@]} | sed 's/_evad/_gtvad/g'))
+dsets_train_evad=($(echo ${dsets_train_evad[@]} | sed 's/_evad//g'))
+
 
 #datasets from array to string list
-dsets_train="${dsets_train[@]}"
+dsets_train="${dsets_train_gtvad[@]} ${dsets_train_evad[@]}"
+
+
 
 VB_dir=exp/VB
 
@@ -42,7 +46,6 @@ if [ $stage -le 1 ]; then
   for name in $dsets_train
     do
 
-    # utils/subset_data_dir.sh data/jsalt19_spkdiar_ami_train 40 data/jsalt19_spkdiar_ami_train_40
     # Train the diagonal UBM.
     mkdir -p $VB_dir || exit 1;
     VB/sid/train_diag_ubm.sh --cmd "$train_cmd --mem 10G" \
