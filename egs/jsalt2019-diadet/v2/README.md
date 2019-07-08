@@ -82,6 +82,11 @@ The recipe contains the following directories:
    /export/fs01/jsalt19/resources/xvectors/jsalt19-diadet/baseline_mfcc40/xvectors
    ```
 
+   The enhanced test sets (including dev, eval) of each corpus are precomputed and directly linked in testing scripts:
+   ```
+   /export/fs01/jsalt19/leisun/dataset/{BabyTrain,CHiME5,SRI,ami}/{dev,test}/SE_1000h_model_m3_s3/*.wav
+   ```
+
 ## Auxiliary scripts
 
  - cmd.sh: define different commands to submit jobs to the SGE queue
