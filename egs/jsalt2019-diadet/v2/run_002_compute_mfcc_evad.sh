@@ -136,7 +136,6 @@ if [ $stage -le 6 ];then
 					  jsalt19_spkdiar_chime5_enhanced_{dev,eval}_{U01,U06}\
 					  jsalt19_spkdiar_ami_enhanced_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}\
 					  jsalt19_spkdiar_sri_enhanced_{dev,eval}
-
     do
 	num_utt=$(wc -l data/$name/utt2spk | cut -d " " -f 1)
 	nj=$(($num_utt < 40 ? 2:40))
@@ -155,7 +154,6 @@ if [ $stage -le 6 ];then
 	hyp_utils/rttm_to_bin_vad.sh --nj $nj data/$name/vad.rttm data/${name}_gtvad $vaddir_gt
 	utils/fix_data_dir.sh data/${name}_gtvad
     done
-
 fi
 
 
