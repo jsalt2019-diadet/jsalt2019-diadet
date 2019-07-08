@@ -5,12 +5,9 @@
 #
 # Apache 2.0.
 #
-# This recipe demonstrates the use of x-vectors for speaker diarization.
-# The scripts are based on the recipe in ../v1/run.sh, but clusters x-vectors
-# instead of i-vectors.  It is similar to the x-vector-based diarization system
-# described in "Diarization is Hard: Some Experiences and Lessons Learned for
-# the JHU Team in the Inaugural DIHARD Challenge" by Sell et al.  The main
-# difference is that we haven't implemented the VB resegmentation yet.
+# This script performs VB resegmentation with a UBM and i-vector 
+# extractor as trained in run_026_train_ubm_ive_reseg.sh
+# Stages 2 and 3 evaluate the output RTTMs
 
 . ./cmd.sh
 . ./path.sh
@@ -142,8 +139,8 @@ fi
 
 if [ $stage -le 3 ]; then 
 
-  # echo "dset,DER_pre,DER_post,DER_dif,Miss_pre,Miss_post,Miss_diff,FA_pre,FA_post,FA_diff,Conf_pre,Conf_post,Conf_diff,"
-  echo "dset,DER_pre,DER_vb_i1,DER_vb_i3,DER_vb_i5,DER_vb_i10"
+  # echo "dset,DER_pre,DER_post,DER_diff,Miss_pre,Miss_post,Miss_diff,FA_pre,FA_post,FA_diff,Conf_pre,Conf_post,Conf_diff,"
+  # echo "dset,DER_pre,DER_post,DER_diff"
 
   for name in $dsets_test
     do 
@@ -151,7 +148,7 @@ if [ $stage -le 3 ]; then
       pre_res_f=$score_dir/$name/plda_scores_tbest/result.pyannote-der
 
       # cols=( 2 11 9 13 )  # columns with DER, Miss, FA, Confusion
-      cols=( 2 )  # columns with DER, Miss, FA, Confusion
+      cols=( 2 )  # columns with only DER
       
       split=(${name//_/,})
 
