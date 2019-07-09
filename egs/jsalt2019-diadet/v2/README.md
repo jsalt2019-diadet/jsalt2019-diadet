@@ -138,6 +138,9 @@ This is a summary of the recipe steps:
 - run_005_train_pyannote_vad.sh:
      - Trains LSTM-based VAD models on each dataset/microphone
 
+- run_006_apply_pyannote_vad.sh:
+    - Applies LSTM-based VAD on each dataset/microphone
+
  - run_010_prepare_xvec_train_data.sh:
       - Prepares the features for x-vector training, i.e., removes silence and applies CMN.
 
