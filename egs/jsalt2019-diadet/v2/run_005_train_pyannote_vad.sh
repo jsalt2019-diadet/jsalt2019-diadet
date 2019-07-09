@@ -19,5 +19,7 @@ for PROTOCOL in AMI.SpeakerDiarization.MixHeadset \
                 CHiME5.SpeakerDiarization.U06
 do
   # FIXME: is this the correct way of doing it?
-  train_cmd ../steps_vad/train.sh ${PROTOCOL} &
+  $train_cmd --gpu 1 <your-standard-output-file> \ 
+      steps_vad/train.sh ${PROTOCOL} &
 done
+wait
