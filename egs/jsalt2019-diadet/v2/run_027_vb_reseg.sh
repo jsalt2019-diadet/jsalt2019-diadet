@@ -43,11 +43,6 @@ dsets_eval=(${dsets_spkdiar_eval_evad[@]} ${dsets_spkdiar_eval_gtvad[@]})
 # consists of all DIAR datasets
 dsets_test="${dsets_dev[@]} ${dsets_eval[@]}"
 
-# consists of all DIAR-DEV datasets
-# dsets_test="${dsets_dev[@]}"
-
-echo $dsets_test
-
 
 num_components=1024 # the number of UBM components (used for VB resegmentation)
 ivector_dim=400 # the dimension of i-vector (used for VB resegmentation)
