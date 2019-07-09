@@ -20,6 +20,8 @@ if [ "$(hostname -d)" == "clsp.jhu.edu" ];then
 fi
 
 
+
+
 # models are stored here
 EXPERIMENT_DIR="exp/vad/${PROTOCOL}"
 
@@ -50,9 +52,30 @@ pyannote-speech-detection apply --gpu \
   ${MODEL_PT} ${PROTOCOL} ${EXPERIMENT_DIR}/scores
 
 # apply the pipeline and get RTTMs. finally!
-for subset in test development train
-do
-pyannote-pipeline apply --subset=${subset} \
+pyannote-pipeline apply --subset=development \
   ${EXPERIMENT_DIR}/pipeline/${PROTOCOL}/train/${PROTOCOL}.development/params.yml \
   ${PROTOCOL} ${EXPERIMENT_DIR}/results
-done
+
+declare -A mapping=( ["AMI.SpeakerDiarization.Array1"]="jsalt19_spkdiar_ami_dev_Array1-01" \
+                     ["AMI.SpeakerDiarization.Array2"]="jsalt19_spkdiar_ami_dev_Array2-01" \
+                     ["AMI.SpeakerDiarization.MixHeadset"]="jsalt19_spkdiar_ami_dev_Mix-Headset" \
+                     ["BabyTrain.SpeakerDiarization.All"]="jsalt19_spkdiar_babytrain_dev" \
+                     ["CHiME5.SpeakerDiarization.U01"]="jsalt19_spkdiar_chime5_dev_U01" \
+                     ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime5_dev_U06" \
+                     ["SRI.SpeakerDiarization.All"]="jsalt19_spkdiar_sri_dev" )
+# FIXME. where exactly should I put the VAD?
+cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.development.rttm ${mapping[$PROTOCOL]}/vad.pyannote.rttm
+
+pyannote-pipeline apply --subset=test \
+  ${EXPERIMENT_DIR}/pipeline/${PROTOCOL}/train/${PROTOCOL}.development/params.yml \
+  ${PROTOCOL} ${EXPERIMENT_DIR}/results
+
+declare -A mapping=( ["AMI.SpeakerDiarization.Array1"]="jsalt19_spkdiar_ami_eval_Array1-01" \
+                     ["AMI.SpeakerDiarization.Array2"]="jsalt19_spkdiar_ami_eval_Array2-01" \
+                     ["AMI.SpeakerDiarization.MixHeadset"]="jsalt19_spkdiar_ami_eval_Mix-Headset" \
+                     ["BabyTrain.SpeakerDiarization.All"]="jsalt19_spkdiar_babytrain_eval" \
+                     ["CHiME5.SpeakerDiarization.U01"]="jsalt19_spkdiar_chime5_eval_U01" \
+                     ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime5_eval_U06" \
+                     ["SRI.SpeakerDiarization.All"]="jsalt19_spkdiar_sri_dev" )
+# FIXME. where exactly should I put the VAD?
+cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.test.rttm ${mapping[$PROTOCOL]}/vad.pyannote.rttm
