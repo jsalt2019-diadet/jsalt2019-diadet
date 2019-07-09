@@ -135,6 +135,9 @@ This is a summary of the recipe steps:
       - Computes MFCC for the augmented data and merges original and augmented data directories.
       - Again, if you use the default configuration you don't need to run this script.
 
+- run_005_train_pyannote_vad.sh:
+     - Trains LSTM-based VAD models on each dataset/microphone
+
  - run_010_prepare_xvec_train_data.sh:
       - Prepares the features for x-vector training, i.e., removes silence and applies CMN.
 
@@ -298,4 +301,3 @@ This is a summary of the recipe steps:
     - Easy to paste in Google spreadsheets:
         - Paste special -> values only.
 	- Push split text to columns.
-
