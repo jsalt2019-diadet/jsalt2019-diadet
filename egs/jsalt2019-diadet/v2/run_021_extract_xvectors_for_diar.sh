@@ -26,7 +26,8 @@ dsets_spkdiar_test_enhanced_gtvad=(jsalt19_spkdiar_babytrain_enhanced_{dev,eval}
 
 #datasets from array to string list
 dsets_adapt="${dsets_adapt[@]}"
-dsets_test="${dsets_spkdiar_test_evad[@]} ${dsets_spkdiar_test_gtvad[@]} ${dsets_spkdet_test_evad[@]} ${dsets_spkdet_test_gtvad[@] ${dsets_spkdiar_test_enhanced_evad[@] ${dsets_spkdiar_test_enhanced_gtvad[@]}" 
+# dsets_test="${dsets_spkdiar_test_evad[@]} ${dsets_spkdiar_test_gtvad[@]} ${dsets_spkdet_test_evad[@]} ${dsets_spkdet_test_gtvad[@]} ${dsets_spkdiar_test_enhanced_evad[@]} ${dsets_spkdiar_test_enhanced_gtvad[@]}" 
+dsets_test="${dsets_spkdiar_test_enhanced_evad[@]} ${dsets_spkdiar_test_enhanced_gtvad[@]}" 
 
 
 
