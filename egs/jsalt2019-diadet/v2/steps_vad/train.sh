@@ -76,28 +76,53 @@ if [ "$(hostname -d)" == "clsp.jhu.edu" ];then
    CUDA_VISIBLE_DEVICES=`free-gpu`
 fi
 
+
 # models will be stored here
 EXPERIMENT_DIR="exp/vad/${PROTOCOL}"
 
-# create models directory and configuration file
-mkdir -p ${EXPERIMENT_DIR}/models
-echo "${MODEL_CONFIG_YML}" > ${EXPERIMENT_DIR}/models/config.yml
+# corner case for SRI: we use CHiME5 as training set
+if [[ "$PROTOCOL" == SRI.* ]]; then
 
-# train model for 200 epochs on protocol training set
-pyannote-speech-detection train --subset=train --gpu --to=200 ${EXPERIMENT_DIR}/models ${PROTOCOL}
+  # models from CHiME5 are stored here
+  FAKE_PROTOCOL="CHiME5.SpeakerDiarization.U06"
+  FAKE_EXPERIMENT_DIR="exp/vad/${FAKE_PROTOCOL}"
 
-# validate the model every 5 epochs on the development set
-pyannote-speech-detection validate --subset=development --gpu --chronological --every=5 --to=200  ${EXPERIMENT_DIR}/models/train/${PROTOCOL}.train ${PROTOCOL}
+  # validate the CHiME5 model every 5 epochs on the development set
+  pyannote-speech-detection validate --subset=development \
+    --gpu --chronological --every=5 --to=200  \
+    ${FAKE_EXPERIMENT_DIR}/models/train/${FAKE_PROTOCOL}.train ${PROTOCOL}
 
-# obtain the best epoch and threshold by reading the resulting "params.yml" file
-PARAMS_YML=${EXPERIMENT_DIR}/models/train/${PROTOCOL}.train/validate/${PROTOCOL}.development/params.yml
-BEST_EPOCH=`grep epoch $PARAMS_YML | sed 's/epoch\: //'`
-printf -v BEST_EPOCH "%04d" $BEST_EPOCH
+  # used to obtain the best threshold by reading the resulting "params.yml" file
+  PARAMS_YML=${FAKE_EXPERIMENT_DIR}/models/train/${FAKE_PROTOCOL}.train/validate/${PROTOCOL}.development/params.yml
+
+else
+
+  # create models directory and configuration file
+  mkdir -p ${EXPERIMENT_DIR}/models
+  echo "${MODEL_CONFIG_YML}" > ${EXPERIMENT_DIR}/models/config.yml
+
+  # train model for 200 epochs on protocol training set
+  pyannote-speech-detection train --subset=train \
+    --gpu --to=200 ${EXPERIMENT_DIR}/models ${PROTOCOL}
+
+  # validate the model every 5 epochs on the development set
+  pyannote-speech-detection validate --subset=development\
+    --gpu --chronological --every=5 --to=200 \
+    ${EXPERIMENT_DIR}/models/train/${PROTOCOL}.train ${PROTOCOL}
+
+  # used to obtain the best threshold by reading the resulting "params.yml" file
+  PARAMS_YML=${EXPERIMENT_DIR}/models/train/${PROTOCOL}.train/validate/${PROTOCOL}.development/params.yml
+
+fi
+
+# obtain the best threshold by reading the "params.yml" file
 THRESHOLD=`grep "  onset" $PARAMS_YML | sed 's/  onset\: //'`
 
 # create VAD pipeline directory and configuration file
 # ideally, the pipeline should be optimized but to make things faster
 # we use the threshold found during the validation step
 mkdir -p ${EXPERIMENT_DIR}/pipeline/${PROTOCOL}/train/${PROTOCOL}.development
-echo "${PIPELINE_CONFIG_YML}" | sed "s%SCORES%${EXPERIMENT_DIR}\/scores%" > ${EXPERIMENT_DIR}/pipeline/${PROTOCOL}/config.yml
-echo "${PIPELINE_PARAMS_YML}" | sed "s/THRESHOLD/${THRESHOLD}/" > ${EXPERIMENT_DIR}/pipeline/${PROTOCOL}/train/${PROTOCOL}.development/params.yml
+echo "${PIPELINE_CONFIG_YML}" | sed "s%SCORES%${EXPERIMENT_DIR}\/scores%" \
+  > ${EXPERIMENT_DIR}/pipeline/${PROTOCOL}/config.yml
+echo "${PIPELINE_PARAMS_YML}" | sed "s/THRESHOLD/${THRESHOLD}/" \
+  > ${EXPERIMENT_DIR}/pipeline/${PROTOCOL}/train/${PROTOCOL}.development/params.yml
