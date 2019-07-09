@@ -14,11 +14,8 @@ set -e
 # this script is called like "train.sh AMI.SpeakerDiarization.MixHeadset"
 PROTOCOL=$1
 
-# FIXME: should this go in path.sh?
-PYANNOTE_DATABASE_CONFIG=/export/fs01/jsalt19/databases/database.yml
-
 # hardcoded VAD configuration file. one might want
-# to make it part of config.sh at some point
+# to store it in conf/ directory at some point
 read -r -d '' MODEL_CONFIG_YML << EOM
 task:
    name: SpeechActivityDetection
@@ -74,14 +71,12 @@ pipeline:
       scores: SCORES
 EOM
 
-# FIXME: this is hard-coded for JHU cluster
-# one should probably do that differently
-# e.g. set this variable outside of this script
+# use CLSP "free-gpu" command to request a specific GPU
 if [ "$(hostname -d)" == "clsp.jhu.edu" ];then
    CUDA_VISIBLE_DEVICES=`free-gpu`
 fi
 
-# FIXME. Can I store models here?
+# models will be stored here
 EXPERIMENT_DIR="exp/vad/${PROTOCOL}"
 
 # create models directory and configuration file
