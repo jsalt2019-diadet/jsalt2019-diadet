@@ -77,10 +77,12 @@ EOM
 # FIXME: this is hard-coded for JHU cluster
 # one should probably do that differently
 # e.g. set this variable outside of this script
-CUDA_VISIBLE_DEVICES=`free-gpu`
+if [ "$(hostname -d)" == "clsp.jhu.edu" ];then
+   CUDA_VISIBLE_DEVICES=`free-gpu`
+fi
 
 # FIXME. Can I store models here?
-EXPERIMENT_DIR="${JSALT_ROOT}/data/vad/${PROTOCOL}"
+EXPERIMENT_DIR="exp/vad/${PROTOCOL}"
 
 # create models directory and configuration file
 mkdir -p ${EXPERIMENT_DIR}/models
