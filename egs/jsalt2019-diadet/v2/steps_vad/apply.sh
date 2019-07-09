@@ -63,8 +63,7 @@ declare -A mapping=( ["AMI.SpeakerDiarization.Array1"]="jsalt19_spkdiar_ami_dev_
                      ["CHiME5.SpeakerDiarization.U01"]="jsalt19_spkdiar_chime5_dev_U01" \
                      ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime5_dev_U06" \
                      ["SRI.SpeakerDiarization.All"]="jsalt19_spkdiar_sri_dev" )
-# FIXME. where exactly should I put the VAD?
-cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.development.rttm ${mapping[$PROTOCOL]}/vad.pyannote.rttm
+cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.development.rttm ./data/${mapping[$PROTOCOL]}/pyannote_vad.rttm
 
 pyannote-pipeline apply --subset=test \
   ${EXPERIMENT_DIR}/pipeline/${PROTOCOL}/train/${PROTOCOL}.development/params.yml \
@@ -77,5 +76,4 @@ declare -A mapping=( ["AMI.SpeakerDiarization.Array1"]="jsalt19_spkdiar_ami_eval
                      ["CHiME5.SpeakerDiarization.U01"]="jsalt19_spkdiar_chime5_eval_U01" \
                      ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime5_eval_U06" \
                      ["SRI.SpeakerDiarization.All"]="jsalt19_spkdiar_sri_dev" )
-# FIXME. where exactly should I put the VAD?
-cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.test.rttm ${mapping[$PROTOCOL]}/vad.pyannote.rttm
+cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.test.rttm ./data/${mapping[$PROTOCOL]}/pyannote_vad.rttm
