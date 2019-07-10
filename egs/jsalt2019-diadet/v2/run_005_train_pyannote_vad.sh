@@ -11,6 +11,8 @@
 . ./path.sh
 set -e
 
+conda activate pyannote
+
 for PROTOCOL in AMI.SpeakerDiarization.MixHeadset \
                 # AMI.SpeakerDiarization.Array1 \
                 # AMI.SpeakerDiarization.Array2 \
@@ -18,8 +20,9 @@ for PROTOCOL in AMI.SpeakerDiarization.MixHeadset \
                 # CHiME5.SpeakerDiarization.U01 \
                 # CHiME5.SpeakerDiarization.U06
 do
-  $train_cmd --gpu 1 exp/vad/${PROTOCOL}/train.log \
-      steps_vad/train.sh ${PROTOCOL} &
+  # $train_cmd --gpu 1 exp/vad/${PROTOCOL}/train.log \
+  #     steps_vad/train.sh ${PROTOCOL} &
+      steps_vad/train.sh ${PROTOCOL} 
 done
 
 # FIXME: what does this wait do?
@@ -32,4 +35,5 @@ MODEL_PT=${FAKE_EXPERIMENT_DIR}/models/train/${FAKE_PROTOCOL}.train/weights/0200
 wait_file ${MODEL_PT}
 
 PROTOCOL=SRI.SpeakerDiarization.All
-$train_cmd --gpu 1 exp/vad/${PROTOCOL}/train.log steps_vad/train.sh ${PROTOCOL}
+# $train_cmd --gpu 1 exp/vad/${PROTOCOL}/train.log steps_vad/train.sh ${PROTOCOL}
+steps_vad/train.sh ${PROTOCOL}
