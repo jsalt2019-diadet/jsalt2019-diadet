@@ -14,6 +14,9 @@ set -e
 # this script is called like "train.sh AMI.SpeakerDiarization.MixHeadset"
 PROTOCOL=$1
 
+# TRAIN_EPOCHS=200
+TRAIN_EPOCHS=1
+
 # hardcoded VAD configuration file. one might want
 # to store it in conf/ directory at some point
 read -r -d '' MODEL_CONFIG_YML << EOM
@@ -89,7 +92,7 @@ if [[ "$PROTOCOL" == SRI.* ]]; then
 
   # validate the CHiME5 model every 5 epochs on the development set
   pyannote-speech-detection validate --subset=development \
-    --gpu --chronological --every=5 --to=200  \
+    --gpu --chronological --every=5 --to=$TRAIN_EPOCHS  \
     ${FAKE_EXPERIMENT_DIR}/models/train/${FAKE_PROTOCOL}.train ${PROTOCOL}
 
   # used to obtain the best threshold by reading the resulting "params.yml" file
@@ -101,13 +104,13 @@ else
   mkdir -p ${EXPERIMENT_DIR}/models
   echo "${MODEL_CONFIG_YML}" > ${EXPERIMENT_DIR}/models/config.yml
 
-  # train model for 200 epochs on protocol training set
+  # train model for $TRAIN_EPOCHS epochs on protocol training set
   pyannote-speech-detection train --subset=train \
-    --gpu --to=200 ${EXPERIMENT_DIR}/models ${PROTOCOL}
+    --gpu --to=$TRAIN_EPOCHS ${EXPERIMENT_DIR}/models ${PROTOCOL}
 
   # validate the model every 5 epochs on the development set
   pyannote-speech-detection validate --subset=development\
-    --gpu --chronological --every=5 --to=200 \
+    --gpu --chronological --every=5 --to=$TRAIN_EPOCHS \
     ${EXPERIMENT_DIR}/models/train/${PROTOCOL}.train ${PROTOCOL}
 
   # used to obtain the best threshold by reading the resulting "params.yml" file
