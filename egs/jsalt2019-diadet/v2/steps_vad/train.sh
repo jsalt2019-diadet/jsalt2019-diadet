@@ -15,6 +15,8 @@ PROTOCOL=$1
 # TRAIN_EPOCHS=200
 TRAIN_EPOCHS=1
 
+echo coocoo
+
 # hardcoded VAD configuration file. one might want
 # to store it in conf/ directory at some point
 read -r -d '' MODEL_CONFIG_YML << EOM
@@ -56,6 +58,9 @@ scheduler:
       epochs_per_cycle: 14
 EOM
 
+echo coocoo1
+
+
 read -r -d '' PIPELINE_PARAMS_YML << EOM
 min_duration_off: 0.1
 min_duration_on: 0.1
@@ -77,9 +82,14 @@ if [ "$(hostname -d)" == "clsp.jhu.edu" ];then
    CUDA_VISIBLE_DEVICES=`free-gpu`
 fi
 
+echo coocoo3
+
 
 # models will be stored here
 EXPERIMENT_DIR="exp/vad/${PROTOCOL}"
+
+echo cooco4
+
 
 # corner case for SRI: we use CHiME5 as training set
 if [[ "$PROTOCOL" == SRI.* ]]; then
