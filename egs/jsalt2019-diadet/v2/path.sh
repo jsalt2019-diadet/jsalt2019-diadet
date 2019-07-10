@@ -15,7 +15,7 @@ PATH=$KALDI_ROOT/tools/sctk-2.4.10/src/md-eval:$PATH
 HYP_ROOT=$TOOLS_ROOT/hyperion/hyperion
 
 # pyannote
-PYANNOTE_DATABASE_CONFIG=/export/fs01/jsalt19/databases/database.yml
+export PYANNOTE_DATABASE_CONFIG=/export/fs01/jsalt19/databases/database.yml
 
 #Anaconda env
 CONDA_ROOT=$TOOLS_ROOT/anaconda/anaconda3.5
