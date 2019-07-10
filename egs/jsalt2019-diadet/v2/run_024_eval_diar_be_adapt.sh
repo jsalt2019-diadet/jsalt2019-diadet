@@ -101,7 +101,7 @@ if [ $stage -le 2 ]; then
 	eval_dataset_i=${dsets_eval[$i]}
 	if [[ "$dev_dataset_i" =~ .*babytrain.* ]];then
 	    score_dir_i=$score_babytrain_dir
-	elif [[ "$dev_dataset_i" =~ .*chime5.* ]] || [[ "$name" =~ .*sri.* ]];then
+	elif [[ "$dev_dataset_i" =~ .*chime5.* ]] || [[ "$dev_dataset_i" =~ .*sri.* ]];then
 	    score_dir_i=$score_chime5_dir
 	elif [[ "$dev_dataset_i" =~ .*ami.* ]];then
 	    score_dir_i=$score_ami_dir
