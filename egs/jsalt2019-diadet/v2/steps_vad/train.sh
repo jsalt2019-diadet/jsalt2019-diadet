@@ -7,8 +7,6 @@
 # $ git checkout develop   <--- important: one must used the develop branch
 # $ pip install .
 
-. ../cmd.sh
-. ../path.sh
 set -e
 
 # this script is called like "train.sh AMI.SpeakerDiarization.MixHeadset"
