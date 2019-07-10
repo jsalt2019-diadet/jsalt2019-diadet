@@ -15,67 +15,65 @@ PROTOCOL=$1
 # TRAIN_EPOCHS=200
 TRAIN_EPOCHS=1
 
-echo coocoo
 
 # hardcoded VAD configuration file. one might want
 # to store it in conf/ directory at some point
-read -r -d '' MODEL_CONFIG_YML << EOM
-task:
-   name: SpeechActivityDetection
-   params:
-      duration: 2.0
-      batch_size: 64
-      per_epoch: 1
-      parallel: 6
+# read -r -d '' MODEL_CONFIG_YML << EOM
+# task:
+#    name: SpeechActivityDetection
+#    params:
+#       duration: 2.0
+#       batch_size: 64
+#       per_epoch: 1
+#       parallel: 6
 
-data_augmentation:
-   name: AddNoise
-   params:
-      snr_min: 10
-      snr_max: 20
-      collection: MUSAN.Collection.BackgroundNoise
+# data_augmentation:
+#    name: AddNoise
+#    params:
+#       snr_min: 10
+#       snr_max: 20
+#       collection: MUSAN.Collection.BackgroundNoise
 
-feature_extraction:
-   name: RawAudio
-   params:
-      sample_rate: 16000
+# feature_extraction:
+#    name: RawAudio
+#    params:
+#       sample_rate: 16000
 
-architecture:
-   name: pyannote.audio.models.PyanNet
-   params:
-      rnn:
-         unit: LSTM
-         hidden_size: 128
-         num_layers: 2
-         bidirectional: True
-      ff:
-         hidden_size: [128, 128]
+# architecture:
+#    name: pyannote.audio.models.PyanNet
+#    params:
+#       rnn:
+#          unit: LSTM
+#          hidden_size: 128
+#          num_layers: 2
+#          bidirectional: True
+#       ff:
+#          hidden_size: [128, 128]
 
-scheduler:
-   name: CyclicScheduler
-   params:
-      learning_rate: auto
-      epochs_per_cycle: 14
-EOM
-
-echo coocoo1
+# scheduler:
+#    name: CyclicScheduler
+#    params:
+#       learning_rate: auto
+#       epochs_per_cycle: 14
+# EOM
 
 
-read -r -d '' PIPELINE_PARAMS_YML << EOM
-min_duration_off: 0.1
-min_duration_on: 0.1
-offset: THRESHOLD
-onset: THRESHOLD
-pad_offset: 0.0
-pad_onset: 0.0
-EOM
 
-read -r -d '' PIPELINE_CONFIG_YML << EOM
-pipeline:
-   name: pyannote.audio.pipeline.speech_activity_detection.SpeechActivityDetection
-   params:
-      scores: SCORES
-EOM
+# read -r -d '' PIPELINE_PARAMS_YML << EOM
+# min_duration_off: 0.1
+# min_duration_on: 0.1
+# offset: THRESHOLD
+# onset: THRESHOLD
+# pad_offset: 0.0
+# pad_onset: 0.0
+# EOM
+
+# read -r -d '' PIPELINE_CONFIG_YML << EOM
+# pipeline:
+#    name: pyannote.audio.pipeline.speech_activity_detection.SpeechActivityDetection
+#    params:
+#       scores: SCORES
+# EOM
 
 # use CLSP "free-gpu" command to request a specific GPU
 if [ "$(hostname -d)" == "clsp.jhu.edu" ];then
