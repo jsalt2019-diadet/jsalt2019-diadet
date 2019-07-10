@@ -91,7 +91,7 @@ if [ $stage -le 1 ]; then
     # You could use `sh ../../../tools/extras/install_kaldi_io.sh` to install it
     # Usage: diarization/VB_resegmentation.sh <data_dir> <init_rttm_filename> <output_dir> <dubm_model> <ie_model>
     VB/diarization/VB_resegmentation.sh --nj $nj --cmd "$train_cmd --mem 10G" \
-      --max-iters $vb_niter --initialize 1 \
+      --max-iters 1 --initialize 1 \
       data/$name $init_rttm_file $VB_dir/$name \
       $VB_dir/$trained_dir/diag_ubm_$num_components/final.dubm $VB_dir/$trained_dir/extractor_diag_c${num_components}_i${ivector_dim}/final.ie || exit 1; 
 
