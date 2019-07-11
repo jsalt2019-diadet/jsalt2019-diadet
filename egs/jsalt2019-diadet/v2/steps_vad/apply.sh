@@ -7,9 +7,11 @@
 # $ git checkout develop   <--- important: one must used the develop branch
 # $ pip install .
 
-. ../cmd.sh
-. ../path.sh
+. path.sh
+. cmd.sh
 set -e
+
+conda activate pyannote
 
 # this script is called like "train.sh AMI.SpeakerDiarization.MixHeadset"
 PROTOCOL=$1
@@ -26,18 +28,18 @@ fi
 EXPERIMENT_DIR="exp/vad/${PROTOCOL}"
 
 # corner case for SRI: we use CHiME5 as training set
-if [[ "$PROTOCOL" == SRI.* ]]; then
+# if [[ "$PROTOCOL" == SRI.* ]]; then
 
-  FAKE_PROTOCOL="CHiME5.SpeakerDiarization.U06"
-  FAKE_EXPERIMENT_DIR="exp/vad/${FAKE_PROTOCOL}"
+#   FAKE_PROTOCOL="CHiME5.SpeakerDiarization.U06"
+#   FAKE_EXPERIMENT_DIR="exp/vad/${FAKE_PROTOCOL}"
 
-  # obtain the best model by reading "epoch" in "params.yml" file
-  PARAMS_YML=${FAKE_EXPERIMENT_DIR}/models/train/${FAKE_PROTOCOL}.train/validate/${PROTOCOL}.development/params.yml
-  BEST_EPOCH=`grep epoch $PARAMS_YML | sed 's/epoch\: //'`
-  printf -v BEST_EPOCH "%04d" $BEST_EPOCH
-  MODEL_PT=${FAKE_EXPERIMENT_DIR}/models/train/${FAKE_PROTOCOL}.train/weights/${BEST_EPOCH}.pt
+#   # obtain the best model by reading "epoch" in "params.yml" file
+#   PARAMS_YML=${FAKE_EXPERIMENT_DIR}/models/train/${FAKE_PROTOCOL}.train/validate/${PROTOCOL}.development/params.yml
+#   BEST_EPOCH=`grep epoch $PARAMS_YML | sed 's/epoch\: //'`
+#   printf -v BEST_EPOCH "%04d" $BEST_EPOCH
+#   MODEL_PT=${FAKE_EXPERIMENT_DIR}/models/train/${FAKE_PROTOCOL}.train/weights/${BEST_EPOCH}.pt
 
-else
+# else
 
   # obtain the best epoch by reading the resulting "params.yml" file
   PARAMS_YML=${EXPERIMENT_DIR}/models/train/${PROTOCOL}.train/validate/${PROTOCOL}.development/params.yml
@@ -45,7 +47,7 @@ else
   printf -v BEST_EPOCH "%04d" $BEST_EPOCH
   MODEL_PT=${EXPERIMENT_DIR}/models/train/${PROTOCOL}.train/weights/${BEST_EPOCH}.pt
 
-fi
+# fi
 
 # extract raw VAD scores (before binarization) into ${EXPERIMENT_DIR}/models/scores
 pyannote-speech-detection apply --gpu \
