@@ -8,8 +8,11 @@ nj=4
 cmd=run.pl
 fbank_config=conf/fbank.conf
 compress=true
+#dummy enhancement 
 py_exec=pytorch-make-fbank-enh-fbank-i.py
 use_gpu=false
+chunk_size=0
+nnet_context=0
 write_utt2num_frames=false  # if true writes utt2num_frames
 # End configuration section.
 
@@ -18,30 +21,39 @@ echo "$0 $@"  # Print the command line for logging
 if [ -f path.sh ]; then . ./path.sh; fi
 . parse_options.sh || exit 1;
 
-if [ $# -lt 1 ] || [ $# -gt 3 ]; then
-   echo "Usage: $0 [options] <data-dir> <nnet-model> [<log-dir> [<fbank-dir>] ]";
+if [ $# -lt 3 ] || [ $# -gt 5 ]; then
+   echo "Usage: $0 [options] <data-dir> <pythone-exec-script> <nnet-model> [<log-dir> [<fbank-dir>] ]";
    echo "e.g.: $0 data/train exp/make_fbank/train mfcc"
    echo "Note: <log-dir> defaults to <data-dir>/log, and <fbank-dir> defaults to <data-dir>/data"
    echo "Options: "
-   echo "  --py-exec <python-file>                        # python executable script  "
    echo "  --fbank-config <config-file>                     # config passed to compute-fbank-feats "
    echo "  --nj <nj>                                        # number of parallel jobs"
    echo "  --cmd (utils/run.pl|utils/queue.pl <queue opts>) # how to run jobs."
    echo "  --write-utt2num-frames <true|false>     # If true, write utt2num_frames file."
-   echo "  --use-gpu <true|false>     # uses the gpu"
+   echo "  --use-gpu <true|false>                  # uses the gpu"
+   echo "  --nnet-context <context>                # aggregated context of the enhancement neural network"
+   echo "  --chunk-size <chunk-size>               # number of frames to be processed in each neural network forward pass"
+   echo "                                          # depends on GPU memory"
    exit 1;
 fi
 
-data=$1
-nnet_model=$2
 
-if [ $# -ge 3 ]; then
-  logdir=$3
+py_exec=$1
+nnet_model=$2
+data=$3
+
+if [ ! -f "$py_exec" ];then
+    echo "Executable python script $py_exec not found"
+    exit 1
+fi
+
+if [ $# -ge 4 ]; then
+  logdir=$4
 else
   logdir=$data/log
 fi
-if [ $# -ge 4 ]; then
-  fbankdir=$4
+if [ $# -ge 5 ]; then
+  fbankdir=$5
 else
   fbankdir=$data/data
 fi
@@ -95,6 +107,7 @@ num_gpus=0
 if $use_gpu;then
     num_gpus=1
     opt_args="${opt_args} --use-gpu"
+    cmd="${cmd} --gpu 1"
 fi
 
 
@@ -103,9 +116,10 @@ if [ -f $data/segments ]; then
   opt_args="${opt_args} --segments $data/segments"
 fi
 
-$cmd JOB=1:$nj --gpu $num_gpus $logdir/make_fbank_${name}.JOB.log \
-    torch.sh --num-gpus $num_gpus \
+$cmd JOB=1:$nj $logdir/make_fbank_${name}.JOB.log \
+    steps_pyfe/torch.sh --num-gpus $num_gpus \
     ${py_exec} @$fbank_config $opt_args --output-step logfb \
+    --nn-model-path $nnet_model --chunk-size $chunk_size --context $nnet_context \
     --input $scp --output ark,scp:$fbankdir/raw_fbank_$name.JOB.ark,$fbankdir/raw_fbank_$name.JOB.scp \
     --part-idx JOB --num-parts $nj || exit 1
 

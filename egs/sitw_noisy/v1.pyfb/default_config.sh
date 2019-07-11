@@ -19,3 +19,10 @@ plda_label=${plda_type}y${plda_y_dim}_v1
 
 be_name=lda${lda_dim}_${plda_label}_${plda_data}
 
+#enhancement
+py_fbank_enh=steps_pyfe/pytorch-compute-fbank-feats-enh-fbank-i.py
+#dummy enhancement network parameters
+enh_nnet=dummy
+enh_context=11
+enh_chunk_size=512
+

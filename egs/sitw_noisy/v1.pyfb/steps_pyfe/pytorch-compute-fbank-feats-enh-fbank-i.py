@@ -26,18 +26,53 @@ from hyperion.io import compression_methods
 from hyperion.feats import MFCC
 
 #define dummy class
-class DummyClass(nn.Module):
+class DummyNet(nn.Module):
 
     def __init__(self, dim):
-        self.weigth = nn.Parameter(torch.eye(dim))
+        super(DummyNet, self).__init__()
+        self.weight = nn.Parameter(torch.eye(dim))
 
     def forward(self, x):
         return x.matmul(self.weight)
 
 
+def apply_nnet(x, model, chunk_size, context, device):
+    x = x.astype('float32')
+
+    if chunk_size == 0:
+        x = torch.tensor(x).to(device)
+        return model(x).detach().numpy()
+
+    half_context = int((context - 1)/2)
+    chunk_shift = chunk_size - (context-1)
+    chunk_size_out = chunk_size - half_context
+    
+    y = np.zeros_like(x, dtype='float32')
+    num_chunks = int(np.ceil(x.shape[0]/chunk_shift))
+    tbeg_in = 0
+    tbeg_out = 0
+    for i in range(num_chunks):
+        tend_in = min(tbeg_in + chunk_size, x.shape[0])
+
+        x_i = torch.tensor(x[tbeg_in:tend_in]).to(device)
+        y_i = model(x_i).detach().numpy()
+        if i == 0:
+            tend_out = min(tbeg_out + chunk_size, x.shape[0])
+            y[tbeg_out:tend_out] = y_i
+            tbeg_out =+ chunk_size_out
+        else:
+            tend_out = min(tbeg_out + chunk_size_out, x.shape[0])
+            y[tbeg_out:tend_out] = y_i[half_context:]
+            tbeg_out += chunk_shift
+
+        tbeg_in += chunk_shift
+
+    return y
+
+
 def compute_mfcc_feats(input_path, output_path,
                        compress, compression_method, write_num_frames, 
-                       use_gpu, nn_model_path,
+                       use_gpu, nn_model_path, chunk_size, context,
                        **kwargs):
 
     #open device
@@ -52,8 +87,10 @@ def compute_mfcc_feats(input_path, output_path,
 
     mfcc_args = MFCC.filter_args(**kwargs)
     mfcc = MFCC(**mfcc_args)
-    enhancer = DummyClass(mfcc.num_filters)
-    # model.load_state_dict(torch.load(nn_model_path))
+    # PUT YOUR NNET MODEL HERE!!!!
+    enhancer = DummyNet(mfcc.num_filters)
+    # we should load the weights here
+    # enhancer.load_state_dict(torch.load(nn_model_path))
     enhancer.to(device)
     enhancer.eval()
 
@@ -81,8 +118,8 @@ def compute_mfcc_feats(input_path, output_path,
         y = mfcc.compute(x)
 
         #we apply dummy identity network to fb
-        y = torch.tensor(y).to(device)
-        y = enhancer(y)
+        logging.info('Running enhancement network')
+        y = apply_nnet(y, enhancer, chunk_size, context, device)
 
         dt = (time.time() - t1)*1000
         rtf = mfcc.frame_shift*y.shape[0]/dt
@@ -120,6 +157,8 @@ if __name__ == "__main__":
     parser.add_argument('--use-gpu', dest='use_gpu', default=False, 
                         action='store_true', help='uses gpu to apply pytorch model')
     parser.add_argument('--nn-model-path', dest='nn_model_path', required=True)
+    parser.add_argument('--chunk-size', dest='chunk_size', type=int, default=0)
+    parser.add_argument('--context', dest='context', type=int, default=0)
 
     args=parser.parse_args()
     config_logger(args.verbose)
