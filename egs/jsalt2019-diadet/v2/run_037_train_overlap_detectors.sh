@@ -55,8 +55,8 @@ if $validate ; then
     do
         db=${trn_vec[$i]}
         ( 
-            echo "$train_cmd_gpu $exp_dir/log/validate_${i}.log \
-                ./local/validate_overlap.sh ${exp_dir}/train/${db}.train $db $from $to $every || exit 1;"
+            $train_cmd_gpu $exp_dir/log/validate_${i}.log \
+                ./local/validate_overlap.sh ${exp_dir}/train/${db}.train $db $from $to $every || exit 1;
         ) &
     done
 fi

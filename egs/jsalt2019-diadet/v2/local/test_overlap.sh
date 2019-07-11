@@ -3,14 +3,14 @@
 # Apache 2.0.
 #
 
-EXP_DIR=${1:-./tutorials/models/overlap_detection}
+net=${1:-./weights/0960.pt}
 dataset=${2:-AMI.SpeakerDiarization.MixHeadset}
-config_ov=${3:-config.yml}
+dest_dir=${3:-./}
 loadenv=${4:-true}
 envname=${5:-'pyannote-audio'}
 
-cp $config_ov $EXP_DIR/.
 if $loadenv ; then
 source activate ${envname}
 fi
-pyannote-overlap-detection train --gpu --to=1000 ${EXP_DIR} ${dataset}
+# pyannote-overlap-detection train --gpu --to=1000 ${EXP_DIR} ${dataset}
+pyannote-overlap-detection apply --gpu ${net} ${dataset} ${dest_dir}
