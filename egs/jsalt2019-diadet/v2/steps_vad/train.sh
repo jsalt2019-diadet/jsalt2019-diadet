@@ -21,6 +21,7 @@ PROTOCOL=$1
 
 # TRAIN_EPOCHS=200
 TRAIN_EPOCHS=1
+VAL_EVERY=1
 
 
 # use CLSP "free-gpu" command to request a specific GPU
@@ -42,7 +43,7 @@ if [[ "$PROTOCOL" == SRI.* ]]; then
 
   # validate the CHiME5 model every 5 epochs on the development set
   pyannote-speech-detection validate --subset=development \
-    --gpu --chronological --every=5 --to=$TRAIN_EPOCHS  \
+    --gpu --chronological --every=$VAL_EVERY --to=$TRAIN_EPOCHS  \
     ${FAKE_EXPERIMENT_DIR}/models/train/${FAKE_PROTOCOL}.train ${PROTOCOL}
 
   # used to obtain the best threshold by reading the resulting "params.yml" file
@@ -60,7 +61,7 @@ else
 
   # validate the model every 5 epochs on the development set
   pyannote-speech-detection validate --subset=development\
-    --gpu --chronological --every=5 --to=$TRAIN_EPOCHS \
+    --gpu --chronological --every=$VAL_EVERY --to=$TRAIN_EPOCHS \
     ${EXPERIMENT_DIR}/models/train/${PROTOCOL}.train ${PROTOCOL}
 
   # used to obtain the best threshold by reading the resulting "params.yml" file
