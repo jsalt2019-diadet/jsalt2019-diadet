@@ -13,12 +13,12 @@
 set -e
 
 for PROTOCOL in AMI.SpeakerDiarization.MixHeadset \
-                AMI.SpeakerDiarization.Array1 \
-                AMI.SpeakerDiarization.Array2 \
-                BabyTrain.SpeakerDiarization.All \
-                CHiME5.SpeakerDiarization.U01 \
-                CHiME5.SpeakerDiarization.U06 \
-                SRI.SpeakerDiarization.All
+                # AMI.SpeakerDiarization.Array1 \
+                # AMI.SpeakerDiarization.Array2 \
+                # BabyTrain.SpeakerDiarization.All \
+                # CHiME5.SpeakerDiarization.U01 \
+                # CHiME5.SpeakerDiarization.U06 \
+                # SRI.SpeakerDiarization.All
 do
   $pyannote_cmd --gpu 1 exp/vad/${PROTOCOL}/apply.log \
       steps_vad/apply.sh ${PROTOCOL} &
