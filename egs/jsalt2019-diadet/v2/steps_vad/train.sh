@@ -6,8 +6,17 @@
 # $ cd pyannote-audio
 # $ git checkout develop   <--- important: one must used the develop branch
 # $ pip install .
+#
+# You'll also need to 
+# $ pip install pyannote.db.musan
 
+. path.sh
+. cmd.sh
 set -e
+
+conda activate pyannote
+
+echo $PYANNOTE_DATABASE_CONFIG
 
 # this script is called like "train.sh AMI.SpeakerDiarization.MixHeadset"
 PROTOCOL=$1
@@ -80,13 +89,9 @@ if [ "$(hostname -d)" == "clsp.jhu.edu" ];then
    CUDA_VISIBLE_DEVICES=`free-gpu`
 fi
 
-echo coocoo3
-
 
 # models will be stored here
 EXPERIMENT_DIR="exp/vad/${PROTOCOL}"
-
-echo cooco4
 
 
 # corner case for SRI: we use CHiME5 as training set
@@ -108,7 +113,8 @@ else
 
   # create models directory and configuration file
   mkdir -p ${EXPERIMENT_DIR}/models
-  echo "${MODEL_CONFIG_YML}" > ${EXPERIMENT_DIR}/models/config.yml
+#   echo "${MODEL_CONFIG_YML}" > ${EXPERIMENT_DIR}/models/config.yml
+  cp steps_vad/config/model.config.yml ${EXPERIMENT_DIR}/models/config.yml
 
   # train model for $TRAIN_EPOCHS epochs on protocol training set
   pyannote-speech-detection train --subset=train \
@@ -131,7 +137,11 @@ THRESHOLD=`grep "  onset" $PARAMS_YML | sed 's/  onset\: //'`
 # ideally, the pipeline should be optimized but to make things faster
 # we use the threshold found during the validation step
 mkdir -p ${EXPERIMENT_DIR}/pipeline/${PROTOCOL}/train/${PROTOCOL}.development
-echo "${PIPELINE_CONFIG_YML}" | sed "s%SCORES%${EXPERIMENT_DIR}\/scores%" \
+# echo "${PIPELINE_CONFIG_YML}" | sed "s%SCORES%${EXPERIMENT_DIR}\/scores%" \
+#   > ${EXPERIMENT_DIR}/pipeline/${PROTOCOL}/config.yml
+# echo "${PIPELINE_PARAMS_YML}" | sed "s/THRESHOLD/${THRESHOLD}/" \
+#   > ${EXPERIMENT_DIR}/pipeline/${PROTOCOL}/train/${PROTOCOL}.development/params.yml
+cat steps_vad/config/pipeline.config.yml | sed "s%SCORES%${EXPERIMENT_DIR}\/scores%" \
   > ${EXPERIMENT_DIR}/pipeline/${PROTOCOL}/config.yml
-echo "${PIPELINE_PARAMS_YML}" | sed "s/THRESHOLD/${THRESHOLD}/" \
+cat steps_vad/config/pipeline.params.yml | sed "s/THRESHOLD/${THRESHOLD}/" \
   > ${EXPERIMENT_DIR}/pipeline/${PROTOCOL}/train/${PROTOCOL}.development/params.yml

@@ -20,7 +20,7 @@ for PROTOCOL in AMI.SpeakerDiarization.MixHeadset \
                 CHiME5.SpeakerDiarization.U06 \
                 SRI.SpeakerDiarization.All
 do
-  $train_cmd --gpu 1 exp/vad/${PROTOCOL}/apply.log \
+  $pyannote_cmd --gpu 1 exp/vad/${PROTOCOL}/apply.log \
       steps_vad/apply.sh ${PROTOCOL} &
 done
 wait
