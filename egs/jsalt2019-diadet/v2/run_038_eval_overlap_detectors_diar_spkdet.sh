@@ -46,6 +46,7 @@ if [ $stage -le 1 ];then
     done
 
 fi
+wait
 
 # thresholding and conversion
 if [ $stage -le 2 ];then
@@ -62,19 +63,21 @@ if [ $stage -le 2 ];then
     done
 
 fi
+wait
 
-# To Kaldi format and RTTM
+# To Kaldi format and RTTM for overlap spkdet
 if [ $stage -le 3 ];then
 
     # Train a overlap detection model based on LSTM and SyncNet features
     echo "Covert to Kaldi for SpkDet and VAD RTTM for SpkDet"
-    for((i=0;i<$num_dbs;i++))
+    # for dsetname in babytrain ami sri
+    for dsetname in ami
     do
-        db=${tst_vec[$i]}
-        ( 
-            $train_cmd $exp_dir/log/thrcov_${i}.log \
-	       ./local/thr_and_conv_overlap.sh $db ${out_dir} || exit 1;
-        ) &
+    ovtxt=${out_dir}/overlap_${dsetname}.txt
+    ./local/diar2spkdet.py ${ovtxt} ${out_dir}
+    dset=jsalt19_spkdet_${dsetname}_eval_test
+    cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/overlap.rttm > data/${dset}/overlap.rttm
+    cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/segoverlap > data/${dset}/segoverlap
     done
 
 fi
