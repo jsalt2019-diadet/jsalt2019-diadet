@@ -16,6 +16,8 @@ conda activate pyannote
 # this script is called like "train.sh AMI.SpeakerDiarization.MixHeadset"
 PROTOCOL=$1
 
+vaddir_supervad=`pwd`/vad_supervad
+
 # use CLSP "free-gpu" command to request a specific GPU
 if [ "$(hostname -d)" == "clsp.jhu.edu" ];then
    CUDA_VISIBLE_DEVICES=`free-gpu`
@@ -24,7 +26,7 @@ fi
 
 
 
-# models are stored here
+# # models are stored here
 EXPERIMENT_DIR="exp/vad/${PROTOCOL}"
 
 # corner case for SRI: we use CHiME5 as training set
@@ -48,6 +50,8 @@ else
   MODEL_PT=${EXPERIMENT_DIR}/models/train/${PROTOCOL}.train/weights/${BEST_EPOCH}.pt
 
 fi
+
+
 
 # extract raw VAD scores (before binarization) into ${EXPERIMENT_DIR}/models/scores
 pyannote-speech-detection apply --subset=development --gpu \
@@ -81,5 +85,13 @@ declare -A mapping=( ["AMI.SpeakerDiarization.Array1"]="jsalt19_spkdiar_ami_eval
                      ["BabyTrain.SpeakerDiarization.All"]="jsalt19_spkdiar_babytrain_eval" \
                      ["CHiME5.SpeakerDiarization.U01"]="jsalt19_spkdiar_chime5_eval_U01" \
                      ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime5_eval_U06" \
-                     ["SRI.SpeakerDiarization.All"]="jsalt19_spkdiar_sri_dev" )
+                     ["SRI.SpeakerDiarization.All"]="jsalt19_spkdiar_sri_eval" )
 cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.test.rttm ./data/${mapping[$PROTOCOL]}/pyannote_vad.rttm
+
+# Usage: rttm_to_bin_vad.sh [options] <rttm-file> <data-dir> <path-to-vad-dir>
+num_utt=$(wc -l data/${mapping[$PROTOCOL]}/utt2spk | cut -d " " -f 1)
+nj=$(($num_utt < 5 ? 1:5))
+rm -rf data/${mapping[$PROTOCOL]}_supervad
+cp -r data/${mapping[$PROTOCOL]} data/${mapping[$PROTOCOL]}_supervad
+hyp_utils/rttm_to_bin_vad.sh --nj $nj data/${mapping[$PROTOCOL]}/pyannote_vad.rttm data/${mapping[$PROTOCOL]} $vaddir_supervad
+utils/fix_data_dir.sh data/${mapping[$PROTOCOL]}_supervad
