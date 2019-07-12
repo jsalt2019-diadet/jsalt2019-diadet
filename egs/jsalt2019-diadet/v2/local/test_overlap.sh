@@ -12,5 +12,5 @@ envname=${5:-'pyannote-audio'}
 if $loadenv ; then
 source activate ${envname}
 fi
-# pyannote-overlap-detection train --gpu --to=1000 ${EXP_DIR} ${dataset}
+
 pyannote-overlap-detection apply --gpu ${net} ${dataset} ${dest_dir}

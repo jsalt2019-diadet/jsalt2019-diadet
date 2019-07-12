@@ -7,7 +7,7 @@
 . ./path.sh
 set -e
 
-stage=1
+stage=3
 
 
 config_file=default_config.sh
@@ -47,23 +47,34 @@ if [ $stage -le 1 ];then
 
 fi
 
-##Validate overlap
-#if [ $stage -le 2 ];then
-#if $validate ; then
-#
-#    # Validate the models trained in stage 1
-#    # Note that the validation can run at the same time that the training
-#    # Ready to visualize it with Tensorboard
-#    echo "Validate overlap detector"
-#    for((i=0;i<$num_dbs;i++))
-#    do
-#        db=${trn_vec[$i]}
-#        ( 
-#            echo "$train_cmd_gpu $exp_dir/log/validate_${i}.log \
-#                ./local/validate_overlap.sh ${exp_dir}/train/${db}.train $db $from $to $every || exit 1;"
-#        ) &
-#    done
-#fi
-#fi
-#
-#wait
+# thresholding and conversion
+if [ $stage -le 2 ];then
+
+    # Train a overlap detection model based on LSTM and SyncNet features
+    echo "Thresholding and converting..."
+    for((i=0;i<$num_dbs;i++))
+    do
+        db=${tst_vec[$i]}
+        ( 
+            $train_cmd $exp_dir/log/thrcov_${i}.log \
+	       ./local/thr_and_conv_overlap.sh $db ${out_dir} || exit 1;
+        ) &
+    done
+
+fi
+
+# To Kaldi format and RTTM
+if [ $stage -le 3 ];then
+
+    # Train a overlap detection model based on LSTM and SyncNet features
+    echo "Covert to Kaldi for SpkDet and VAD RTTM for SpkDet"
+    for((i=0;i<$num_dbs;i++))
+    do
+        db=${tst_vec[$i]}
+        ( 
+            $train_cmd $exp_dir/log/thrcov_${i}.log \
+	       ./local/thr_and_conv_overlap.sh $db ${out_dir} || exit 1;
+        ) &
+    done
+
+fi

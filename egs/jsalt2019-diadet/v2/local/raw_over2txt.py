@@ -73,9 +73,9 @@ def main():
     desc = "Write the output of the binary overlap detector into test based on a threshold"
     version = "%prog 0.1"
     parser = OptionParser(usage=usage, description=desc, version=version)
-    parser.add_option("-t", "--onset", action="store", help="Onset Threshold", default=0.70)
-    parser.add_option("-f", "--offset", action="store", help="Offset Threshold", default=0.70)
-    parser.add_option("-o", "--outputfile", action="store", help="Output file", default="./overlap.txt")
+    parser.add_option("-t", "--onset", action="store", type="float", help="Onset Threshold", default=0.70)
+    parser.add_option("-f", "--offset", action="store", type="float", help="Offset Threshold", default=0.70)
+    parser.add_option("-o", "--outputfile", action="store", type="string", help="Output file", default="./overlap.txt")
     (opt, args) = parser.parse_args()
 
     if(len(args)!=2):
