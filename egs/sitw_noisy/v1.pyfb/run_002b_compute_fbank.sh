@@ -47,9 +47,6 @@ if [ $stage -le 2 ];then
 	steps_pyfe/make_fbank.sh --write-utt2num-frames true --fbank-config conf/pyfb_16k.conf --nj 40 --cmd "$train_cmd" \
 			   data/${name} exp/make_fbank $fbankdir
 	utils/fix_data_dir.sh data/${name}
-	steps_fe/compute_vad_decision.sh --nj 30 --cmd "$train_cmd" \
-					 data/${name} exp/make_vad $vaddir
-	utils/fix_data_dir.sh data/${name}
     done
 fi
 
@@ -71,9 +68,6 @@ if [ $stage -le 4 ];then
     do
 	steps_pyfe/make_fbank.sh --write-utt2num-frames true --fbank-config conf/pyfb_16k.conf --nj 40 --cmd "$train_cmd" \
 			   data/${name} exp/make_fbank $fbankdir
-	utils/fix_data_dir.sh data/${name}
-	steps_fe/compute_vad_decision.sh --nj 40 --cmd "$train_cmd" \
-					 data/${name} exp/make_vad $vaddir
 	utils/fix_data_dir.sh data/${name}
     done
 fi

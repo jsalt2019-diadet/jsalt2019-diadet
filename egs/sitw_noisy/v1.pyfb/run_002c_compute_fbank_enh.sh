@@ -11,8 +11,7 @@
 set -e
 nodes=fs01 #by default it puts fbank in /export/fs01/jsalt19
 storage_name=$(date +'%m_%d_%H_%M')
-fbankdir=`pwd`/fbank
-vaddir=`pwd`/fbank  # energy VAD
+fbankdir=`pwd`/fbank_enh
 
 stage=1
 config_file=default_config.sh
@@ -44,11 +43,11 @@ fi
 if [ $stage -le 2 ];then 
     for name in voxceleb1 voxceleb2_train
     do
+	if [ ! -f "data/$name/feats_orig.scp" ] && [ -f "data/$name/feats.scp" ];then
+	    cp data/$name/feats.scp data/$name/feats_orig.scp
+	fi
 	steps_pyfe/make_fbank_enh.sh --write-utt2num-frames true --fbank-config conf/pyfb_16k.conf --nj 40 --cmd "$train_cmd" \
 			   $py_fbank_enh $enh_nnet data/${name} exp/make_fbank $fbankdir
-	utils/fix_data_dir.sh data/${name}
-	steps_fe/compute_vad_decision.sh --nj 30 --cmd "$train_cmd" \
-					 data/${name} exp/make_vad $vaddir
 	utils/fix_data_dir.sh data/${name}
     done
 fi
@@ -69,11 +68,11 @@ fi
 if [ $stage -le 4 ];then 
     for name in sitw_dev_enroll sitw_dev_test sitw_eval_enroll sitw_eval_test
     do
+	if [ ! -f "data/$name/feats_orig.scp" ] && [ -f "data/$name/feats.scp" ];then
+	    cp data/$name/feats.scp data/$name/feats_orig.scp
+	fi
 	steps_pyfe/make_fbank_enh.sh --write-utt2num-frames true --fbank-config conf/pyfb_16k.conf --nj 40 --cmd "$train_cmd" \
 			   $py_fbank_enh $enh_nnet data/${name} exp/make_fbank $fbankdir
-	utils/fix_data_dir.sh data/${name}
-	steps_fe/compute_vad_decision.sh --nj 40 --cmd "$train_cmd" \
-					 data/${name} exp/make_vad $vaddir
 	utils/fix_data_dir.sh data/${name}
     done
 fi
