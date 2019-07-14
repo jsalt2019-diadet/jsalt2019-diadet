@@ -40,10 +40,9 @@ class DummyNet(nn.Module):
 
 def apply_nnet(x, model, chunk_size, context, device):
     x = x.astype('float32')
-
     if chunk_size == 0:
-        x = torch.tensor(x).to(device)
-        return model(x).detach().numpy()
+        x = torch.tensor(x[None,None,:]).to(device)
+        return model(x).detach().numpy()[0,0]
 
     half_context = int((context - 1)/2)
     chunk_shift = chunk_size - (context-1)
@@ -56,8 +55,8 @@ def apply_nnet(x, model, chunk_size, context, device):
     for i in range(num_chunks):
         tend_in = min(tbeg_in + chunk_size, x.shape[0])
 
-        x_i = torch.tensor(x[tbeg_in:tend_in]).to(device)
-        y_i = model(x_i).detach().numpy()
+        x_i = torch.tensor(x[None,None,tbeg_in:tend_in]).to(device)
+        y_i = model(x_i).detach().numpy()[0,0]
         if i == 0:
             tend_out = min(tbeg_out + chunk_size, x.shape[0])
             y[tbeg_out:tend_out] = y_i

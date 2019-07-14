@@ -29,9 +29,9 @@ enh_chunk_size=512
 
 #enhancement
 # context aggregation network with residual x+logsigmoid(can(x)), linear context
-py_fbank_enh=steps_pyfe/steps_pyfe/pytorch-compute-fbank-feats-enh-fbank-can-small-logsigmask.py
+py_fbank_enh=steps_pyfe/pytorch-compute-fbank-feats-enh-fbank-can-small-logsigmask.py
 #dummy enhancement network parameters
-enh_nnet=exp/SE/model.h5
+enh_nnet=exp/se_models/7/30.nw_SE.raw
 enh_context=73
 enh_chunk_size=500
 
