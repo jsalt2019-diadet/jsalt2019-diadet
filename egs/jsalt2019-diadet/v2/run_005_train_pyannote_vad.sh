@@ -12,23 +12,24 @@
 set -e
 
 
-# for PROTOCOL in AMI.SpeakerDiarization.MixHeadset \
-#                 AMI.SpeakerDiarization.Array1 \
-#                 AMI.SpeakerDiarization.Array2 \
-#                 BabyTrain.SpeakerDiarization.All \
-#                 CHiME5.SpeakerDiarization.U01 
-# do
+for PROTOCOL in AMI.SpeakerDiarization.MixHeadset \
+                AMI.SpeakerDiarization.Array1 \
+                AMI.SpeakerDiarization.Array2 \
+                BabyTrain.SpeakerDiarization.All \
+                CHiME5.SpeakerDiarization.U01 
+do
 
-#   $pyannote_cmd --gpu 1 exp/vad/${PROTOCOL}/train.log \
-#       steps_vad/train.sh ${PROTOCOL} &
+  $pyannote_cmd --gpu 1 exp/vad/${PROTOCOL}/train.log \
+      steps_vad/train.sh ${PROTOCOL} &
 
-# done
+done
 
 
-
-# PROTOCOL=CHiME5.SpeakerDiarization.U06
-# $pyannote_cmd --gpu 1 exp/vad/${PROTOCOL}/train.log \
-#     steps_vad/train.sh ${PROTOCOL} 
+# this ensures that CHiME5.SpeakerDiarization.U06 is complete 
+# before starting on SRI because the SRI depends on CHIME5
+PROTOCOL=CHiME5.SpeakerDiarization.U06
+$pyannote_cmd --gpu 1 exp/vad/${PROTOCOL}/train.log \
+    steps_vad/train.sh ${PROTOCOL} 
 
 
 PROTOCOL=SRI.SpeakerDiarization.All

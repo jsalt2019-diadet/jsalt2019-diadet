@@ -20,6 +20,9 @@ conda activate pyannote
 PROTOCOL=$1
 
 # TRAIN_EPOCHS=200
+# VAL_EVERY=5
+
+# for testing purposes
 TRAIN_EPOCHS=1
 VAL_EVERY=1
 
@@ -32,6 +35,15 @@ fi
 
 # models will be stored here
 EXPERIMENT_DIR="exp/vad/${PROTOCOL}"
+
+if [[ -d "$EXPERIMENT_DIR/pipeline" ]]; then
+  echo "It looks like protocol $PROTOCOL has already been trained"
+  echo "Remove $EXPERIMENT_DIR/pipeline if you'd like to re-train. "
+  exit 1
+fi
+
+# Pyannote will exit if it sees a models dir
+if [[ -d "$EXPERIMENT_DIR/models" ]]; then rm -rf $EXPERIMENT_DIR/models; fi
 
 
 # corner case for SRI: we use CHiME5 as training set
@@ -51,18 +63,18 @@ if [[ "$PROTOCOL" == SRI.* ]]; then
 
 else
 
-  # # create models directory and configuration file
-  # mkdir -p ${EXPERIMENT_DIR}/models
-  # cp steps_vad/config/model.config.yml ${EXPERIMENT_DIR}/models/config.yml
+  # create models directory and configuration file
+  mkdir -p ${EXPERIMENT_DIR}/models
+  cp steps_vad/config/model.config.yml ${EXPERIMENT_DIR}/models/config.yml
 
-  # # train model for $TRAIN_EPOCHS epochs on protocol training set
-  # pyannote-speech-detection train --subset=train \
-  #   --gpu --to=$TRAIN_EPOCHS ${EXPERIMENT_DIR}/models ${PROTOCOL}
+  # train model for $TRAIN_EPOCHS epochs on protocol training set
+  pyannote-speech-detection train --subset=train \
+    --gpu --to=$TRAIN_EPOCHS ${EXPERIMENT_DIR}/models ${PROTOCOL}
 
-  # # validate the model every 5 epochs on the development set
-  # pyannote-speech-detection validate --subset=development\
-  #   --gpu --chronological --every=$VAL_EVERY --to=$TRAIN_EPOCHS \
-  #   ${EXPERIMENT_DIR}/models/train/${PROTOCOL}.train ${PROTOCOL}
+  # validate the model every 5 epochs on the development set
+  pyannote-speech-detection validate --subset=development\
+    --gpu --chronological  --parallel=3 --every=$VAL_EVERY --to=$TRAIN_EPOCHS \
+    ${EXPERIMENT_DIR}/models/train/${PROTOCOL}.train ${PROTOCOL}
 
   # used to obtain the best threshold by reading the resulting "params.yml" file
   PARAMS_YML=${EXPERIMENT_DIR}/models/train/${PROTOCOL}.train/validate/${PROTOCOL}.development/params.yml
