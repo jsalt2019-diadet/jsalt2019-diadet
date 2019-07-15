@@ -14,17 +14,17 @@ PATH=$KALDI_ROOT/tools/sctk-2.4.10/src/md-eval:$PATH
 #hyperion
 HYP_ROOT=$TOOLS_ROOT/hyperion/hyperion
 
-#pyannote
-#PYANNOTE=$TOOLS_ROOT/pyannonte/pyannote-core:$TOOLS_ROOT/pyannonte/pyannote-metrics
+# pyannote
+export PYANNOTE_DATABASE_CONFIG=/export/fs01/jsalt19/databases/database.yml
 
 #Anaconda env
 CONDA_ROOT=$TOOLS_ROOT/anaconda/anaconda3.5
 if [ -f "$CONDA_ROOT/etc/profile.d/conda.sh" ]; then
-    #for conda version >=4.4 do    
+    #for conda version >=4.4 do
     . $CONDA_ROOT/etc/profile.d/conda.sh
     conda activate
 else
-    #for conda version <4.4 do 
+    #for conda version <4.4 do
     PATH=$CONDA_ROOT/bin:$PATH
 fi
 
