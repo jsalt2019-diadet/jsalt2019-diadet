@@ -38,7 +38,7 @@ EXPERIMENT_DIR="exp/vad/${PROTOCOL}"
 
 if [[ -d "$EXPERIMENT_DIR/pipeline" ]]; then
   echo "It looks like protocol $PROTOCOL has already been trained"
-  echo "Remove $EXPERIMENT_DIR/pipeline if you'd like to re-train. "
+  echo "Remove $EXPERIMENT_DIR/pipeline and $EXPERIMENT_DIR/modelss if you'd like to re-train. "
   exit 1
 fi
 

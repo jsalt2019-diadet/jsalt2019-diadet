@@ -23,8 +23,8 @@ do
       steps_vad/train.sh ${PROTOCOL} &
   
   # hack in order to avoid a CUDA visible devices error,
-  # these scripts are running in parallel and all requested 
-  # a gpu at the same time
+  # if we aren't careful they will all request a gpu at almost
+  # the exact same time and get assigned the same gpu
   sleep 15
 
 done
