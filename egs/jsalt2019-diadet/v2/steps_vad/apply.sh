@@ -75,6 +75,16 @@ declare -A mapping=( ["AMI.SpeakerDiarization.Array1"]="jsalt19_spkdiar_ami_dev_
                      ["SRI.SpeakerDiarization.All"]="jsalt19_spkdiar_sri_dev" )
 cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.development.rttm ./data/${mapping[$PROTOCOL]}/pyannote_vad.rttm
 
+# Usage: rttm_to_bin_vad.sh [options] <rttm-file> <data-dir> <path-to-vad-dir>
+num_utt=$(wc -l data/${mapping[$PROTOCOL]}/utt2spk | cut -d " " -f 1)
+nj=$(($num_utt < 5 ? 1:5))
+rm -rf data/${mapping[$PROTOCOL]}_supervad
+cp -r data/${mapping[$PROTOCOL]} data/${mapping[$PROTOCOL]}_supervad
+hyp_utils/rttm_to_bin_vad.sh --nj $nj data/${mapping[$PROTOCOL]}/pyannote_vad.rttm data/${mapping[$PROTOCOL]} $vaddir_supervad
+utils/fix_data_dir.sh data/${mapping[$PROTOCOL]}_supervad
+
+
+
 pyannote-pipeline apply --subset=test \
   ${EXPERIMENT_DIR}/pipeline/${PROTOCOL}/train/${PROTOCOL}.development/params.yml \
   ${PROTOCOL} ${EXPERIMENT_DIR}/results
