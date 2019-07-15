@@ -78,7 +78,7 @@ done
 opt_args=""
 
 if $write_utt2num_frames; then
-  opt_args="${opt_args} --write-num-frames $logdir/utt2num_frames.JOB"
+  opt_args="${opt_args} --write-num-frames $data/utt2num_frames.JOB"
 fi
 
 if $compress;then
@@ -104,9 +104,9 @@ done > $data/feats.scp
 
 if $write_utt2num_frames; then
   for n in $(seq $nj); do
-    cat $logdir/utt2num_frames.$n || exit 1;
+    cat $data/utt2num_frames.$n || exit 1;
   done > $data/utt2num_frames || exit 1
-  rm $logdir/utt2num_frames.*
+  rm $data/utt2num_frames.*
 fi
 
 nf=`cat $data/feats.scp | wc -l`

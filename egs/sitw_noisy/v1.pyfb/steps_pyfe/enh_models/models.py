@@ -1,6 +1,47 @@
 import torch
 import torch.nn as nn
 
+class SEBlock2D(nn.Module):
+    """ From https://arxiv.org/abs/1709.01507
+    """
+    def __init__(self,num_channels, r):
+        super(SEBlock2D, self).__init__()
+        self.conv1 = nn.Conv2d(num_channels, int(num_channels/r), kernel_size=1, bias=False)
+        self.relu = nn.ReLU(inplace=True)
+        self.conv2 = nn.Conv2d(int(num_channels/r), num_channels, kernel_size=1, bias=False)
+        self.sigmoid = nn.Sigmoid()
+
+
+    def forward(self, x):
+        z = torch.mean(x, dim=(2,3), keepdim=True)
+        scale = self.sigmoid(self.conv2(self.relu(self.conv1(z))))
+        y = scale * x
+        return y
+
+
+class TSEBlock2D(nn.Module):
+    """ From https://arxiv.org/abs/1709.01507
+        Modified to do pooling only in time dimension
+    """
+    def __init__(self, num_channels, num_feats, r):
+        super(TSEBlock2D, self).__init__()
+        self.num_channels_1d = num_channels*num_feats
+        self.conv1 = nn.Conv2d(self.num_channels_1d, int(self.num_channels_1d/r), kernel_size=1, bias=False)
+        self.relu = nn.ReLU(inplace=True)
+        self.conv2 = nn.Conv2d(int(self.num_channels_1d/r), self.num_channels_1d, kernel_size=1, bias=False)
+        self.sigmoid = nn.Sigmoid()
+
+
+    def forward(self, x):
+        num_feats = x.shape[3]
+        num_channels = x.shape[1]
+        z = torch.mean(x, dim=(2,), keepdim=True)
+        z = z.view(-1, self.num_channels_1d, 1, 1)
+        scale = self.sigmoid(self.conv2(self.relu(self.conv1(z))))
+        scale = scale.view(-1, num_channels, 1, num_feats)
+        y = scale * x
+        return y
+
     
 
 class DFL_CAN2d_2(nn.Module):
@@ -553,7 +594,105 @@ class DFL_ResCAN2d_SmallContext_LogSigMask_BNIn(DFL_ResCAN2d_SmallContext_BNIn):
         x = x + torch.nn.functional.logsigmoid(y)
         return x
 
+
+
+class DFL_SEResCAN2d_SmallContext_BNIn(DFL_ResCAN2d_SmallContext_BNIn):
+
+    def __init__(self, num_channels=45, bias=False):
+        super(DFL_SEResCAN2d_SmallContext_BNIn, self).__init__(
+            num_channels=num_channels, bias=bias)
+
+        self.seblocks = nn.ModuleList([
+            SEBlock2D(num_channels, r=8),
+            SEBlock2D(num_channels, r=8),
+            SEBlock2D(num_channels, r=8)
+            ])
+
+    def forward(self, x):
+        h1 = x
+        for i in range(4):
+            h1 = self.network[i](h1)
+
+        h2 = h1
+        for i in range(4,9):
+            h2 = self.network[i](h2)
+        h2 = self.seblocks[0](h2)
+        h2 = self.network[9](h1+h2)
+
+        h3 = h2
+        for i in range(10,15):
+            h3 = self.network[i](h3)
+        h3 = self.seblocks[1](h3)
+        h3 = self.network[15](h2+h3)
+
+        h4 = h3
+        for i in range(16,21):
+            h4 = self.network[i](h4)
+        h4 = self.seblocks[2](h4)
+        h4 = self.network[21](h3+h4)
+
+        h5 = h4
+        for i in range(22,len(self.network)):
+            h5 = self.network[i](h5)
+        
+        return h5
+
     
+class DFL_SEResCAN2d_SmallContext_LogSigMask_BNIn(DFL_SEResCAN2d_SmallContext_BNIn):
+    def forward(self, x):
+        y = super(DFL_SEResCAN2d_SmallContext_LogSigMask_BNIn, self).forward(x)
+        x = x + torch.nn.functional.logsigmoid(y)
+        return x
+
+
+class DFL_TSEResCAN2d_SmallContext_BNIn(DFL_ResCAN2d_SmallContext_BNIn):
+
+    def __init__(self, num_channels=45, num_feats=40, bias=False):
+        super(DFL_TSEResCAN2d_SmallContext_BNIn, self).__init__(
+            num_channels=num_channels, bias=bias)
+
+        self.seblocks = nn.ModuleList([
+            TSEBlock2D(num_channels, num_feats, r=8),
+            TSEBlock2D(num_channels, num_feats, r=8),
+            TSEBlock2D(num_channels, num_feats, r=8)
+            ])
+
+    def forward(self, x):
+        h1 = x
+        for i in range(4):
+            h1 = self.network[i](h1)
+
+        h2 = h1
+        for i in range(4,9):
+            h2 = self.network[i](h2)
+        h2 = self.seblocks[0](h2)
+        h2 = self.network[9](h1+h2)
+
+        h3 = h2
+        for i in range(10,15):
+            h3 = self.network[i](h3)
+        h3 = self.seblocks[1](h3)
+        h3 = self.network[15](h2+h3)
+
+        h4 = h3
+        for i in range(16,21):
+            h4 = self.network[i](h4)
+        h4 = self.seblocks[2](h4)
+        h4 = self.network[21](h3+h4)
+
+        h5 = h4
+        for i in range(22,len(self.network)):
+            h5 = self.network[i](h5)
+        
+        return h5
+
+    
+class DFL_TSEResCAN2d_SmallContext_LogSigMask_BNIn(DFL_TSEResCAN2d_SmallContext_BNIn):
+    def forward(self, x):
+        y = super(DFL_TSEResCAN2d_SmallContext_LogSigMask_BNIn, self).forward(x)
+        x = x + torch.nn.functional.logsigmoid(y)
+        return x
+
     
 # caffeenet benchmark - better performance is possible w/ this c.f. DFL_CAN2d
 #class DFL_CAN2d_BN_after_activation(nn.Module):
