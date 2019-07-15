@@ -19,12 +19,12 @@ conda activate pyannote
 # this script is called like "train.sh AMI.SpeakerDiarization.MixHeadset"
 PROTOCOL=$1
 
-# TRAIN_EPOCHS=200
-# VAL_EVERY=5
+TRAIN_EPOCHS=10
+VAL_EVERY=5
 
 # for testing purposes
-TRAIN_EPOCHS=1
-VAL_EVERY=1
+# TRAIN_EPOCHS=1
+# VAL_EVERY=1
 
 
 # use CLSP "free-gpu" command to request a specific GPU

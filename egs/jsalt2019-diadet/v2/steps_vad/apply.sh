@@ -20,7 +20,7 @@ vaddir_supervad=`pwd`/vad_supervad
 
 # use CLSP "free-gpu" command to request a specific GPU
 if [ "$(hostname -d)" == "clsp.jhu.edu" ];then
-   CUDA_VISIBLE_DEVICES=`free-gpu`
+   export CUDA_VISIBLE_DEVICES=`free-gpu`
 fi
 
 
