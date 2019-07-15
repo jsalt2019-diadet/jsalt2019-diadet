@@ -19,8 +19,8 @@ conda activate pyannote
 # this script is called like "train.sh AMI.SpeakerDiarization.MixHeadset"
 PROTOCOL=$1
 
-TRAIN_EPOCHS=10
-VAL_EVERY=5
+TRAIN_EPOCHS=50
+VAL_EVERY=2
 
 # for testing purposes
 # TRAIN_EPOCHS=1
