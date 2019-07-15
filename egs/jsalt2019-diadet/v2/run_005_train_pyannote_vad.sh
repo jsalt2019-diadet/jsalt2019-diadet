@@ -21,6 +21,11 @@ do
 
   $pyannote_cmd --gpu 1 exp/vad/${PROTOCOL}/train.log \
       steps_vad/train.sh ${PROTOCOL} &
+  
+  # hack in order to avoid a CUDA visible devices error,
+  # these scripts are running in parallel and all requested 
+  # a gpu at the same time
+  sleep 15
 
 done
 
