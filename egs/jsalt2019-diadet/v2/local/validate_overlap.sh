@@ -8,7 +8,7 @@ dataset=${2:-AMI.SpeakerDiarization.MixHeadset}
 from=${3:-1}
 to=${4:-1000}
 every=${5:-1}
-precision=${6:-0.8}
+precision=${6:-0.9}
 loadenv=${7:-true}
 envname=${8:-'pyannote-audio'}
 

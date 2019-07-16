@@ -7,7 +7,7 @@
 . ./path.sh
 set -e
 
-stage=3
+stage=1
 
 
 config_file=default_config.sh
@@ -22,13 +22,8 @@ config_overlap=config.yml
 # SRI overlap model is trained in CHiME5
 # tst_vec=(AMI.SpeakerDiarization.MixHeadset BabyTrain.SpeakerDiarization.All SRI.SpeakerDiarization.All)
 tst_vec=(AMI.SpeakerDiarization.MixHeadset)
+val_vec=(AMI.SpeakerDiarization.MixHeadset.development)
 num_dbs=${#tst_vec[@]}
-
-##### TO DO ####
-# We select just the net that we want for development purposes
-# The net should be selected based on the validation file (nets are still on a training stage)
-ovnet=${exp_dir}/train/AMI.SpeakerDiarization.MixHeadset.train/weights/0422.pt
-###############
 
 #Train overlap
 if [ $stage -le 1 ];then
@@ -39,6 +34,12 @@ if [ $stage -le 1 ];then
     for((i=0;i<$num_dbs;i++))
     do
         db=${tst_vec[$i]}
+        # We select just the net that we want for development purposes
+        # The net should be selected based on the validation file (nets are still on a training stage)
+        paramfile=${exp_dir}/train/${tst_vec[$i]}.train/validate/${val_vec[$i]}/params.yml
+        nit=`cat $paramfile | grep epoch | cut -d' ' -f2 | xargs -I num printf "%04d\n" num`
+        ovnet=${exp_dir}/train/${tst_vec[$i]}.train/weights/${nit}.pt
+
         ( 
             $train_cmd_gpu $exp_dir/log/test_${i}.log \
 	       ./local/test_overlap.sh $ovnet $db ${out_dir} || exit 1;
@@ -56,9 +57,17 @@ if [ $stage -le 2 ];then
     for((i=0;i<$num_dbs;i++))
     do
         db=${tst_vec[$i]}
+        # We select just the net that we want for development purposes
+        # The net should be selected based on the validation file (nets are still on a training stage)
+        paramfile=${exp_dir}/train/${tst_vec[$i]}.train/validate/${val_vec[$i]}/params.yml
+        offset=`cat $paramfile | grep -w offset: | cut -d' ' -f4`
+        onset=`cat $paramfile | grep -w onset: | cut -d' ' -f4`
+        #echo $onset
+        #echo $offset
+	    #echo "./local/thr_and_conv_overlap.sh $db ${out_dir} $onset $offset";
         ( 
             $train_cmd $exp_dir/log/thrcov_${i}.log \
-	       ./local/thr_and_conv_overlap.sh $db ${out_dir} || exit 1;
+	       ./local/thr_and_conv_overlap.sh $db ${out_dir} $onset $offset || exit 1;
         ) &
     done
 
@@ -78,6 +87,24 @@ if [ $stage -le 3 ];then
     dset=jsalt19_spkdet_${dsetname}_eval_test
     cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/overlap.rttm > data/${dset}/overlap.rttm
     cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/segoverlap > data/${dset}/segoverlap
+    done
+
+fi
+
+# Remove the overlap areas from the VAD
+if [ $stage -le 4 ];then
+
+    # Train a overlap detection model based on LSTM and SyncNet features
+    echo "Remove the overlap areas from the VAD"
+    # for dsetname in babytrain ami sri
+    for dsetname in ami
+    do
+    dset=jsalt19_spkdet_${dsetname}_eval_test
+    ovrttm=data/${dset}/overlap.rttm
+    vadrttm=data/${dset}/vad.rttm
+    cp -r data/jsalt19_spkdet_${dsetname}_eval_test data/jsalt19_spkdet_${dsetname}_eval_test_overlap
+    outputrttm=data/jsalt19_spkdet_${dsetname}_eval_test_overlap/vad.rttm
+    ./local/merge_overlap.sh $vadrttm $ovrttm $outputrttm
     done
 
 fi

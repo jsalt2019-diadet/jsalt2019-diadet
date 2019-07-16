@@ -5,16 +5,14 @@
 
 dataset=${1:-AMI.SpeakerDiarization.MixHeadset}
 dest_dir=${2:-./}
-loadenv=${3:-true}
-envname=${4:-'pyannote-audio'}
+onset=${3:-./}
+offset=${4:-./}
+loadenv=${5:-true}
+envname=${6:-'pyannote-audio'}
 
 if $loadenv ; then
 source activate ${envname}
 fi
-
-# TODO Get the onset and offset values from the validation
-onset=0.7
-offset=0.7
 
 # Save file depending on the name
 delimiter='.'
