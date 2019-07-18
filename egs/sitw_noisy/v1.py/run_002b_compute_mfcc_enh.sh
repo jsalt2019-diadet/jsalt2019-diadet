@@ -11,9 +11,7 @@
 set -e
 nodes=fs01 #by default it puts mfcc in /export/fs01/jsalt19
 storage_name=$(date +'%m_%d_%H_%M')
-mfccdir=`pwd`/mfcc
-vaddir=`pwd`/mfcc  # energy VAD
-
+mfccdir=`pwd`/mfcc_enh
 
 stage=1
 config_file=default_config.sh
@@ -42,39 +40,42 @@ if [ $stage -le 1 ]; then
 fi
 
 #Train datasets
-if [ $stage -le 2 ];then 
-    for name in voxceleb1 voxceleb2_train
-    do
-	steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj 40 --cmd "$train_cmd" \
-			   data/${name} exp/make_mfcc $mfccdir
-	utils/fix_data_dir.sh data/${name}
-	steps_fe/compute_vad_decision.sh --nj 30 --cmd "$train_cmd" \
-					 data/${name} exp/make_vad $vaddir
-	utils/fix_data_dir.sh data/${name}
-    done
+if [ "$enh_train" == "true" ];then
+    if [ $stage -le 2 ];then 
+	for name in voxceleb1 voxceleb2_train
+	do
+	    rm -rf data/${name}_enh${enh_name}
+	    cp -r data/$name data/${name}_enh${enh_name}
+	    name=${name}_enh${enh_name}
+	    steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pyfb_16k.conf --nj 40 --cmd "$train_cmd" \
+		$py_mfcc_enh $enh_nnet data/${name} exp/make_mfcc $mfccdir
+	    utils/fix_data_dir.sh data/${name}
+	done
+    fi
+
+
+    # Combine voxceleb
+    if [ $stage -le 3 ];then 
+	utils/combine_data.sh --extra-files "utt2num_frames" data/voxceleb_enh${enh_name} \
+	    data/voxceleb1_enh${enh_name} data/voxceleb2_train_enh${enh_name}
+	utils/fix_data_dir.sh data/voxceleb_enh${enh_name}
+
+	if [ "$nnet_data" == "voxceleb_div2" ] || [ "$plda_data" == "voxceleb_div2" ];then
+	    #divide the size of voxceleb
+	    utils/subset_data_dir.sh data/voxceleb_enh${enh_name} $(echo "1236567/2" | bc) data/voxceleb_div2_enh${enh_name}
+	fi
+    fi
 fi
-
-# Combine voxceleb
-if [ $stage -le 3 ];then 
-  utils/combine_data.sh --extra-files "utt2num_frames" data/voxceleb data/voxceleb1 data/voxceleb2_train
-  utils/fix_data_dir.sh data/voxceleb
-
-  if [ "$nnet_data" == "voxceleb_div2" ] || [ "$plda_data" == "voxceleb_div2" ];then
-      #divide the size of voxceleb
-      utils/subset_data_dir.sh data/voxceleb $(echo "1236567/2" | bc) data/voxceleb_div2
-  fi
-fi
-
 
 #SITW
 if [ $stage -le 4 ];then 
     for name in sitw_dev_enroll sitw_dev_test sitw_eval_enroll sitw_eval_test
     do
-	steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj 40 --cmd "$train_cmd" \
-			   data/${name} exp/make_mfcc $mfccdir
-	utils/fix_data_dir.sh data/${name}
-	steps_fe/compute_vad_decision.sh --nj 40 --cmd "$train_cmd" \
-					 data/${name} exp/make_vad $vaddir
+	rm -rf data/${name}_enh${enh_name}
+	cp -r data/$name data/${name}_enh${enh_name}
+	name=${name}_enh${enh_name}
+	steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pyfb_16k.conf --nj 40 --cmd "$train_cmd" \
+			   $py_mfcc_enh $enh_nnet data/${name} exp/make_mfcc $mfccdir
 	utils/fix_data_dir.sh data/${name}
     done
 fi
