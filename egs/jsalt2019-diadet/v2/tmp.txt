@@ -1,0 +1,7 @@
+egs/*/v*/data
+egs/*/v*/data_diar
+egs/*/v*/mfcc
+egs/*/v*/exp
+egs/*/v*/vad_*/
+
+rsync -av --exclude='egs/*/v*/data' --exclude='egs/*/v*/data_diar' --exclude='egs/*/v*/mfcc' --exclude='egs/*/v*/exp' --exclude='egs/*/v*/vad_*/' v2 v3
