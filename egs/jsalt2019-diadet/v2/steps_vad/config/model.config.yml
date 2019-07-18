@@ -6,12 +6,12 @@ task:
       per_epoch: 1
       parallel: 6
 
-# data_augmentation:
-#    name: AddNoise
-#    params:
-#       snr_min: 10
-#       snr_max: 20
-#       collection: MUSAN.Collection.BackgroundNoise
+data_augmentation:
+   name: AddNoise
+   params:
+      snr_min: 10
+      snr_max: 20
+      collection: MUSAN.Collection.BackgroundNoise
 
 feature_extraction:
    name: RawAudio
