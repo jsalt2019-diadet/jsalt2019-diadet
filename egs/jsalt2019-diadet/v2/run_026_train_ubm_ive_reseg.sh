@@ -43,6 +43,9 @@ if [ $stage -le 1 ]; then
     do
 
     # Train the diagonal UBM.
+    # REDFLAG: this script will call a gmm-select binary
+    # which may encounter memory issues, depending on your version of Kaldi
+    # the issue came up with chime5-train in which files were very long
     mkdir -p $VB_dir || exit 1;
     VB/sid/train_diag_ubm.sh --cmd "$train_cmd --mem 10G" \
     --nj 40 --num-threads 8 --subsample 1 --delta-order 0 --apply-cmn false \
