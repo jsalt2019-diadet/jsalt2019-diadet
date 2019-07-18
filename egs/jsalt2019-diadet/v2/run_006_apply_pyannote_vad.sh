@@ -29,10 +29,7 @@ all_prots="${ami_prots[@]} ${babytrain_prots[@]} ${chime5_prots[@]} ${sri_prots[
 
 if [ $stage -le 1 ];then 
 
-  # TESTING(FIXME)
-  # for PROTOCOL in  $all_prots           
-  # do
-  for PROTOCOL in SRI.SpeakerDiarization.All BabyTrain.SpeakerDiarization.All
+  for PROTOCOL in  $all_prots           
   do
 
     $pyannote_cmd --gpu 1 exp/vad/${PROTOCOL}/apply.log \
@@ -43,9 +40,6 @@ if [ $stage -le 1 ];then
 fi 
 wait
 
-
-# TESTING(FIXME)
-exit
 
 if [ $stage -le 2 ];then 
   # take Pyannote rttm, copy to it's respective kaldi-style data dir 
