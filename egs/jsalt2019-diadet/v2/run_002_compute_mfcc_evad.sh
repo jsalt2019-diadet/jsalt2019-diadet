@@ -27,7 +27,7 @@ config_file=default_config.sh
 if [ $stage -le 1 ]; then
     # Prepare to distribute data over multiple machines
     if [[ $(hostname -f) == *.clsp.jhu.edu ]] && [ ! -d $mfccdir/storage ]; then
-	dir_name=$USER/hyp-data/jsalt2019diadet/v1/$storage_name/mfcc/storage
+	dir_name=$USER/hyp-data/jsalt2019diadet/v2/$storage_name/mfcc/storage
 	if [ "$nodes" == "b0" ];then
 	    utils/create_split_dir.pl \
 			    utils/create_split_dir.pl \
