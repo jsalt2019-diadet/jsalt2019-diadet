@@ -41,17 +41,17 @@ done
 cp $output_path/${data_name}_dev_test/utt2spk $output_path/${data_name}_dev_test/spk2utt
 utils/fix_data_dir.sh $output_path/${data_name}_dev_test
 
-cd $output_path/${data_name}_dev_test/trials
-for dur in 30
-do
-    for suffix in "" _test5 _test15 _test30
-    do
-	awk '$2 ~ /rm4.*mc09/' trials_enr${dur}${suffix} > trials_enr${dur}${suffix}_clo
-	awk '$2 ~ /rm4.*mc03/ || $2 ~ /rm4.*mc05/ || $2 ~ /rm4.*mc22/' trials_enr${dur}${suffix} > trials_enr${dur}${suffix}_far
-	awk '$2 ~ /rm4.*mc14/' trials_enr${dur}${suffix} > trials_enr${dur}${suffix}_tv
-    done
-done
-cd -
+# cd $output_path/${data_name}_dev_test/trials
+# for dur in 30
+# do
+#     for suffix in "" _test5 _test15 _test30
+#     do
+# 	awk '$2 ~ /rm4.*mc09/' trials_enr${dur}${suffix} > trials_enr${dur}${suffix}_clo
+# 	awk '$2 ~ /rm4.*mc03/ || $2 ~ /rm4.*mc05/ || $2 ~ /rm4.*mc22/' trials_enr${dur}${suffix} > trials_enr${dur}${suffix}_far
+# 	awk '$2 ~ /rm4.*mc14/' trials_enr${dur}${suffix} > trials_enr${dur}${suffix}_tv
+#     done
+# done
+# cd -
 
 
 # Make eval data
@@ -78,25 +78,25 @@ cp $output_path/${data_name}_eval_test/utt2spk $output_path/${data_name}_eval_te
 utils/fix_data_dir.sh $output_path/${data_name}_eval_test
 
 
-#make subconditions trial files
-cd $output_path/${data_name}_eval_test/trials
-for dur in 30
-do
-    for suffix in "" _test5 _test15 _test30
-    do
-	awk '$2 ~ /rm1.*mc09/' trials_enr${dur}${suffix} \
-	    > trials_enr${dur}${suffix}_clo
-	awk '$2 ~ /rm1.*mc05/ || $2 ~ /rm1.*mc16/ || $2 ~ /rm3.*mc18/' \
-	    trials_enr${dur}${suffix} > trials_enr${dur}${suffix}_med
-	awk '$2 ~ /rm3.*mc01/' trials_enr${dur}${suffix} \
-	    > trials_enr${dur}${suffix}_far
-	awk '$2 ~ /rm1.*mc10/ || $2 ~ /rm2.*mc05/ || $2 ~ /rm2.*mc22/ || $2 ~ /rm3.*mc11/' \
-	    trials_enr${dur}${suffix} > trials_enr${dur}${suffix}_tv
-	awk '$2 ~ /rm3.*mc07/ || $2 ~ /rm3.*mc13/ || $2 ~ /rm3.*mc16/' \
-	    trials_enr${dur}${suffix} > trials_enr${dur}${suffix}_clomed
-	awk '$2 ~ /rm2.*mc11/ || $2 ~ /rm2.*mc16/ || $2 ~ /rm2.*mc20/' \
-	    trials_enr${dur}${suffix} > trials_enr${dur}${suffix}_clofarwall
+# #make subconditions trial files
+# cd $output_path/${data_name}_eval_test/trials
+# for dur in 30
+# do
+#     for suffix in "" _test5 _test15 _test30
+#     do
+# 	awk '$2 ~ /rm1.*mc09/' trials_enr${dur}${suffix} \
+# 	    > trials_enr${dur}${suffix}_clo
+# 	awk '$2 ~ /rm1.*mc05/ || $2 ~ /rm1.*mc16/ || $2 ~ /rm3.*mc18/' \
+# 	    trials_enr${dur}${suffix} > trials_enr${dur}${suffix}_med
+# 	awk '$2 ~ /rm3.*mc01/' trials_enr${dur}${suffix} \
+# 	    > trials_enr${dur}${suffix}_far
+# 	awk '$2 ~ /rm1.*mc10/ || $2 ~ /rm2.*mc05/ || $2 ~ /rm2.*mc22/ || $2 ~ /rm3.*mc11/' \
+# 	    trials_enr${dur}${suffix} > trials_enr${dur}${suffix}_tv
+# 	awk '$2 ~ /rm3.*mc07/ || $2 ~ /rm3.*mc13/ || $2 ~ /rm3.*mc16/' \
+# 	    trials_enr${dur}${suffix} > trials_enr${dur}${suffix}_clomed
+# 	awk '$2 ~ /rm2.*mc11/ || $2 ~ /rm2.*mc16/ || $2 ~ /rm2.*mc20/' \
+# 	    trials_enr${dur}${suffix} > trials_enr${dur}${suffix}_clofarwall
 		
-    done
-done
-cd -
+#     done
+# done
+# cd -
