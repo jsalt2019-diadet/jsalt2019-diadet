@@ -6,6 +6,10 @@
 # $ cd pyannote-audio
 # $ git checkout develop   <--- important: one must used the develop branch
 # $ pip install .
+#
+# REDFLAG: the pyannote scripts stdout don't go to terminal when 
+# running this script, you'll have to go to the log files 
+# to see what's happening
 
 . ./cmd.sh
 . ./path.sh
@@ -21,7 +25,7 @@ do
 
   $pyannote_cmd --gpu 1 exp/vad/${PROTOCOL}/train.log \
       steps_vad/train.sh ${PROTOCOL} &
-  
+
   # hack in order to avoid a CUDA visible devices error,
   # if we aren't careful they will all request a gpu at almost
   # the exact same time and get assigned the same gpu
