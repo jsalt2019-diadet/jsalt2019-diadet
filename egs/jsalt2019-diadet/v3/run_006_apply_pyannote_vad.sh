@@ -25,6 +25,9 @@ sri_prots=(SRI.SpeakerDiarization.All)
 all_prots="${ami_prots[@]} ${babytrain_prots[@]} ${chime5_prots[@]} ${sri_prots[@]}"
 
 
+# models are stored here
+exp_vad="exp/vad"  
+
 
 
 if [ $stage -le 1 ];then 
@@ -51,8 +54,7 @@ if [ $stage -le 2 ];then
   for PROTOCOL in  $all_prots           
   do
 
-    # models are stored here
-    EXPERIMENT_DIR="exp/vad/${PROTOCOL}"  
+    EXPERIMENT_DIR=$exp_vad/$PROTOCOL
 
     declare -A mapping=( ["AMI.SpeakerDiarization.Array1"]="jsalt19_spkdiar_ami_dev_Array1-01" \
                         ["AMI.SpeakerDiarization.Array2"]="jsalt19_spkdiar_ami_dev_Array2-01" \
