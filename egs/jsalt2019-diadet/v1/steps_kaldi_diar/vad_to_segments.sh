@@ -66,7 +66,9 @@ if [ $stage -le 0 ]; then
   > $data/subsegments || exit 1;
 fi
 
-if [ $stage -le 1 ]; then
+
+if [ $stage -le 2 ]; then
   utils/data/subsegment_data_dir.sh $data \
       $data/subsegments $data_out
 fi
+
