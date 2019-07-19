@@ -10,7 +10,7 @@
 . ./path.sh
 set -e
 
-stage=1
+stage=8
 config_file=default_config.sh
 
 . parse_options.sh || exit 1;
