@@ -116,7 +116,7 @@ fi
 
 $cmd JOB=1:$nj $logdir/make_mfcc_${name}.JOB.log \
     steps_pyfe/torch.sh --num-gpus $num_gpus \
-    ${py_exec} @$mfcc_config $opt_args --output-step logfb \
+    ${py_exec} @$mfcc_config $opt_args \
     --nn-model-path $nnet_model --chunk-size $chunk_size --context $nnet_context \
     --input $scp --output ark,scp:$mfccdir/raw_mfcc_$name.JOB.ark,$mfccdir/raw_mfcc_$name.JOB.scp \
     --part-idx JOB --num-parts $nj || exit 1

@@ -89,12 +89,14 @@ def compute_mfcc_feats(input_path, output_path,
         device = torch.device('cpu')
 
     mfcc_args1 = MFCC.filter_args(**kwargs)
-    mfcc_args2 = copy.deepcopy(mfcc_args2)
-    mfcc_args1.output_step='logfb'
-    mfcc_args2.input_step='logfb'
-
+    mfcc_args2 = copy.deepcopy(mfcc_args1)
+    mfcc_args1['output_step'] = 'logfb'
+    mfcc_args2['input_step'] = 'logfb'
+    print(kwargs)
+    print(mfcc_args1)
+    print(mfcc_args2)
     mfcc1 = MFCC(**mfcc_args1)
-    mfcc2 = MFCC(**mfcc_args2)    
+    mfcc2 = MFCC(**mfcc_args2)   
 
     # PUT YOUR NNET MODEL HERE!!!!
     enhancer = CAN(num_channels=45, num_feats=40)
@@ -102,7 +104,7 @@ def compute_mfcc_feats(input_path, output_path,
     enhancer.to(device)
     enhancer.eval()
 
-    if mfcc.input_step == 'wave':
+    if mfcc1.input_step == 'wave':
         input_args = AR.filter_args(**kwargs)
         reader = AR(input_path, **input_args)
     else:
@@ -117,7 +119,7 @@ def compute_mfcc_feats(input_path, output_path,
         f_num_frames = open(write_num_frames, 'w')
     
     for data in reader:
-        if mfcc.input_step == 'wave':
+        if mfcc1.input_step == 'wave':
             key, x, fs = data
         else:
             key, x = data
@@ -142,12 +144,13 @@ def compute_mfcc_feats(input_path, output_path,
 
         # concatenate logE and filterbanks
         y = np.concatenate((logE[:,None], y), axis=-1)
+
         #apply DCT
         logging.info('Applying DCT')
         y = mfcc2.compute(y)
 
         dt = (time.time() - t1)*1000
-        rtf = mfcc.frame_shift*y.shape[0]/dt
+        rtf = mfcc1.frame_shift*y.shape[0]/dt
         logging.info('Extracted filter-banks for %s num-frames=%d elapsed-time=%.2f ms. real-time-factor=%.2f' %
                      (key, y.shape[0], dt, rtf))
         writer.write([key], [y])
@@ -155,7 +158,7 @@ def compute_mfcc_feats(input_path, output_path,
         if write_num_frames is not None:
             f_num_frames.write('%s %d\n' % (key, y.shape[0]))
 
-        mfcc.reset()
+        mfcc1.reset()
             
     if write_num_frames is not None:
         f_num_frames.close()
@@ -190,6 +193,5 @@ if __name__ == "__main__":
     del args.verbose
     logging.debug(args)
 
-    
     compute_mfcc_feats(**vars(args))
     
