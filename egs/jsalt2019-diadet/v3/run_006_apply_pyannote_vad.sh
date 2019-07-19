@@ -44,8 +44,7 @@ fi
 wait
 
 
-# TESTING(FIXME)
-exit
+
 
 if [ $stage -le 2 ];then 
   # take Pyannote rttm, copy to it's respective kaldi-style data dir 
