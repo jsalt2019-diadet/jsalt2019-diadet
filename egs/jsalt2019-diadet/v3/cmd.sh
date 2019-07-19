@@ -11,5 +11,10 @@
 # or search for the string 'default_config' in utils/queue.pl or utils/slurm.pl.
 
 export train_cmd="queue.pl --mem 4G -l hostname=\"[bc][01]*\" -V"
+<<<<<<< HEAD
+export pyannote_cmd="queue.pl --mem 20G -l hostname=\"c[01]*\" -V"
+
+=======
 export train_cmd_gpu="queue.pl --mem 4G -l gpu=1 -l hostname=\"b1[123456789]*|c0*\" -V"
+>>>>>>> 9399ffa5d65e0e2d98d466e84d32df78bd18925f
 

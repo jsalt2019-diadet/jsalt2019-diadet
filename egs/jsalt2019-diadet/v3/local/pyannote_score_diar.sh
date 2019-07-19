@@ -55,9 +55,12 @@ pyannote-metrics.py detection --subset=$subset $task $score_dir/rttm \
 		    2> $score_dir/pyannote-det.log \
 		    > $score_dir/result.pyannote-det &
 
+<<<<<<< HEAD
+=======
 conda deactivate
 exit
 
+>>>>>>> 9399ffa5d65e0e2d98d466e84d32df78bd18925f
 if [ "$is_sri" == "true" ];then
     task=SRI.SpeakerDiarization
     if [ "$subset" == "development" ];then

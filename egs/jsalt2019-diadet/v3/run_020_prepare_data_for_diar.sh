@@ -5,7 +5,11 @@
 set -e
 
 feats_diar=`pwd -P`/exp/feats_diar
+<<<<<<< HEAD
+storage_name=jsalt19-v1-diar-$(date +'%m_%d_%H_%M')
+=======
 storage_name=jsalt19-v3-diar-$(date +'%m_%d_%H_%M')
+>>>>>>> 9399ffa5d65e0e2d98d466e84d32df78bd18925f
 stage=1
 config_file=default_config.sh
 
@@ -17,11 +21,19 @@ config_file=default_config.sh
 # - speaker diarization datasets with energy vad and ground truth vad
 dsets_train="voxceleb"
 dsets_adapt=(jsalt19_spkdiar_{babytrain,chime5,ami}_train_gtvad)
+<<<<<<< HEAD
+dsets_spkdiar_test_evad=(jsalt19_spkdiar_babytrain_{dev,eval} jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06} jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01} jsalt19_spkdiar_sri_{dev,eval})
+dsets_spkdiar_test_gtvad=(jsalt19_spkdiar_babytrain_{dev,eval}_gtvad jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06}_gtvad jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_gtvad jsalt19_spkdiar_sri_{dev,eval}_gtvad)
+
+dsets_spkdiar_test_enhanced_evad=(jsalt19_spkdiar_babytrain_enhanced_{dev,eval}  jsalt19_spkdiar_chime5_enhanced_{dev,eval}_{U01,U06} jsalt19_spkdiar_ami_enhanced_{dev,eval}_{Mix-Headset,Array1-01,Array2-01} jsalt19_spkdiar_sri_enhanced_{dev,eval} )
+dsets_spkdiar_test_enhanced_gtvad=(jsalt19_spkdiar_babytrain_enhanced_{dev,eval}_gtvad jsalt19_spkdiar_chime5_enhanced_{dev,eval}_{U01,U06}_gtvad jsalt19_spkdiar_ami_enhanced_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_gtvad jsalt19_spkdiar_sri_enhanced_{dev,eval}_gtvad )
+=======
 dsets_spkdiar_test_evad=(jsalt19_spkdiar_babytrain_{dev,eval} jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06} jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01})
 dsets_spkdiar_test_gtvad=(jsalt19_spkdiar_babytrain_{dev,eval}_gtvad jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06}_gtvad jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_gtvad)
 
 dsets_spkdiar_test_enhanced_evad=(jsalt19_spkdiar_babytrain_enhanced_{dev,eval}  jsalt19_spkdiar_chime5_enhanced_{dev,eval}_{U01,U06} jsalt19_spkdiar_ami_enhanced_{dev,eval}_{Mix-Headset,Array1-01,Array2-01})
 dsets_spkdiar_test_enhanced_gtvad=(jsalt19_spkdiar_babytrain_enhanced_{dev,eval}_gtvad jsalt19_spkdiar_chime5_enhanced_{dev,eval}_{U01,U06}_gtvad jsalt19_spkdiar_ami_enhanced_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_gtvad)
+>>>>>>> 9399ffa5d65e0e2d98d466e84d32df78bd18925f
 
 dsets_spkdet_test_evad=(jsalt19_spkdet_babytrain_{dev,eval}_test jsalt19_spkdet_ami_{dev,eval}_test jsalt19_spkdet_sri_{dev,eval}_test)
 dsets_spkdet_test_gtvad=(jsalt19_spkdet_babytrain_{dev,eval}_test_gtvad jsalt19_spkdet_ami_{dev,eval}_test_gtvad jsalt19_spkdet_sri_{dev,eval}_test_gtvad)

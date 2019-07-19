@@ -27,7 +27,11 @@ config_file=default_config.sh
 if [ $stage -le 1 ]; then
     # Prepare to distribute data over multiple machines
     if [[ $(hostname -f) == *.clsp.jhu.edu ]] && [ ! -d $mfccdir/storage ]; then
+<<<<<<< HEAD
+	dir_name=$USER/hyp-data/jsalt2019diadet/v1/$storage_name/mfcc/storage
+=======
 	dir_name=$USER/hyp-data/jsalt2019diadet/v3/$storage_name/mfcc/storage
+>>>>>>> 9399ffa5d65e0e2d98d466e84d32df78bd18925f
 	if [ "$nodes" == "b0" ];then
 	    utils/create_split_dir.pl \
 			    utils/create_split_dir.pl \
@@ -131,9 +135,17 @@ if [ $stage -le 6 ];then
     for name in jsalt19_spkdiar_babytrain_{train,dev,eval} \
     					  jsalt19_spkdiar_chime5_train jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06} \
     					  jsalt19_spkdiar_ami_train jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01} \
+<<<<<<< HEAD
+					  jsalt19_spkdiar_sri_{dev,eval}\
 					  jsalt19_spkdiar_babytrain_enhanced_{dev,eval}\
 					  jsalt19_spkdiar_chime5_enhanced_{dev,eval}_{U01,U06}\
 					  jsalt19_spkdiar_ami_enhanced_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}\
+					  jsalt19_spkdiar_sri_enhanced_{dev,eval}
+=======
+					  jsalt19_spkdiar_babytrain_enhanced_{dev,eval}\
+					  jsalt19_spkdiar_chime5_enhanced_{dev,eval}_{U01,U06}\
+					  jsalt19_spkdiar_ami_enhanced_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}\
+>>>>>>> 9399ffa5d65e0e2d98d466e84d32df78bd18925f
     do
 	num_utt=$(wc -l data/$name/utt2spk | cut -d " " -f 1)
 	nj=$(($num_utt < 40 ? 2:40))

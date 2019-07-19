@@ -20,6 +20,46 @@ output_path=$3
 
 data_name=jsalt19_spkdet_ami
 
+<<<<<<< HEAD
+# # Make Training data
+# # This will be used to adapt NNet and PLDA models
+# combine_str=""
+# combine_vad=""
+# for mic in $train_mics
+# do
+
+#     python local/make_jsalt19_spkdet.py \
+# 	   --list-path $list_path/train \
+# 	   --wav-path $wav_path \
+# 	   --output-path $output_path \
+# 	   --data-name $data_name \
+# 	   --partition train \
+# 	   --mic $mic \
+# 	   --rttm-suffix ${mic}_train
+    
+    
+#     awk -v suff="$mic" '{$1=$1"."suff; print $0}' $list_path/train/all.uem \
+# 	> $output_path/${data_name}_train_${mic}/diarization.uem
+    
+#     #fix ES2010d files have 2 channels
+#     awk '$1~/ES2010d/ { print $1,"sox "$2" -t wav - remix 1 |" }
+#          $1!~/ES2010d/ { print $0}' \
+# 	$output_path/${data_name}_train_${mic}/wav.scp \
+# 	>  $output_path/${data_name}_train_${mic}/wav.scp.tmp
+#     mv $output_path/${data_name}_train_${mic}/wav.scp.tmp $output_path/${data_name}_train_${mic}/wav.scp
+
+	
+#     #make spk2utt so kaldi don't complain
+#     utils/utt2spk_to_spk2utt.pl $output_path/${data_name}_train_${mic}/utt2spk \
+# 				> $output_path/${data_name}_train_${mic}/spk2utt
+
+#     utils/fix_data_dir.sh $output_path/${data_name}_train_${mic}
+#     combine_str="$combine_str $output_path/${data_name}_train_${mic}"
+#     combine_vad="$combine_vad $output_path/${data_name}_train_${mic}/vad.rttm"
+# done
+# utils/combine_data.sh $output_path/${data_name}_train $combine_str
+# cat $combine_vad > $output_path/${data_name}_train/vad.rttm
+=======
 # Make Training data
 # This will be used to adapt NNet and PLDA models
 combine_str=""
@@ -58,6 +98,7 @@ do
 done
 utils/combine_data.sh $output_path/${data_name}_train $combine_str
 cat $combine_vad > $output_path/${data_name}_train/vad.rttm
+>>>>>>> 9399ffa5d65e0e2d98d466e84d32df78bd18925f
 
 # Make dev data
 echo "making $data_name dev"

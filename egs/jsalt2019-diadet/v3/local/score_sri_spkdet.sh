@@ -46,6 +46,17 @@ $cmd $log_file_base.log \
 #      --score-file ${score_file_base}_scores \
 #      --output-path ${score_file_base}_sub  &
 
+<<<<<<< HEAD
+for cond_i in $conds
+do
+    echo "sri $dev_eval enr-$enr_dur $cond_i"
+    $cmd ${log_file_base}_${cond_i}.log \
+	 python local/score_dcf.py --key-file ${trials}_${cond_i} \
+	 --score-file ${score_file_base}_scores \
+	 --output-path ${score_file_base}_${cond_i} &
+    
+done
+=======
 # for cond_i in $conds
 # do
 #     echo "sri $dev_eval enr-$enr_dur $cond_i"
@@ -55,6 +66,7 @@ $cmd $log_file_base.log \
 # 	 --output-path ${score_file_base}_${cond_i} &
     
 # done
+>>>>>>> 9399ffa5d65e0e2d98d466e84d32df78bd18925f
 
 for test_dur in 5 15 30
 do
@@ -64,6 +76,17 @@ do
 	 --score-file ${score_file_base}_scores \
 	 --output-path ${score_file_base}_test${test_dur} &
 
+<<<<<<< HEAD
+    for cond_i in $conds
+    do
+	echo "sri $dev_eval enr-$enr_dur test-$test_dur $cond_i"
+	$cmd ${log_file_base}_test${test_dur}_${cond_i}.log \
+	     python local/score_dcf.py --key-file ${trials}_test${test_dur}_${cond_i} \
+	     --score-file ${score_file_base}_scores \
+	     --output-path ${score_file_base}_test${test_dur}_${cond_i} &
+	
+    done
+=======
     # for cond_i in $conds
     # do
     # 	echo "sri $dev_eval enr-$enr_dur test-$test_dur $cond_i"
@@ -73,6 +96,7 @@ do
     # 	     --output-path ${score_file_base}_test${test_dur}_${cond_i} &
 	
     # done
+>>>>>>> 9399ffa5d65e0e2d98d466e84d32df78bd18925f
 
     
 done

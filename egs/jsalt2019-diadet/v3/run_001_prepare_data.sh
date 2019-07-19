@@ -44,7 +44,11 @@ if [ $stage -le 3 ];then
     
     # Prepare enhanced data of dev and eval
     echo "running enhancement on each audio may take much time, we link the precomputed audios here."
+<<<<<<< HEAD
+    local/make_chime5_spkdiar_enhanced_dev_eval.sh $enhanced_eval_root $chime5_list_dir ./data
+=======
     local/make_chime5_spkdiar_jsalt19_enhanced_dev_eval.sh $enhanced_eval_root $chime5_list_dir ./data
+>>>>>>> 9399ffa5d65e0e2d98d466e84d32df78bd18925f
 fi
 
 
@@ -61,11 +65,19 @@ fi
 if [ $stage -le 5 ];then
     # Prepare SRI
     local/make_sri_spkdet.sh $sri_root $sri_list_dir ./data
+<<<<<<< HEAD
+    local/make_sri_spkdiar.sh $sri_root $sri_list_dir ./data
+    
+    # Prepare enhanced data of dev and eval
+    echo "running enhancement on each audio may take much time, we link the precomputed audios here."
+    local/make_sri_spkdiar_enhanced_dev_eval.sh $enhanced_eval_root $sri_list_dir ./data
+=======
     #local/make_sri_spkdiar.sh $sri_root $sri_list_dir ./data
     
     # Prepare enhanced data of dev and eval
     #echo "running enhancement on each audio may take much time, we link the precomputed audios here."
     #local/make_sri_spkdiar_enhanced_dev_eval.sh $enhanced_eval_root $sri_list_dir ./data
+>>>>>>> 9399ffa5d65e0e2d98d466e84d32df78bd18925f
 fi
 
 
