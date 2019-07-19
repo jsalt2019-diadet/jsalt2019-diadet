@@ -7,7 +7,7 @@
 . ./path.sh
 set -e
 
-stage=1
+stage=4
 
 
 config_file=default_config.sh
@@ -18,6 +18,7 @@ config_file=default_config.sh
 exp_dir=exp/overlap_models
 out_dir=${exp_dir}/test_raw
 config_overlap=config.yml
+vaddir_ov=`pwd`/vad_ov  # VAD without OV regions
 
 # SRI overlap model is trained in CHiME5
 # tst_vec=(AMI.SpeakerDiarization.MixHeadset BabyTrain.SpeakerDiarization.All SRI.SpeakerDiarization.All)
@@ -103,8 +104,10 @@ if [ $stage -le 4 ];then
     ovrttm=data/${dset}/overlap.rttm
     vadrttm=data/${dset}/vad.rttm
     cp -r data/jsalt19_spkdet_${dsetname}_eval_test data/jsalt19_spkdet_${dsetname}_eval_test_overlap
-    outputrttm=data/jsalt19_spkdet_${dsetname}_eval_test_overlap/vad.rttm
+    outputrttm=data/jsalt19_spkdet_${dsetname}_eval_test_overlap/vad_ov.rttm
     ./local/merge_overlap.sh $vadrttm $ovrttm $outputrttm
+    hyp_utils/rttm_to_bin_vad.sh --nj 5 $outputrttm data/jsalt19_spkdet_${dsetname}_eval_test_overlap/ $vaddir_ov
+    # utils/fix_data_dir.sh data/jsalt19_spkdet_${dsetname}_eval_test_overlap
     done
 
 fi
