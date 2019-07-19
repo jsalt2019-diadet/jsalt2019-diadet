@@ -39,7 +39,7 @@ fi
 
 export MPLBACKEND="agg"
 export PATH=$HYP_ROOT/hyperion/bin:/usr/local/cuda/bin:$PATH
-export PYTHONPATH=$HYP_ROOT:$PYTHONPATH:/export/fs01/jsalt19/dcastan/pyannote-audio
+export PYTHONPATH=$HYP_ROOT:$PYTHONPATH
 export LD_LIBRARY_PATH
 export LC_ALL=C
 
