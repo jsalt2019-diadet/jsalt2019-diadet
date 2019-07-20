@@ -5,7 +5,7 @@
 set -e
 
 feats_diar=`pwd -P`/exp/feats_diar
-storage_name=jsalt19-v1-diar-$(date +'%m_%d_%H_%M')
+storage_name=jsalt19-v3-diar-$(date +'%m_%d_%H_%M')
 stage=1
 config_file=default_config.sh
 
