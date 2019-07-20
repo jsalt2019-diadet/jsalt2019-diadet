@@ -133,7 +133,6 @@ if [ $stage -le 7 ];then
     mkdir -p $be_ami_dir
     # Train a LDA model on Voxceleb+ami_train,
     echo "Train LDA for ami"
-
     # ind zca whitening
     copy-vector scp:$xvector_dir/jsalt19_spkdiar_ami_train_gtvad/xvector.scp ark:- | local/zca_whitening.py ark:- $be_ami_dir/zca_whitening_ind
     # ood zca whitening
