@@ -78,12 +78,12 @@ if [ $stage -le 2 ];then
     mv data/${mapping[$PROTOCOL]}/vad.scp data/${mapping[$PROTOCOL]}/evad.scp
     hyp_utils/rttm_to_bin_vad.sh --nj $nj data/${mapping[$PROTOCOL]}/pyannote_vad.rttm data/${mapping[$PROTOCOL]} $vaddir_supervad
     mv data/${mapping[$PROTOCOL]}/vad.scp data/${mapping[$PROTOCOL]}/pyannote_vad.scp
-    ln -s data/${mapping[$PROTOCOL]}/pyannote_vad.scp data/${mapping[$PROTOCOL]}/vad.scp
+    ln -rs data/${mapping[$PROTOCOL]}/pyannote_vad.scp data/${mapping[$PROTOCOL]}/vad.scp
 
     # take vad.scp from the unenhanced data dir, copy over to enhanced
     mv data/${mapping_enhanced[$PROTOCOL]}/vad.scp data/${mapping_enhanced[$PROTOCOL]}/evad.scp
     cp data/${mapping[$PROTOCOL]}/pyannote_vad.scp data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.scp
-    ln -s data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.scp data/${mapping_enhanced[$PROTOCOL]}/vad.scp
+    ln -rs data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.scp data/${mapping_enhanced[$PROTOCOL]}/vad.scp
 
     utils/fix_data_dir.sh data/${mapping[$PROTOCOL]}
     utils/fix_data_dir.sh data/${mapping_enhanced[$PROTOCOL]}
@@ -115,12 +115,12 @@ if [ $stage -le 2 ];then
     mv data/${mapping[$PROTOCOL]}/vad.scp data/${mapping[$PROTOCOL]}/evad.scp
     hyp_utils/rttm_to_bin_vad.sh --nj $nj data/${mapping[$PROTOCOL]}/pyannote_vad.rttm data/${mapping[$PROTOCOL]} $vaddir_supervad
     mv data/${mapping[$PROTOCOL]}/vad.scp data/${mapping[$PROTOCOL]}/pyannote_vad.scp
-    ln -s data/${mapping[$PROTOCOL]}/pyannote_vad.scp data/${mapping[$PROTOCOL]}/vad.scp
+    ln -rs data/${mapping[$PROTOCOL]}/pyannote_vad.scp data/${mapping[$PROTOCOL]}/vad.scp
 
     # take vad.scp from the unenhanced data dir, copy over to enhanced
     mv data/${mapping_enhanced[$PROTOCOL]}/vad.scp data/${mapping_enhanced[$PROTOCOL]}/evad.scp
     cp data/${mapping[$PROTOCOL]}/pyannote_vad.scp data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.scp
-    ln -s data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.scp data/${mapping_enhanced[$PROTOCOL]}/vad.scp
+    ln -rs data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.scp data/${mapping_enhanced[$PROTOCOL]}/vad.scp
 
     utils/fix_data_dir.sh data/${mapping[$PROTOCOL]}
     utils/fix_data_dir.sh data/${mapping_enhanced[$PROTOCOL]}
