@@ -24,6 +24,9 @@ chime5_prots=(CHiME5.SpeakerDiarization.{U01,U06})
 sri_prots=(SRI.SpeakerDiarization.All)
 all_prots="${ami_prots[@]} ${babytrain_prots[@]} ${chime5_prots[@]} ${sri_prots[@]}"
 
+# TESTING(FIXME) - do we need to include SRI ?
+all_prots="${ami_prots[@]} ${babytrain_prots[@]} ${chime5_prots[@]}"
+
 
 
 if [ $stage -le 1 ];then 
@@ -63,9 +66,10 @@ if [ $stage -le 2 ];then
                         ["AMI.SpeakerDiarization.MixHeadset"]="jsalt19_spkdiar_ami_enhanced_dev_Mix-Headset" \
                         ["BabyTrain.SpeakerDiarization.All"]="jsalt19_spkdiar_babytrain_enhanced_dev" \
                         ["CHiME5.SpeakerDiarization.U01"]="jsalt19_spkdiar_chime5_enhanced_dev_U01" \
-                        ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime_enhanced_dev_U06" \
+                        ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime5_enhanced_dev_U06" \
                         ["SRI.SpeakerDiarization.All"]="jsalt19_spkdiar_sri_enhanced_dev" ) 
     cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.development.rttm ./data/${mapping[$PROTOCOL]}/pyannote_vad.rttm
+    cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.development.rttm ./data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.rttm
 
     # Usage: rttm_to_bin_vad.sh [options] <rttm-file> <data-dir> <path-to-vad-dir>
     # overwrite evad vad.scp in the data dir 
@@ -99,9 +103,10 @@ if [ $stage -le 2 ];then
                         ["AMI.SpeakerDiarization.MixHeadset"]="jsalt19_spkdiar_ami_enhanced_eval_Mix-Headset" \
                         ["BabyTrain.SpeakerDiarization.All"]="jsalt19_spkdiar_babytrain_enhanced_eval" \
                         ["CHiME5.SpeakerDiarization.U01"]="jsalt19_spkdiar_chime5_enhanced_eval_U01" \
-                        ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime_enhanced_eval_U06" \
+                        ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime5_enhanced_eval_U06" \
                         ["SRI.SpeakerDiarization.All"]="jsalt19_spkdiar_sri_enhanced_eval" )                        
     cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.test.rttm ./data/${mapping[$PROTOCOL]}/pyannote_vad.rttm
+    cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.test.rttm ./data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.rttm
 
     # Usage: rttm_to_bin_vad.sh [options] <rttm-file> <data-dir> <path-to-vad-dir>
     # overwrite evad vad.scp in the data dir 
