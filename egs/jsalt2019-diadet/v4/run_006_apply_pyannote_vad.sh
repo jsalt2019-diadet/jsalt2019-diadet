@@ -26,7 +26,6 @@ all_prots="${ami_prots[@]} ${babytrain_prots[@]} ${chime5_prots[@]} ${sri_prots[
 
 
 
-
 if [ $stage -le 1 ];then 
 
   for PROTOCOL in  $all_prots           
@@ -72,12 +71,15 @@ if [ $stage -le 2 ];then
     # overwrite evad vad.scp in the data dir 
     num_utt=$(wc -l data/${mapping[$PROTOCOL]}/utt2spk | cut -d " " -f 1)
     nj=$(($num_utt < 5 ? 1:5))
-    rm -f data/${mapping[$PROTOCOL]}/vad.scp
+    mv data/${mapping[$PROTOCOL]}/vad.scp data/${mapping[$PROTOCOL]}/evad.scp
     hyp_utils/rttm_to_bin_vad.sh --nj $nj data/${mapping[$PROTOCOL]}/pyannote_vad.rttm data/${mapping[$PROTOCOL]} $vaddir_supervad
+    mv data/${mapping[$PROTOCOL]}/vad.scp data/${mapping[$PROTOCOL]}/pyannote_vad.scp
+    ln -s data/${mapping[$PROTOCOL]}/pyannote_vad.scp data/${mapping[$PROTOCOL]}/vad.scp
 
     # take vad.scp from the unenhanced data dir, copy over to enhanced
-    rm -f data/${mapping_enhanced[$PROTOCOL]}/vad.scp
-    cp data/${mapping[$PROTOCOL]}/vad.scp data/${mapping_enhanced[$PROTOCOL]}
+    mv data/${mapping_enhanced[$PROTOCOL]}/vad.scp data/${mapping_enhanced[$PROTOCOL]}/evad.scp
+    cp data/${mapping[$PROTOCOL]}/pyannote_vad.scp data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.scp
+    ln -s data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.scp data/${mapping_enhanced[$PROTOCOL]}/vad.scp
 
     utils/fix_data_dir.sh data/${mapping[$PROTOCOL]}
     utils/fix_data_dir.sh data/${mapping_enhanced[$PROTOCOL]}
@@ -105,12 +107,15 @@ if [ $stage -le 2 ];then
     # overwrite evad vad.scp in the data dir 
     num_utt=$(wc -l data/${mapping[$PROTOCOL]}/utt2spk | cut -d " " -f 1)
     nj=$(($num_utt < 5 ? 1:5))
-    rm -f data/${mapping[$PROTOCOL]}/vad.scp
+    mv data/${mapping[$PROTOCOL]}/vad.scp data/${mapping[$PROTOCOL]}/evad.scp
     hyp_utils/rttm_to_bin_vad.sh --nj $nj data/${mapping[$PROTOCOL]}/pyannote_vad.rttm data/${mapping[$PROTOCOL]} $vaddir_supervad
+    mv data/${mapping[$PROTOCOL]}/vad.scp data/${mapping[$PROTOCOL]}/pyannote_vad.scp
+    ln -s data/${mapping[$PROTOCOL]}/pyannote_vad.scp data/${mapping[$PROTOCOL]}/vad.scp
 
     # take vad.scp from the unenhanced data dir, copy over to enhanced
-    rm -f data/${mapping_enhanced[$PROTOCOL]}/vad.scp
-    cp data/${mapping[$PROTOCOL]}/vad.scp data/${mapping_enhanced[$PROTOCOL]}
+    mv data/${mapping_enhanced[$PROTOCOL]}/vad.scp data/${mapping_enhanced[$PROTOCOL]}/evad.scp
+    cp data/${mapping[$PROTOCOL]}/pyannote_vad.scp data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.scp
+    ln -s data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.scp data/${mapping_enhanced[$PROTOCOL]}/vad.scp
 
     utils/fix_data_dir.sh data/${mapping[$PROTOCOL]}
     utils/fix_data_dir.sh data/${mapping_enhanced[$PROTOCOL]}
