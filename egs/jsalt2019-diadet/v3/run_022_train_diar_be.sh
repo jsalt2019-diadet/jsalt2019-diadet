@@ -133,7 +133,6 @@ if [ $stage -le 7 ];then
     mkdir -p $be_ami_dir
     # Train a LDA model on Voxceleb+ami_train,
     echo "Train LDA for ami"
-    
     # ind zca whitening
     copy-vector scp:$xvector_dir/jsalt19_spkdiar_ami_train_gtvad/xvector.scp ark:- | local/zca_whitening.py ark:- $be_ami_dir/zca_whitening_ind
     # ood zca whitening
@@ -142,8 +141,7 @@ if [ $stage -le 7 ];then
     #Center each dataset with its mean
     ivector-subtract-global-mean scp:$xvector_dir/${plda_diar_data}_128k/xvector.scp ark:- | \
 	local/zca_whitening.py ark:- $be_ami_dir/zca_whitening_ood $be_ami_dir/zca_whitening_ind ark:- |
-	copy-vector ark:- ark,t:- > $be_ami_dir/xvector.ark.tmp
-  
+	copy-vector ark:- ark,t:- > $be_ami_dir/xvector.ark.tmp 
     ivector-subtract-global-mean scp:$xvector_dir/jsalt19_spkdiar_ami_train_gtvad/xvector.scp ark,t:- >> $be_ami_dir/xvector.ark.tmp
     #remove duplicate key, that appears for some reason
     awk '{ if(!($1 in l)){ print $0; l[$1]=1}}' $be_ami_dir/xvector.ark.tmp | copy-vector ark:- ark:$be_ami_dir/xvector.ark
