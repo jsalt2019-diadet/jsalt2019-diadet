@@ -166,6 +166,7 @@ if [ $stage -le 2 ];then
 	echo "Calibrate scores of ${name_vec[$i]} with automatic diarization"
 	db=jsalt19_spkdet_${name_vec[$i]}
 	scorer=local/score_${name_vec[$i]}_spkdet.sh
+	mem_scorer=${mem_scorer_vec[$i]}
         for plda in plda_${spkdet_diar_name}{,_gtvad} plda_adapt_${spkdet_diar_name}{,_gtvad} \
 			 plda_adapt_snorm_${spkdet_diar_name}{,_gtvad} 
 	do
@@ -176,7 +177,7 @@ if [ $stage -le 2 ];then
 		fi
 
 		(
-		    local/calibrate_jsalt19_spkdet_v1.sh --cmd "$train_cmd" \
+		    local/calibrate_jsalt19_spkdet_v1.sh --cmd "$train_cmd --mem $mem_scorer" \
 							 $db $dur $score_dir/$plda
 
 		    $scorer --cmd "$train_cmd --mem $mem_scorer" \
