@@ -54,7 +54,7 @@ echo pyannote-metrics.py detection --subset=$subset $task $score_dir/rttm
 pyannote-metrics.py detection --subset=$subset $task $score_dir/rttm \
 		    2> $score_dir/pyannote-det.log \
 		    > $score_dir/result.pyannote-det &
-
+wait
 conda deactivate
 exit
 
