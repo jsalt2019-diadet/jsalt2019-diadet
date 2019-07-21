@@ -45,6 +45,7 @@ if [ $stage -le 1 ];then
             $train_cmd_gpu $exp_dir/log/test_${i}.log \
 	       ./local/test_overlap.sh $ovnet $db ${out_dir} || exit 1;
         ) &
+
     done
 
 fi
@@ -66,9 +67,10 @@ if [ $stage -le 2 ];then
         #echo $onset
         #echo $offset
 	    #echo "./local/thr_and_conv_overlap.sh $db ${out_dir} $onset $offset";
+
         ( 
-            $train_cmd $exp_dir/log/thrcov_${i}.log \
-	       ./local/thr_and_conv_overlap.sh $db ${out_dir} $onset $offset || exit 1;
+            $train_cmd $exp_dir/log/thrcov_eval_and_dev_${i}.log \
+	       ./local/thr_and_conv_overlap.sh $db ${out_dir} $onset $offset true || exit 1;
         ) &
     done
 
@@ -83,14 +85,18 @@ if [ $stage -le 3 ];then
     # for dsetname in babytrain ami sri
     for dsetname in ami
     do
-    ovtxt=${out_dir}/overlap_${dsetname}.txt
-    ./local/diar2spkdet.py ${ovtxt} ${out_dir}
-    dset=jsalt19_spkdet_${dsetname}_eval_test
-    cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/overlap.rttm > data/${dset}/overlap.rttm
-    cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/segoverlap > data/${dset}/segoverlap
+    for part in dev eval
+    do
+    ovtxt=${out_dir}/overlap_${part}_${dsetname}.txt
+    ./local/diar2spkdet.py ${ovtxt} ${out_dir} --outputname overlap_${part}_${dsetname}
+    dset=jsalt19_spkdet_${dsetname}_${part}_test
+    cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/overlap_${part}_${dsetname}.rttm > data/${dset}/overlap.rttm
+    cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/segoverlap_overlap_${part}_${dsetname} > data/${dset}/segoverlap
+    done
     done
 
 fi
+
 
 # Remove the overlap areas from the VAD
 if [ $stage -le 4 ];then

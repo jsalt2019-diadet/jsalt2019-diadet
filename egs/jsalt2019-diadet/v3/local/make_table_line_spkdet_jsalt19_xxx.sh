@@ -79,7 +79,8 @@ fi
 
 
 printf "$name,"
-for db in dev eval
+#for db in dev eval
+for db in eval
 do
     for((i=0;i<$num_conds;i++))
     do
