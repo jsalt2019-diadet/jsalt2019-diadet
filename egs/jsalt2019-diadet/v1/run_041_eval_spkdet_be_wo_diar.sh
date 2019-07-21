@@ -166,7 +166,7 @@ if [ $stage -le 2 ];then
 		    continue
 		fi
 		(
-		    local/calibrate_jsalt19_spkdet_v1.sh --cmd "$train_cmd" \
+		    local/calibrate_jsalt19_spkdet_v1.sh --cmd "$train_cmd --mem $mem_scorer" \
 							 $db $dur $score_dir/$plda
 
 		    $scorer --cmd "$train_cmd --mem $mem_scorer" \
