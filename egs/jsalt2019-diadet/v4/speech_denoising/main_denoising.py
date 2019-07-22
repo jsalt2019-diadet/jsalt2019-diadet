@@ -179,7 +179,7 @@ def denoise_wav(src_wav_file, dest_wav_file, global_mean, global_var, use_gpu,
 
 
 
-def main_denoising(wav_files, output_dir, verbose, use_gpu, gpu_id, truncate_minutes, mode,stage_select=3):
+def main_denoising(wav_files, output_dir, verbose, use_gpu, truncate_minutes, mode,stage_select=3):
     """Perform speech enhancement for WAV files in ``wav_dir``.
 
     Parameters
