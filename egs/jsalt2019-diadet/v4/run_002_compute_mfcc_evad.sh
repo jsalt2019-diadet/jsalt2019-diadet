@@ -69,7 +69,7 @@ fi
 
 #Spk detection training data
 if [ $stage -le 4 ];then 
-    for name in jsalt19_spkdet_{babytrain,chime5,ami}_train 
+    for name in jsalt19_spkdet_{babytrain,chime5,ami}{,_enhanced}_train 
     do
 	steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj 40 --cmd "$train_cmd" \
 			   data/${name} exp/make_mfcc $mfccdir
@@ -83,7 +83,7 @@ fi
 #Spk detection enrollment and test data
 if [ $stage -le 5 ];then
 
-    for db in jsalt19_spkdet_{babytrain,ami,sri}_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}_{dev,eval}
     do
 	# enrollment 
 	for d in 5 15 30
@@ -128,12 +128,10 @@ fi
 
 #Spk diarization data
 if [ $stage -le 6 ];then 
-    for name in jsalt19_spkdiar_babytrain_{train,dev,eval} \
-    					  jsalt19_spkdiar_chime5_train jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06} \
-    					  jsalt19_spkdiar_ami_train jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01} \
-					  jsalt19_spkdiar_babytrain_enhanced_{dev,eval}\
-					  jsalt19_spkdiar_chime5_enhanced_{dev,eval}_{U01,U06}\
-					  jsalt19_spkdiar_ami_enhanced_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}
+    for name in jsalt19_spkdiar_babytrain{,_enhanced}_{train,dev,eval} \
+    					  jsalt19_spkdiar_chime5{,_enhanced}_train jsalt19_spkdiar_chime5{,_enhanced}_{dev,eval}_{U01,U06} \
+    					  jsalt19_spkdiar_ami{,_enhanced}_train jsalt19_spkdiar_ami{,_enhanced}_{dev,eval}_{Mix-Headset,Array1-01,Array2-01} \
+					  jsalt19_spkdiar_sri{,_enhanced}_{dev,eval}
     do
 	num_utt=$(wc -l data/$name/utt2spk | cut -d " " -f 1)
 	nj=$(($num_utt < 40 ? 2:40))
