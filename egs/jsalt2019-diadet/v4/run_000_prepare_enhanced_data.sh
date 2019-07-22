@@ -14,14 +14,15 @@ config_file=default_config.sh
 . parse_options.sh || exit 1;
 . datapath.sh
 
-OUTPUT_ROOT=./data_enhanced_aduios/m{MODE}_s{STAGE_SELECT} 
+OUTPUT_ROOT=./data_enhanced_aduios/ 
 
 if [ $stage -le 1 ];then
     # Prepare the enhanced data of Babytrain.
     for partition in {train,dev,test}
     do
-      dataDir=/export/fs01/jsalt19/databases/BabyTrain/${partition}
+      dataDir=/export/fs01/jsalt19/databases/BabyTrain/${partition}/wav
       outputDir=${OUTPUT_ROOT}/BabyTrain/${partition}
+      echo "$train_cmd_gpu  ./local/denoising_sig2sig.sh $dataDir $outputDir "
 
       $train_cmd_gpu  ./local/denoising_sig2sig.sh $dataDir $outputDir  
       exit
