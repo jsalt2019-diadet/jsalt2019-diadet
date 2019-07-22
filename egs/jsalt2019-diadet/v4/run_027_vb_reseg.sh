@@ -24,6 +24,7 @@ be_dir=exp/be_diar/$nnet_name/$be_diar_name
 score_dir=exp/diarization/$nnet_name/$be_diar_name
 
 VB_dir=exp/VB
+VB_models_dir=$VB_dir/models
 
 #dev datasets
 dsets_spkdiar_dev_evad=(jsalt19_spkdiar_babytrain_dev jsalt19_spkdiar_chime5_dev_{U01,U06} jsalt19_spkdiar_ami_dev_{Mix-Headset,Array1-01,Array2-01} jsalt19_spkdiar_sri_dev)
@@ -79,7 +80,8 @@ if [ $stage -le 1 ]; then
     fi
 
 
-    output_rttm_dir=$VB_dir/$name/rttm
+    # append _VB to the data dir, then output to the same location
+    output_rttm_dir=$score_dir/${name}_VB/plda_scores_tbest
     mkdir -p $output_rttm_dir || exit 1;
     init_rttm_file=$score_dir/$name/plda_scores_tbest/rttm
 
@@ -90,7 +92,7 @@ if [ $stage -le 1 ]; then
     # Usage: diarization/VB_resegmentation.sh <data_dir> <init_rttm_filename> <output_dir> <dubm_model> <ie_model>
     VB/diarization/VB_resegmentation.sh --nj $nj --cmd "$train_cmd --mem 10G" \
       --max-iters 1 --initialize 1 \
-      data/$name $init_rttm_file $VB_dir/$name \
+      data/$name $init_rttm_file $output_rttm_dir \
       $VB_dir/$trained_dir/diag_ubm_$num_components/final.dubm $VB_dir/$trained_dir/extractor_diag_c${num_components}_i${ivector_dim}/final.ie || exit 1; 
 
 
@@ -116,9 +118,10 @@ if [ $stage -le 2 ]; then
       
     # Compute the DER after VB resegmentation wtih 
     # PYANNOTE
+    # "Usage: $0 <dataset> <dev/eval> <score-dir>"
     echo "Starting Pyannote rttm evaluation for $name ... "
     $train_cmd $VB_dir/$name/pyannote.log \
-        local/pyannote_score_diar.sh $name $dev_eval $VB_dir/$name/rttm
+        local/pyannote_score_diar.sh $name $dev_eval $score_dir/${name}_VB/plda_scores_tbest
     
 
     done
@@ -127,31 +130,5 @@ fi
 
 
 
-if [ $stage -le 3 ]; then 
-
-  # echo "dset,DER_pre,DER_post,DER_diff,Miss_pre,Miss_post,Miss_diff,FA_pre,FA_post,FA_diff,Conf_pre,Conf_post,Conf_diff,"
-  echo "dset,DER_pre,DER_post,DER_diff"
-
-  for name in $dsets_test
-    do 
-
-      pre_res_f=$score_dir/$name/plda_scores_tbest/result.pyannote-der
-
-      # cols=( 2 11 9 13 )  # columns with DER, Miss, FA, Confusion
-      cols=( 2 )  # columns with only DER
-      
-      split=(${name//_/,})
-
-      echo -n "$split," 
-
-      for num in ${cols[@]}; do 
-        awk -v num=$num '/TOTAL/ { printf "%.2f,", $num}' $pre_res_f
-        awk -v num=$num '/TOTAL/ { printf "%.2f,", $num}' $VB_dir/$name/rttm/result.pyannote-der
-      done
-      echo
-     
-    done
-
-fi
 
 
