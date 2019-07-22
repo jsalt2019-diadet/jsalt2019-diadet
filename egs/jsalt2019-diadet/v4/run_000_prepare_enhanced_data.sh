@@ -24,7 +24,7 @@ if [ $stage -le 1 ];then
       outputDir=${OUTPUT_ROOT}/BabyTrain/${partition}
       echo "$train_cmd_gpu  ./local/denoising_sig2sig.sh $dataDir $outputDir "
 
-      $train_cmd_gpu  ./local/denoising_sig2sig.sh $dataDir $outputDir  
+      $se_cmd_gpu ./local/denoising_sig2sig.sh $dataDir $outputDir  
       exit
     done
 
