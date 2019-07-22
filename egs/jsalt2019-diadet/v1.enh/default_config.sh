@@ -57,3 +57,23 @@ w_W_ami=0.25
 #ncoh_chime5=300
 #ncoh_ami=300
 ncoh=500
+
+
+# feat enhancement variables
+# context aggregation network with residual x+logsigmoid(can(x)), linear context
+enh_name=CAN18
+py_mfcc_enh=steps_pyfe/pytorch-compute-mfcc-feats-enh-fbank-tserescan-small-logsigmask-bnin.py
+#dummy enhancement network parameters
+enh_nnet=exp/se_models/18/30.nw_SE.raw
+enh_context=73
+enh_chunk_size=500
+#enh_chunk_size=0
+
+# data to train plda for enhancement
+enh_train=false #don't enhance training data (voxceleb)
+enh_adapt=false #don't enhance adaptation data (datasets training sets)
+enh_test=true #enhance test data (diarization, enroll, test dev and eval)
+
+
+
+
