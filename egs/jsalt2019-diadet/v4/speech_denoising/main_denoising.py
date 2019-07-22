@@ -124,7 +124,7 @@ def denoise_wav(src_wav_file, dest_wav_file, global_mean, global_var, use_gpu,
     total_chunks = int(math.ceil(wav_data.size / chunk_length))
     data_se = [] # Will hold enhanced audio data for each chunk.   
     
-    model_pth = os.path.join(HERE, 'model', '1000h_se.pth')
+    model_pth = os.path.join(HERE, 'speech_denoising', '1000h_se.pth')
     if not os.path.exists(model_pth):
         cmd = "cp  {} {} ".format('/export/fs01/jsalt19/leisun/speech_enhancement/speech_denoising_pytorch/model/1000h_se.pth', model_pth )
     
