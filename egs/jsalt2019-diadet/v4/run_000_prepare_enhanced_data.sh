@@ -16,7 +16,7 @@ config_file=default_config.sh
 . $config_file
 . datapath.sh
 
-output_root=data_enhanced_aduios
+output_root=data_enhanced_audios
 log_dir=$output_root/log/
 
 echo "Processing all datasets can be very time-consuming, it's recommended to use the pre-processed audios path introduced in datapath.sh"
