@@ -6,7 +6,7 @@
 # Begin configuration section.
 nj=4
 cmd=run.pl
-fbank_config=conf/fbank.conf
+mfcc_config=conf/mfcc.conf
 compress=true
 use_gpu=false
 chunk_size=0
@@ -20,11 +20,11 @@ if [ -f path.sh ]; then . ./path.sh; fi
 . parse_options.sh || exit 1;
 
 if [ $# -lt 3 ] || [ $# -gt 5 ]; then
-   echo "Usage: $0 [options] <data-dir> <pythone-exec-script> <nnet-model> [<log-dir> [<fbank-dir>] ]";
-   echo "e.g.: $0 data/train exp/make_fbank/train mfcc"
-   echo "Note: <log-dir> defaults to <data-dir>/log, and <fbank-dir> defaults to <data-dir>/data"
+   echo "Usage: $0 [options] <data-dir> <pythone-exec-script> <nnet-model> [<log-dir> [<mfcc-dir>] ]";
+   echo "e.g.: $0 data/train exp/make_mfcc/train mfcc"
+   echo "Note: <log-dir> defaults to <data-dir>/log, and <mfcc-dir> defaults to <data-dir>/data"
    echo "Options: "
-   echo "  --fbank-config <config-file>                     # config passed to compute-fbank-feats "
+   echo "  --mfcc-config <config-file>                     # config passed to compute-mfcc-feats "
    echo "  --nj <nj>                                        # number of parallel jobs"
    echo "  --cmd (utils/run.pl|utils/queue.pl <queue opts>) # how to run jobs."
    echo "  --write-utt2num-frames <true|false>     # If true, write utt2num_frames file."
@@ -51,19 +51,19 @@ else
   logdir=$data/log
 fi
 if [ $# -ge 5 ]; then
-  fbankdir=$5
+  mfccdir=$5
 else
-  fbankdir=$data/data
+  mfccdir=$data/data
 fi
 
 
-# make $fbankdir an absolute pathname.
-fbankdir=`perl -e '($dir,$pwd)= @ARGV; if($dir!~m:^/:) { $dir = "$pwd/$dir"; } print $dir; ' $fbankdir ${PWD}`
+# make $mfccdir an absolute pathname.
+mfccdir=`perl -e '($dir,$pwd)= @ARGV; if($dir!~m:^/:) { $dir = "$pwd/$dir"; } print $dir; ' $mfccdir ${PWD}`
 
 # use "name" as part of name of the archive.
 name=`basename $data`
 
-mkdir -p $fbankdir || exit 1;
+mkdir -p $mfccdir || exit 1;
 mkdir -p $logdir || exit 1;
 
 if [ -f $data/feats.scp ]; then
@@ -74,11 +74,11 @@ fi
 
 scp=$data/wav.scp
 
-required="$scp $fbank_config"
+required="$scp $mfcc_config"
 
 for f in $required; do
   if [ ! -f $f ]; then
-    echo "make_fbank.sh: no such file $f"
+    echo "make_mfcc.sh: no such file $f"
     exit 1;
   fi
 done
@@ -86,9 +86,9 @@ done
 utils/validate_data_dir.sh --no-text --no-feats $data || exit 1;
 
 for n in $(seq $nj); do
-  # the next command does nothing unless $fbankdir/storage/ exists, see
+  # the next command does nothing unless $mfccdir/storage/ exists, see
   # utils/create_data_link.pl for more info.
-  utils/create_data_link.pl $fbankdir/raw_fbank_$name.$n.ark
+  utils/create_data_link.pl $mfccdir/raw_mfcc_$name.$n.ark
 done
 
 opt_args=""
@@ -114,17 +114,17 @@ if [ -f $data/segments ]; then
   opt_args="${opt_args} --segments $data/segments"
 fi
 
-$cmd JOB=1:$nj $logdir/make_fbank_${name}.JOB.log \
+$cmd JOB=1:$nj $logdir/make_mfcc_${name}.JOB.log \
     steps_pyfe/torch.sh --num-gpus $num_gpus \
-    ${py_exec} @$fbank_config $opt_args --output-step logfb \
+    ${py_exec} @$mfcc_config $opt_args \
     --nn-model-path $nnet_model --chunk-size $chunk_size --context $nnet_context \
-    --input $scp --output ark,scp:$fbankdir/raw_fbank_$name.JOB.ark,$fbankdir/raw_fbank_$name.JOB.scp \
+    --input $scp --output ark,scp:$mfccdir/raw_mfcc_$name.JOB.ark,$mfccdir/raw_mfcc_$name.JOB.scp \
     --part-idx JOB --num-parts $nj || exit 1
 
 
 # concatenate the .scp files together.
 for n in $(seq $nj); do
-  cat $fbankdir/raw_fbank_$name.$n.scp || exit 1;
+  cat $mfccdir/raw_mfcc_$name.$n.scp || exit 1;
 done > $data/feats.scp
 
 if $write_utt2num_frames; then
@@ -141,4 +141,4 @@ if [ $nf -ne $nu ]; then
   echo "consider using utils/fix_data_dir.sh $data"
 fi
 
-echo "Succeeded creating filterbank features for $name"
+echo "Succeeded creating MFCC features for $name"
