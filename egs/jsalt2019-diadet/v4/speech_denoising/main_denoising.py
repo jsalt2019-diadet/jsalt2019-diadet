@@ -19,10 +19,7 @@ WAV files with one path per line:
     /path/to/file3.wav
     ...
 
-This functionality is enabled via the ``-S`` flag, as in the following:
-
-   python main_denoising.py -S some.scp --output_dir se_wav_dir/
-he GPU using chunks that are 10 minutes in duration. This should use at
+The GPU using chunks that are 10 minutes in duration. This should use at
 most 8 GB of GPU memory.
 
 References
