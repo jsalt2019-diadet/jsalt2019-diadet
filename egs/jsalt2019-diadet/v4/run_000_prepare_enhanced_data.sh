@@ -5,6 +5,7 @@
 ###################################
 # Run speech enhancement
 ###################################
+. ./cmd.sh
 . ./path.sh
 set -e
 
@@ -12,6 +13,7 @@ stage=1
 config_file=default_config.sh
 
 . parse_options.sh || exit 1;
+. $config_file
 . datapath.sh
 
 OUTPUT_ROOT=./data_enhanced_aduios/ 
@@ -25,7 +27,7 @@ if [ $stage -le 1 ];then
     do
       dataDir=/export/fs01/jsalt19/databases/BabyTrain/${partition}/wav
       outputDir=${OUTPUT_ROOT}/BabyTrain/${partition}
-      echo "$train_cmd_gpu  ./local/denoising_sig2sig.sh $dataDir $outputDir "
+      echo "$se_cmd_gpu  ./local/denoising_sig2sig.sh $dataDir $outputDir "
 
       $se_cmd_gpu ./local/denoising_sig2sig.sh $dataDir $outputDir  
     done
@@ -38,7 +40,7 @@ if [ $stage -le 2 ];then
     do
       dataDir=/export/fs01/jsalt19/databases/AMI/${partition}/wav/
       outputDir=${OUTPUT_ROOT}/AMI/${partition}
-      echo "$train_cmd_gpu  ./local/denoising_sig2sig.sh $dataDir $outputDir "
+      echo "$se_cmd_gpu  ./local/denoising_sig2sig.sh $dataDir $outputDir "
 
       $se_cmd_gpu ./local/denoising_sig2sig.sh $dataDir $outputDir  
     done
@@ -51,7 +53,7 @@ if [ $stage -le 3 ];then
     do
       dataDir=/export/fs01/jsalt19/databases/CHiME5/${partition}/wav/
       outputDir=${OUTPUT_ROOT}/CHiME5/${partition}
-      echo "$train_cmd_gpu  ./local/denoising_sig2sig.sh $dataDir $outputDir "
+      echo "$se_cmd_gpu  ./local/denoising_sig2sig.sh $dataDir $outputDir "
 
       $se_cmd_gpu ./local/denoising_sig2sig.sh $dataDir $outputDir  
     done
