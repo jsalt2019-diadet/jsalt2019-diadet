@@ -124,9 +124,10 @@ def denoise_wav(src_wav_file, dest_wav_file, global_mean, global_var, use_gpu,
     total_chunks = int(math.ceil(wav_data.size / chunk_length))
     data_se = [] # Will hold enhanced audio data for each chunk.   
     
-    model_pth = os.path.join(HERE, 'speech_denoising', '1000h_se.pth')
+    model_pth = os.path.join(HERE, '1000h_se.pth')
     if not os.path.exists(model_pth):
         cmd = "cp  {} {} ".format('/export/fs01/jsalt19/leisun/speech_enhancement/speech_denoising_pytorch/model/1000h_se.pth', model_pth )
+        os.system(cmd)
     
     nnet = LSTM_SE_PL_Dense_MTL(257, 7, 1024, 3, 257,'false')
     nnet.load_state_dict(torch.load(model_pth))
@@ -200,8 +201,8 @@ def main_denoising(wav_files, output_dir, verbose, use_gpu, truncate_minutes, mo
         os.makedirs(output_dir)
 
     # Load global MVN statistics.
-    global_mean = np.load(os.path.join(HERE, 'speech_denoising', 'mean.npy') )
-    global_var = 1 / np.load(os.path.join(HERE, 'speech_denoising', 'inv_std.npy') )
+    global_mean = np.load(os.path.join(HERE, 'mean.npy') )
+    global_var = 1 / np.load(os.path.join(HERE, 'inv_std.npy') )
 
     # Perform speech enhancement.
     for src_wav_file in wav_files:
@@ -228,7 +229,7 @@ def main_denoising(wav_files, output_dir, verbose, use_gpu, truncate_minutes, mo
         try:
             bn = os.path.basename(src_wav_file)
             dest_wav_file = os.path.join(output_dir, bn)
-            denoise_wav(src_wav_file, dest_wav_file, global_mean, global_var, use_gpu, gpu_id, truncate_minutes, mode, stage_select )
+            denoise_wav(src_wav_file, dest_wav_file, global_mean, global_var, use_gpu, truncate_minutes, mode, stage_select )
             print('Finished processing file "%s".' % src_wav_file)
         except Exception as e:
             msg = 'Problem encountered while processing file "%s". Skipping.' % src_wav_file
