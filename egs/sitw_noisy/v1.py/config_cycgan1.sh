@@ -22,13 +22,12 @@ be_name=lda${lda_dim}_${plda_label}_${plda_data}
 
 #enhancement
 # context aggregation network with residual x+logsigmoid(can(x)), linear context
-enh_name=e18
-py_mfcc_enh=steps_pyfe/pytorch-compute-mfcc-feats-enh-fbank-tserescan-small-logsigmask-bnin.py
+enh_name=cycgan_1
+py_mfcc_enh=steps_pyfe/pytorch-compute-mfcc-feats-cycgan-v3.py
 #dummy enhancement network parameters
-enh_nnet=exp/se_models/18/30.nw_SE.raw
-enh_context=73
-#enh_chunk_size=500
-enh_chunk_size=0
+enh_nnet=exp/se_models/cycgan_1/checkpoint.epoch50.tgt2src_gen.pth
+enh_context=55
+enh_chunk_size=127
 
 # data to train plda for enhancement
 enh_train=false

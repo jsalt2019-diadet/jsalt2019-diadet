@@ -48,6 +48,7 @@ if [ "$enh_train" == "true" ];then
 	    cp -r data/$name data/${name}_enh${enh_name}
 	    name=${name}_enh${enh_name}
 	    steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pymfcc_16k.conf --nj 40 --cmd "$train_cmd" \
+	        --chunk-size $enh_chunk_size --nnet-context $enh_context \
 		$py_mfcc_enh $enh_nnet data/${name} exp/make_mfcc $mfccdir
 	    utils/fix_data_dir.sh data/${name}
 	done
@@ -75,6 +76,7 @@ if [ $stage -le 4 ];then
 	cp -r data/$name data/${name}_enh${enh_name}
 	name=${name}_enh${enh_name}
 	steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pymfcc_16k.conf --nj 40 --cmd "$train_cmd" \
+	                   --chunk-size $enh_chunk_size --nnet-context $enh_context \
 			   $py_mfcc_enh $enh_nnet data/${name} exp/make_mfcc $mfccdir
 	utils/fix_data_dir.sh data/${name}
     done

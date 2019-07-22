@@ -1,9 +1,9 @@
 #Default configuration parameters for the experiment
 
 #xvector training 
-nnet_data=voxceleb_div2
+nnet_data=voxceleb_combined
 nnet_vers=2a.1
-nnet_name=2a.1.voxceleb_div2
+nnet_name=2a.1.voxceleb_combined
 nnet_num_epochs=3
 nnet_dir=exp/xvector_nnet_$nnet_name
 
@@ -27,8 +27,7 @@ py_mfcc_enh=steps_pyfe/pytorch-compute-mfcc-feats-enh-fbank-tserescan-small-logs
 #dummy enhancement network parameters
 enh_nnet=exp/se_models/18/30.nw_SE.raw
 enh_context=73
-#enh_chunk_size=500
-enh_chunk_size=0
+enh_chunk_size=500
 
 # data to train plda for enhancement
 enh_train=false
