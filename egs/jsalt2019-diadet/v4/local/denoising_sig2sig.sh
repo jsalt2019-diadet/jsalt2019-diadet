@@ -19,11 +19,18 @@ TRUNCATE_MINUTES=10  # Duration in minutes of chunks for enhancement. If you exp
 MODE=3   #Use which output of the model: mode=1 is irm, mode=2 is lps, mode=3 is fusion of both.
 STAGE_SELECT=3 # Only works if choosing  1000h-model.
 
+echo "/home/leisun1/anaconda3/bin/python  speech_denoising/main_denoising.py \
+       --verbose \
+       --wav_dir $data_dir --output_dir $output_dir \
+       --use_gpu $USE_GPU  \
+       --truncate_minutes $TRUNCATE_MINUTES \
+       --mode $MODE \
+       --stage_select $STAGE_SELECT"
 
 /home/leisun1/anaconda3/bin/python  speech_denoising/main_denoising.py \
        --verbose \
        --wav_dir $data_dir --output_dir $output_dir \
        --use_gpu $USE_GPU  \
-       --truncate_minutes $TRUNCATE_MINUTES \
+       --truncate_minutes  $TRUNCATE_MINUTES \
        --mode $MODE \
        --stage_select $STAGE_SELECT
