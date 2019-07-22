@@ -26,11 +26,13 @@ dsets_spkdiar_test_enhanced_gtvad=(jsalt19_spkdiar_babytrain_enhanced_{dev,eval}
 dsets_spkdet_test_evad=(jsalt19_spkdet_babytrain_{dev,eval}_test jsalt19_spkdet_ami_{dev,eval}_test jsalt19_spkdet_sri_{dev,eval}_test)
 dsets_spkdet_test_gtvad=(jsalt19_spkdet_babytrain_{dev,eval}_test_gtvad jsalt19_spkdet_ami_{dev,eval}_test_gtvad jsalt19_spkdet_sri_{dev,eval}_test_gtvad)
 
+dsets_spkdet_test_enhanced_evad=(jsalt19_spkdet_babytrain_enhanced_{dev,eval}_test jsalt19_spkdet_ami_enhanced_{dev,eval}_test jsalt19_spkdet_sri_enhanced_{dev,eval}_test)
+dsets_spkdet_test_enhanced_gtvad=(jsalt19_spkdet_babytrain_enhanced_{dev,eval}_test_gtvad jsalt19_spkdet_ami_enhanced_{dev,eval}_test_gtvad jsalt19_spkdet_sri_enhanced_{dev,eval}_test_gtvad)
 
 #datasets from array to string list"
 dsets_adapt="${dsets_adapt[@]}"
-dsets_test_evad="${dsets_spkdiar_test_evad[@]} ${dsets_spkdiar_test_enhanced_evad[@]} ${dsets_spkdet_test_evad[@]}"
-dsets_test_gtvad="${dsets_spkdiar_test_gtvad[@]} ${dsets_spkdiar_test_enhanced_gtvad[@]} ${dsets_spkdet_test_gtvad[@]}"
+dsets_test_evad="${dsets_spkdiar_test_evad[@]} ${dsets_spkdiar_test_enhanced_evad[@]} ${dsets_spkdet_test_evad[@] ${dsets_spkdet_test_enhanced_evad[@]}"
+dsets_test_gtvad="${dsets_spkdiar_test_gtvad[@]} ${dsets_spkdiar_test_enhanced_gtvad[@]} ${dsets_spkdet_test_gtvad[@] ${dsets_spkdet_test_enhanced_gtvad[@]}"
 
 
 if [ $stage -le 1 ];then
