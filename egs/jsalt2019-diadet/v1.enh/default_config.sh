@@ -61,10 +61,12 @@ ncoh=500
 
 # feat enhancement variables
 # context aggregation network with residual x+logsigmoid(can(x)), linear context
-enh_name=CAN18
+#enh_name=CAN18
+enh_name=CAN22
 py_mfcc_enh=steps_pyfe/pytorch-compute-mfcc-feats-enh-fbank-tserescan-small-logsigmask-bnin.py
 #dummy enhancement network parameters
-enh_nnet=exp/se_models/18/30.nw_SE.raw
+#enh_nnet=exp/se_models/18/30.nw_SE.raw
+enh_nnet=exp/se_models/22/52.nw_SE.raw
 enh_context=73
 enh_chunk_size=500
 #enh_chunk_size=0

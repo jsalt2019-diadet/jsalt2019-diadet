@@ -14,9 +14,6 @@ PATH=$KALDI_ROOT/tools/sctk-2.4.10/src/md-eval:$PATH
 #hyperion
 HYP_ROOT=$TOOLS_ROOT/hyperion/hyperion
 
-#pyannote
-#PYANNOTE=$TOOLS_ROOT/pyannonte/pyannote-core:$TOOLS_ROOT/pyannonte/pyannote-metrics
-
 #Anaconda env
 CONDA_ROOT=$TOOLS_ROOT/anaconda/anaconda3.5
 if [ -f "$CONDA_ROOT/etc/profile.d/conda.sh" ]; then
@@ -28,10 +25,28 @@ else
     PATH=$CONDA_ROOT/bin:$PATH
 fi
 
-LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
-LD_LIBRARY_PATH=/usr/local/cuda/lib:$LD_LIBRARY_PATH
-if [ ! -d /usr/local/cuda/lib64 ]; then
-    LD_LIBRARY_PATH=$HOME/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+if [ "$(hostname --domain)" == "cm.gemini" ];then
+    module load cuda10.0/toolkit
+    module load ffmpeg
+
+    #CuDNN env
+    CUDNN_ROOT=$TOOLS_ROOT/cudnn/cudnn-10.0-v7.4
+
+    #torch env
+    export TORCH=pytorch1.0_cuda10.0
+
+else
+    LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+    LD_LIBRARY_PATH=/usr/local/cuda/lib:$LD_LIBRARY_PATH
+    if [ ! -d /usr/local/cuda/lib64 ]; then
+	LD_LIBRARY_PATH=$HOME/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+    fi
+
+    #CuDNN env
+    CUDNN_ROOT=$TOOLS_ROOT/cudnn/cudnn-9.0-v7.4
+
+    #torch env
+    export TORCH=pytorch1.0_cuda9.0
 fi
 
 # export CPATH=$HOME/usr/local/cudnn-v5.1/include:/usr/local/cuda/include:$CPATH

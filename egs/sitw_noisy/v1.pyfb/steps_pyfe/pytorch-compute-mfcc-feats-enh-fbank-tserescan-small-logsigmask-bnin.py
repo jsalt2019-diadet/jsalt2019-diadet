@@ -73,7 +73,7 @@ def apply_nnet(x, model, chunk_size, context, device):
     return y
 
 
-def compute_mfcc_feats(input_path, output_path,
+def compute_mfcc_feats(input_path, output_path, segments_path,
                        compress, compression_method, write_num_frames, 
                        use_gpu, nn_model_path, chunk_size, context,
                        **kwargs):
@@ -106,7 +106,7 @@ def compute_mfcc_feats(input_path, output_path,
 
     if mfcc1.input_step == 'wave':
         input_args = AR.filter_args(**kwargs)
-        reader = AR(input_path, **input_args)
+        reader = AR(input_path, segments_path, **input_args)
     else:
         input_args = DRF.filter_args(**kwargs)
         reader = DRF.create(input_path, **input_args)
@@ -173,6 +173,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--input', dest='input_path', required=True)
     parser.add_argument('--output', dest='output_path', required=True)
+    parser.add_argument('--segments', dest='segments_path', default=None)
     parser.add_argument('--write-num-frames', dest='write_num_frames', default=None)
 
     DRF.add_argparse_args(parser)

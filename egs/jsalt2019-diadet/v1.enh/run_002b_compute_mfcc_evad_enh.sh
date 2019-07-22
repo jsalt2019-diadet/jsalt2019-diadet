@@ -12,8 +12,8 @@
 set -e
 nodes=fs01 #by default it puts mfcc in /export/fs01/jsalt19
 storage_name=$(date +'%m_%d_%H_%M')
-mfccdir=`pwd`/mfcc_enh_${enh_name}
-vaddir=`pwd`/mfcc_enh_${enh_name}  # energy VAD
+mfccdir=`pwd`/mfcc_enh
+vaddir=`pwd`/mfcc_enh  # energy VAD
 vaddir_gt=`pwd`/vad_gt  # ground truth VAD
 
 stage=1
@@ -21,6 +21,10 @@ config_file=default_config.sh
 
 . parse_options.sh || exit 1;
 . $config_file
+
+mfccdir=${mfccdir}_${enh_name}
+vaddir=${vaddir}_${enh_name}
+
 
 # Make filterbanks and compute the energy-based VAD for each dataset
 
