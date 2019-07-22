@@ -20,6 +20,45 @@ list_path=$2
 output_path=$3
 
 data_name=jsalt19_spkdiar_chime5_enhanced
+# Make Training data
+# This will be used to adapt NNet and PLDA models
+combine_str=""
+for mic in $train_mics
+do
+    if [ $mic == "PXX" ];then
+	args="--bin-wav"
+    else
+	args=""
+    fi
+    echo "making $data_name train mic-$mic"
+    python local/make_jsalt19_spkdiar.py \
+	   --list-path $list_path/train \
+	   --wav-path $wav_path/CHiME5/train/SE_1000h_model_m3_s3 \
+	   --output-path $output_path \
+	   --data-name $data_name \
+	   --partition train \
+	   --rttm-suffix .$mic \
+	   --mic $mic $args \
+
+
+    cp $list_path/train/all.$mic.uem $output_path/${data_name}_train_${mic}/diarization.uem
+
+    #make spk2utt so kaldi don't complain
+    utils/utt2spk_to_spk2utt.pl $output_path/${data_name}_train_${mic}/utt2spk \
+				> $output_path/${data_name}_train_${mic}/spk2utt
+
+    utils/fix_data_dir.sh $output_path/${data_name}_train_${mic}
+    combine_str="$combine_str $output_path/${data_name}_train_${mic}"
+done
+utils/combine_data.sh $output_path/${data_name}_train $combine_str
+
+for f in diarization.rttm diarization.uem vad.rttm vad.segments
+do
+    for mic in $train_mics
+    do
+	cat $output_path/${data_name}_train_${mic}/$f
+    done > $output_path/${data_name}_train/$f
+done
 
 
 for mic in $test_mics

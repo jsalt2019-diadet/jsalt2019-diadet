@@ -24,7 +24,7 @@ if [ $stage -le 1 ]; then
 
     # prepared datasets with subsegments based on automatic diarization with energy VAD
     # each subsegment is defined by a binary vad
-    for db in jsalt19_spkdet_{babytrain,ami,sri}_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}_{dev,eval}
     do
 	name=${db}_test
 	if [[ "$db" =~ .*_babytrain_.* ]];then
@@ -45,7 +45,7 @@ if [ $stage -le 2 ]; then
 
     # prepared datasets with subsegments based on automatic diarization with ground truth VAD
     # each subsegment is defined by a binary vad
-    for db in jsalt19_spkdet_{babytrain,ami,sri}_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}_{dev,eval}
     do
 	name=${db}_test
 	name_gt=${db}_test_gtvad
@@ -67,7 +67,7 @@ fi
 
 if [ $stage -le 3 ]; then
     # Extracts x-vectors for test with automatic diarization and energy VAD
-    for db in jsalt19_spkdet_{babytrain,ami,sri}_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}_{dev,eval}
     do
 	name=${db}_test_${spkdet_diar_name}
 	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \
@@ -79,7 +79,7 @@ fi
 
 if [ $stage -le 4 ]; then
     # Extracts x-vectors for test with automatic diarization and ground truth VAD
-    for db in jsalt19_spkdet_{babytrain,ami,sri}_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}_{dev,eval}
     do
 	name=${db}_test_${spkdet_diar_name}_gtvad
 	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \
@@ -92,7 +92,7 @@ fi
 if [ $stage -le 5 ]; then
     # combine enroll and test xvectors for step 043
     # with automatic diarization energy vad
-    for dset in jsalt19_spkdet_{babytrain,ami,sri}
+    for dset in jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}
     do
 	for part in dev eval
 	do
@@ -115,7 +115,7 @@ fi
 if [ $stage -le 6 ]; then
     # combine enroll and test xvectors for step 043
     # with automatic diarization ground truth vad
-    for dset in jsalt19_spkdet_{babytrain,ami,sri}
+    for dset in jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}
     do
 	for part in dev eval
 	do

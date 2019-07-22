@@ -23,11 +23,17 @@ local/make_table_line_spkdiar_jsalt19_babytrain.sh --print-header true "$name e-
 local/make_table_line_spkdiar_jsalt19_babytrain.sh "$name_adapt e-vad" $score_adapt_dir
 
 echo ""
+#energy VAD - enhanced
+local/make_table_line_spkdiar_jsalt19_babytrain_enhanced.sh --print-header true "$name e-vad" $score_dir
+local/make_table_line_spkdiar_jsalt19_babytrain_enhanced.sh "$name_adapt e-vad" $score_adapt_dir
+
 
 #GT VAD
 local/make_table_line_spkdiar_jsalt19_babytrain.sh --print-header true --use-gtvad true "$name" $score_dir
 local/make_table_line_spkdiar_jsalt19_babytrain.sh --use-gtvad true "$name_adapt" $score_adapt_dir
 
-
-
+echo ""
+#GT VAD - enhanced
+local/make_table_line_spkdiar_jsalt19_babytrain_enhanced.sh --print-header true --use-gtvad true "$name" $score_dir
+local/make_table_line_spkdiar_jsalt19_babytrain_enhanced.sh --use-gtvad true "$name_adapt" $score_adapt_dir
 exit
