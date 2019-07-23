@@ -25,6 +25,7 @@ from hyperion.io import SequentialDataReaderFactory as DRF
 from hyperion.io import DataWriterFactory as DWF
 from hyperion.io import compression_methods
 from hyperion.feats import MFCC
+from hyperion.feats import MeanVarianceNormalization as MVN
 from hyperion.utils.math import logsumexp
 
 from cycgan_models.cycle_gan_gen_model_ver3 import ConvGenNet as CGN
@@ -101,6 +102,8 @@ def compute_mfcc_feats(input_path, output_path,
     mfcc1 = MFCC(**mfcc_args1)
     mfcc2 = MFCC(**mfcc_args2)   
 
+    mvn = MVN(norm_var=False, left_context=150, rigth_context=150)
+    
     # PUT YOUR NNET MODEL HERE!!!!
     enhancer = CGN()
     #enhancer.load_state_dict(torch.load(nn_model_path, map_location=device)['state_dict'])
@@ -140,6 +143,7 @@ def compute_mfcc_feats(input_path, output_path,
 
         #we apply dummy identity network to fb
         logging.info('Running enhancement network')
+        y = mvn.normalize(y)
         y = apply_nnet(y, enhancer, chunk_size, context, device)
 
         #lets rescale the logE based on enhanced filterbanks

@@ -15,6 +15,7 @@ storage_name=$(date +'%m_%d_%H_%M')
 mfccdir=`pwd`/mfcc_enh
 vaddir=`pwd`/mfcc_enh  # energy VAD
 vaddir_gt=`pwd`/vad_gt  # ground truth VAD
+use_gpu=false
 
 stage=1
 config_file=default_config.sh
@@ -25,8 +26,7 @@ config_file=default_config.sh
 mfccdir=${mfccdir}_${enh_name}
 vaddir=${vaddir}_${enh_name}
 
-
-# Make filterbanks and compute the energy-based VAD for each dataset
+# Make MFCC with enhancement and compute the energy-based VAD for each dataset
 
 if [ $stage -le 1 ]; then
     # Prepare to distribute data over multiple machines
@@ -52,11 +52,11 @@ if [ "$enh_train" == true ];then
 	for name in voxceleb1 voxceleb2_train
 	do
 	    steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pymfcc_16k.conf \
-					--nj 40 --cmd "$train_cmd" \
+					--nj 40 --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
 					--chunk-size $enh_chunk_size --nnet-context $enh_context \
 					$py_mfcc_enh $enh_nnet data/${name} exp/make_mfcc_enh $mfccdir
 	    utils/fix_data_dir.sh data/${name}
-	    steps_fe/compute_vad_decision.sh --nj 30 --cmd "$train_cmd" \
+	    steps_fe/compute_vad_decision.sh --nj 30 --cmd "$eval_enh_cmd" \
 					     data/${name} exp/make_vad_enh $vaddir
 	    utils/fix_data_dir.sh data/${name}
 	done
@@ -80,7 +80,7 @@ if [ $stage -le 4 ] && [ "$enh_adapt" == true ];then
     for name in jsalt19_spkdet_{babytrain,chime5,ami}_train 
     do
 	steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pymfcc_16k.conf \
-				    --nj 40 --cmd "$train_cmd" \
+				    --nj 40 --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
 				    --chunk-size $enh_chunk_size --nnet-context $enh_context \
 				    $py_mfcc_enh $enh_nnet data/${name} exp/make_mfcc_enh $mfccdir
 	utils/fix_data_dir.sh data/${name}
@@ -106,13 +106,13 @@ if [ $stage -le 5 ] && [ "$enh_test" == true ];then
 	    num_spk=$(wc -l data/$name/spk2utt | cut -d " " -f 1)
 	    nj=$(($num_spk < 40 ? $num_spk:40))
 	    steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pymfcc_16k.conf \
-					--nj $nj --cmd "$train_cmd" \
+					--nj $nj --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
 					--chunk-size $enh_chunk_size --nnet-context $enh_context \
 					$py_mfcc_enh $enh_nnet data/${name} exp/make_mfcc_enh $mfccdir
 	    utils/fix_data_dir.sh data/${name}
 	    if [[ "$db" =~ .*sri.* ]];then
 		#for sri we run the energy vad
-		steps_fe/compute_vad_decision.sh --nj $nj --cmd "$train_cmd" \
+		steps_fe/compute_vad_decision.sh --nj $nj --cmd "$eval_enh_cmd" \
 						 data/${name} exp/make_vad_enh $vaddir
 	    else
 		# ground truth VAD
@@ -124,12 +124,12 @@ if [ $stage -le 5 ] && [ "$enh_test" == true ];then
 	# test
 	name=${db}_test
 	steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pymfcc_16k.conf \
-				    --nj 40 --cmd "$train_cmd" \
+				    --nj 40 --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
 				    --chunk-size $enh_chunk_size --nnet-context $enh_context \
 				    $py_mfcc_enh $enh_nnet data/${name} exp/make_mfcc_enh $mfccdir
 	utils/fix_data_dir.sh data/${name}
 	#energy VAD
-	steps_fe/compute_vad_decision.sh --nj 30 --cmd "$train_cmd" \
+	steps_fe/compute_vad_decision.sh --nj 30 --cmd "$eval_enh_cmd" \
 					 data/${name} exp/make_vad_enh $vaddir
 	utils/fix_data_dir.sh data/${name}
 	
@@ -149,12 +149,12 @@ if [ $stage -le 6 ] && [ "$enh_adapt" == true ];then
 	num_utt=$(wc -l data/$name/utt2spk | cut -d " " -f 1)
 	nj=$(($num_utt < 40 ? 2:40))
 	steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pymfcc_16k.conf \
-				    --nj $nj --cmd "$train_cmd" \
+				    --nj $nj --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
 				    --chunk-size $enh_chunk_size --nnet-context $enh_context \
 				    $py_mfcc_enh $enh_nnet data/${name} exp/make_mfcc_enh $mfccdir
 	utils/fix_data_dir.sh data/${name}
 	# energy VAD
-	steps_fe/compute_vad_decision.sh --nj $nj --cmd "$train_cmd" \
+	steps_fe/compute_vad_decision.sh --nj $nj --cmd "$eval_enh_cmd" \
 					 data/${name} exp/make_vad_enh $vaddir
 	utils/fix_data_dir.sh data/${name}
 	
@@ -177,12 +177,12 @@ if [ $stage -le 7 ] && [ "$enh_test" == true ];then
 	num_utt=$(wc -l data/$name/utt2spk | cut -d " " -f 1)
 	nj=$(($num_utt < 40 ? 2:40))
 	steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pymfcc_16k.conf \
-				    --nj $nj --cmd "$train_cmd" \
+				    --nj $nj --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
 				    --chunk-size $enh_chunk_size --nnet-context $enh_context \
 				    $py_mfcc_enh $enh_nnet data/${name} exp/make_mfcc_enh $mfccdir
 	utils/fix_data_dir.sh data/${name}
 	# energy VAD
-	steps_fe/compute_vad_decision.sh --nj $nj --cmd "$train_cmd" \
+	steps_fe/compute_vad_decision.sh --nj $nj --cmd "$eval_enh_cmd" \
 					 data/${name} exp/make_vad_enh $vaddir
 	utils/fix_data_dir.sh data/${name}
 
