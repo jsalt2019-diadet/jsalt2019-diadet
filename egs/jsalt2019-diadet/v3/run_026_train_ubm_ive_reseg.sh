@@ -21,7 +21,7 @@ config_file=default_config.sh
 num_components=1024 # the number of UBM components (used for VB resegmentation)
 ivector_dim=400 # the dimension of i-vector (used for VB resegmentation)
 
-dsets_train_evad=(jsalt19_spkdiar_{babytrain,chime5,ami}_train_evad )
+dsets_train_evad=(jsalt19_spkdiar_{babytrain,chime5,ami}_train_evad)
 
 dsets_train_gtvad=($(echo ${dsets_train_evad[@]} | sed 's/_evad/_gtvad/g'))
 dsets_train_evad=($(echo ${dsets_train_evad[@]} | sed 's/_evad//g'))
@@ -32,7 +32,7 @@ dsets_train="${dsets_train_gtvad[@]} ${dsets_train_evad[@]}"
 
 
 
-VB_dir=exp/VB
+VB_dir=exp/VB/models
 
 # Variational Bayes resegmentation using the code from Brno University of Technology
 # Please see https://speech.fit.vutbr.cz/software/vb-diarization-eigenvoice-and-hmm-priors 

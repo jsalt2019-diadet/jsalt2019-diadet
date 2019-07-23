@@ -32,7 +32,7 @@ else
     vad_suff=""
 fi
 
-dataset="chime5_enhanced"
+dataset="chime5"
 num_conds=${#conds[*]}
 num_cols=$((4*$num_conds))
 
@@ -77,7 +77,7 @@ for db in dev eval
 do
     for((i=0;i<$num_conds;i++))
     do
-	res_file=$score_dir/jsalt19_spkdiar_chime5_enhanced_${db}${conds[$i]}${vad_suff}/plda_scores_tbest/result.pyannote-der
+	res_file=$score_dir/jsalt19_spkdiar_chime5_${db}${conds[$i]}${vad_suff}/rttm/result.pyannote-der
 	awk '/TOTAL/ { printf "%.2f,%.2f,%.2f,%.2f,", $2,$11,$9,$13}' $res_file
     done
 done

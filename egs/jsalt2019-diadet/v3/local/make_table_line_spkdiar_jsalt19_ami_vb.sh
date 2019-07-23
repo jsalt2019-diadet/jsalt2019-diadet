@@ -23,8 +23,8 @@ declare -a conds
 header_2="DER,Miss,FA,Spk-Confusion,"
 
 ii=0
-header_1=(U01 U06)
-conds=(_U01 _U06)
+header_1=(Mix-Headset Array1 Array2)
+conds=(_Mix-Headset _Array1-01 _Array2-01)
 
 if [ "$use_gtvad" == "true" ];then
     vad_suff="_gtvad"
@@ -32,7 +32,7 @@ else
     vad_suff=""
 fi
 
-dataset="chime5_enhanced"
+dataset="ami"
 num_conds=${#conds[*]}
 num_cols=$((4*$num_conds))
 
@@ -77,7 +77,7 @@ for db in dev eval
 do
     for((i=0;i<$num_conds;i++))
     do
-	res_file=$score_dir/jsalt19_spkdiar_chime5_enhanced_${db}${conds[$i]}${vad_suff}/plda_scores_tbest/result.pyannote-der
+	res_file=$score_dir/jsalt19_spkdiar_ami_${db}${conds[$i]}${vad_suff}/rttm/result.pyannote-der
 	awk '/TOTAL/ { printf "%.2f,%.2f,%.2f,%.2f,", $2,$11,$9,$13}' $res_file
     done
 done

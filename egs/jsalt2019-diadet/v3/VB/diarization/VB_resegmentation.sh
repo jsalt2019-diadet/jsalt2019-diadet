@@ -112,5 +112,5 @@ if [ $stage -le 1 ]; then
 	--channel $channel --initialize $initialize \
         $sdata/JOB $init_rttm_filename $output_dir/tmp $output_dir/tmp/dubm.tmp $output_dir/tmp/ie.tmp || exit 1;
 
-    cat $output_dir/tmp/*.rttm > $output_dir/rttm/VB_rttm
+    cat $output_dir/tmp/*.rttm > $output_dir/rttm/rttm
 fi
