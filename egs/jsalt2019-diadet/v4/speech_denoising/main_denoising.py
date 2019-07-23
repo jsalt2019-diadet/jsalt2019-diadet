@@ -19,27 +19,7 @@ WAV files with one path per line:
     /path/to/file3.wav
     ...
 
-This functionality is enabled via the ``-S`` flag, as in the following:
-
-   python main_denoising.py -S some.scp --output_dir se_wav_dir/
-
-As this model is computationally demanding, use of a GPU is recommended, which
-may be enabled via the ``--use_gpu`` and ``--gpu_id`` flags. The ``--use_gpu`` flag
-indicates whether or not to use a GPU with possible values being ``false`` and ``true``.
-The ``--gpu_id`` flag specifies the device id of the GPU to use. For instance:
-
-   python main_denoising.py --use_gpu true --gpu_id 0 -S some.scp --output_dir se_wav_dir/
-
-will perform enhancement using the GPU with device id 0.
-
-If you find that you have insufficient available GPU memory to run the model, try
-adjusting the flag ``--truncate_minutes``, which controls the length of audio
-chunks processed. Smaller values of ``--truncate_minutes`` will lead to a smaller
-memory footprint. For instance:
-
-   python main_denoising.py --truncate_minutes 10 --use_gpu true --gpu_id 0 -S some.scp --output_dir se_wav_dir/
-
-will perform enhancement on the GPU using chunks that are 10 minutes in duration. This should use at
+The GPU using chunks that are 10 minutes in duration. This should use at
 most 8 GB of GPU memory.
 
 References
@@ -75,6 +55,9 @@ BITDEPTH = 16 # Expected bitdepth of input WAV.
 WL = 512 # Analysis window length in samples for feature extraction.
 WL2 = WL // 2
 NFREQS = 257 # Number of positive frequencies in FFT output.
+if torch.cuda.is_available():
+    gpu_id = int(os.popen('free-gpu').read())
+    torch.cuda.set_device(gpu_id)
 
 
 
@@ -131,11 +114,7 @@ def denoise_wav(src_wav_file, dest_wav_file, global_mean, global_var, use_gpu,
     
     nnet = LSTM_SE_PL_Dense_MTL(257, 7, 1024, 3, 257,'false')
     nnet.load_state_dict(torch.load(model_pth))
-      
-    if torch.cuda.is_available(): 
-        gpu_id = int(os.popen('free-gpu').read())
-        torch.cuda.set_device(gpu_id)
-        nnet = nnet.cuda()
+    nnet = nnet.cuda()
     nnet.eval()
 
     for i in range(1, total_chunks + 1):
