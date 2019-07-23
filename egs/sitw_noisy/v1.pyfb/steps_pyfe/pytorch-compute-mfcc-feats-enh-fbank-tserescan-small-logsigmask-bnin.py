@@ -12,6 +12,7 @@ import argparse
 import time
 import logging
 import copy
+import subprocess
 
 import numpy as np
 from six.moves import xrange
@@ -39,6 +40,15 @@ class DummyNet(nn.Module):
     def forward(self, x):
         return x.matmul(self.weight)
 
+    
+def find_free_gpus():
+    try:
+        result = subprocess.run('free-gpu', stdout=subprocess.PIPE)
+        gpu_ids = result.stdout.decode('utf-8')
+    except:
+        gpu_ids = '0'
+    return gpu_ids
+    
 
 def apply_nnet(x, model, chunk_size, context, device):
     x = x.astype('float32')
@@ -79,11 +89,26 @@ def compute_mfcc_feats(input_path, output_path, segments_path,
                        **kwargs):
 
     #open device
-    if  use_gpu and torch.cuda.is_available():
-        logging.info('CUDA_VISIBLE_DEVICES=%s' % os.environ['CUDA_VISIBLE_DEVICES'])
-        logging.info('init gpu device')
-        device = torch.device('cuda', 0)
-        torch.tensor([0]).to(device)
+    if use_gpu and torch.cuda.is_available():
+        os.environ['CUDA_DEVICE_ORDER']='PCI_BUS_ID'
+        max_tries = 100
+        for g in range(max_tries):
+            try:
+                gpu_ids = find_free_gpus()
+                os.environ['CUDA_VISIBLE_DEVICES'] = gpu_ids
+                logging.info('CUDA_VISIBLE_DEVICES=%s' % os.environ['CUDA_VISIBLE_DEVICES'])
+                logging.info('init gpu device')
+                device = torch.device('cuda', 0)
+                torch.tensor([0]).to(device)
+                break
+            except:
+                if g < max_tries-1:
+                    logging.info('failing init gpu, trying again')
+                    time.sleep(10)
+                else:
+                    logging.info('failing init gpu, using cpu')
+                    device = torch.device('cpu')
+                    
     else:
         logging.info('init cpu device')
         device = torch.device('cpu')

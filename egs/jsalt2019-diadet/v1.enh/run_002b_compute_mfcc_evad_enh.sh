@@ -15,9 +15,10 @@ storage_name=$(date +'%m_%d_%H_%M')
 mfccdir=`pwd`/mfcc_enh
 vaddir=`pwd`/mfcc_enh  # energy VAD
 vaddir_gt=`pwd`/vad_gt  # ground truth VAD
-use_gpu=false
+use_gpu=true
 
 stage=1
+max_nj=10
 config_file=default_config.sh
 
 . parse_options.sh || exit 1;
@@ -52,7 +53,7 @@ if [ "$enh_train" == true ];then
 	for name in voxceleb1 voxceleb2_train
 	do
 	    steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pymfcc_16k.conf \
-					--nj 40 --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
+					--nj ${max_nj} --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
 					--chunk-size $enh_chunk_size --nnet-context $enh_context \
 					$py_mfcc_enh $enh_nnet data/${name} exp/make_mfcc_enh $mfccdir
 	    utils/fix_data_dir.sh data/${name}
@@ -80,7 +81,7 @@ if [ $stage -le 4 ] && [ "$enh_adapt" == true ];then
     for name in jsalt19_spkdet_{babytrain,chime5,ami}_train 
     do
 	steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pymfcc_16k.conf \
-				    --nj 40 --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
+				    --nj ${max_nj} --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
 				    --chunk-size $enh_chunk_size --nnet-context $enh_context \
 				    $py_mfcc_enh $enh_nnet data/${name} exp/make_mfcc_enh $mfccdir
 	utils/fix_data_dir.sh data/${name}
@@ -104,7 +105,7 @@ if [ $stage -le 5 ] && [ "$enh_test" == true ];then
 		continue
 	    fi
 	    num_spk=$(wc -l data/$name/spk2utt | cut -d " " -f 1)
-	    nj=$(($num_spk < 40 ? $num_spk:40))
+	    nj=$(($num_spk < ${max_nj} ? $num_spk:${max_nj}))
 	    steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pymfcc_16k.conf \
 					--nj $nj --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
 					--chunk-size $enh_chunk_size --nnet-context $enh_context \
@@ -124,7 +125,7 @@ if [ $stage -le 5 ] && [ "$enh_test" == true ];then
 	# test
 	name=${db}_test
 	steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pymfcc_16k.conf \
-				    --nj 40 --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
+				    --nj ${max_nj} --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
 				    --chunk-size $enh_chunk_size --nnet-context $enh_context \
 				    $py_mfcc_enh $enh_nnet data/${name} exp/make_mfcc_enh $mfccdir
 	utils/fix_data_dir.sh data/${name}
@@ -147,7 +148,7 @@ if [ $stage -le 6 ] && [ "$enh_adapt" == true ];then
     for name in jsalt19_spkdiar_{babytrain,chime5,ami}_train
     do
 	num_utt=$(wc -l data/$name/utt2spk | cut -d " " -f 1)
-	nj=$(($num_utt < 40 ? 2:40))
+	nj=$(($num_utt < ${max_nj} ? 2:${max_nj}))
 	steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pymfcc_16k.conf \
 				    --nj $nj --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
 				    --chunk-size $enh_chunk_size --nnet-context $enh_context \
@@ -175,7 +176,7 @@ if [ $stage -le 7 ] && [ "$enh_test" == true ];then
     					  jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01} 
     do
 	num_utt=$(wc -l data/$name/utt2spk | cut -d " " -f 1)
-	nj=$(($num_utt < 40 ? 2:40))
+	nj=$(($num_utt < ${max_nj} ? 2:${max_nj}))
 	steps_pyfe/make_mfcc_enh.sh --write-utt2num-frames true --mfcc-config conf/pymfcc_16k.conf \
 				    --nj $nj --cmd "$eval_enh_cmd" --use-gpu $use_gpu \
 				    --chunk-size $enh_chunk_size --nnet-context $enh_context \
