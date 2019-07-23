@@ -7,8 +7,9 @@ dataset=${1:-AMI.SpeakerDiarization.MixHeadset}
 dest_dir=${2:-./}
 onset=${3:-./}
 offset=${4:-./}
-loadenv=${5:-true}
-envname=${6:-'pyannote-audio'}
+dev=${5:-false}
+loadenv=${6:-true}
+envname=${7:-'pyannote-audio'}
 
 if $loadenv ; then
 source activate ${envname}
@@ -23,10 +24,19 @@ while [[ $s ]]; do
     s=${s#*"$delimiter"};
 done;
 name=`echo ${array[0],,}`
-outputfile=$dest_dir/overlap_${name}.txt
+outputfile=$dest_dir/overlap_eval_${name}.txt
 
 # Covert the output to txt
 echo "Converting"
 echo "./local/raw_over2txt.py $dataset $dest_dir --onset $onset --offset $offset --outputfile $outputfile"
 ./local/raw_over2txt.py $dataset $dest_dir --onset $onset --offset $offset --outputfile $outputfile
+
+if [ "$dev" = true ] ; then
+    outputfile=$dest_dir/overlap_dev_${name}.txt
+
+    # Covert the output to txt
+    echo "Converting"
+    echo "./local/raw_over2txt.py $dataset $dest_dir --onset $onset --offset $offset --outputfile $outputfile --dev"
+    ./local/raw_over2txt.py $dataset $dest_dir --onset $onset --offset $offset --outputfile $outputfile --dev
+fi
 

@@ -75,6 +75,7 @@ def main():
     parser = OptionParser(usage=usage, description=desc, version=version)
     parser.add_option("-t", "--onset", action="store", type="float", help="Onset Threshold", default=0.70)
     parser.add_option("-f", "--offset", action="store", type="float", help="Offset Threshold", default=0.70)
+    parser.add_option("-d", "--dev", action="store_true", help="Print output based on development set", default=False)
     parser.add_option("-o", "--outputfile", action="store", type="string", help="Output file", default="./overlap.txt")
     (opt, args) = parser.parse_args()
 
@@ -82,31 +83,45 @@ def main():
         parser.error("Incorrect number of arguments")
     database, raw_score_path = args
 
-    # get first test file of AMI protocol
+    # get test file of protocol
     protocol = get_protocol(database)
-    test_file = next(protocol.test())
 
     # load precomputed overlap scores as pyannote.core.SlidingWindowFeature
     precomputed = Precomputed(raw_score_path)
-    ovl_scores = precomputed(test_file)
-
+    # StackedRNN model
     # initialize binarizer
     # onset / offset are tunable parameters (and should be tuned for better 
     # performance). we use log_scale=True because of the final log-softmax in the 
-    # StackedRNN model
     binarize = Binarize(onset=opt.onset, offset=opt.offset, log_scale=True)
 
-    # binarize overlap scores to obtain overlap regions as pyannote.core.Timeline
-    ovl_regions = binarize.apply(ovl_scores, dimension=1)
-    ovl_regions.uri = test_file['uri']
+    fw = open(opt.outputfile, 'a+')
 
-    # write the output into text
-    fw = open(opt.outputfile, 'wt')
-    write_txt(fw, ovl_regions)
+    if opt.dev:
+        for test_file in protocol.development():
+            ovl_scores = precomputed(test_file)
+
+
+            # binarize overlap scores to obtain overlap regions as pyannote.core.Timeline
+            ovl_regions = binarize.apply(ovl_scores, dimension=1)
+            ovl_regions.uri = test_file['uri']
+
+
+            # write the output into text
+            write_txt(fw, ovl_regions)
+ 
+    else:
+        for test_file in protocol.test():
+            ovl_scores = precomputed(test_file)
+
+
+            # binarize overlap scores to obtain overlap regions as pyannote.core.Timeline
+            ovl_regions = binarize.apply(ovl_scores, dimension=1)
+            ovl_regions.uri = test_file['uri']
+
+
+            # write the output into text
+            write_txt(fw, ovl_regions)
     fw.close()
-
-
-
 
 
 if __name__=="__main__":

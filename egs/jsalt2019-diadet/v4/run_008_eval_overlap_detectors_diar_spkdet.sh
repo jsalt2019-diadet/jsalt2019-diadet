@@ -7,7 +7,7 @@
 . ./path.sh
 set -e
 
-stage=4
+stage=1
 
 
 config_file=default_config.sh
@@ -22,11 +22,12 @@ vaddir_ov=`pwd`/vad_ov  # VAD without OV regions
 
 # SRI overlap model is trained in CHiME5
 # tst_vec=(AMI.SpeakerDiarization.MixHeadset BabyTrain.SpeakerDiarization.All SRI.SpeakerDiarization.All)
-tst_vec=(AMI.SpeakerDiarization.MixHeadset)
-val_vec=(AMI.SpeakerDiarization.MixHeadset.development)
+tst_vec=(AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.Array1 AMI.SpeakerDiarization.Array2)
+trn_vec=(AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.MixHeadset)
+val_vec=(AMI.SpeakerDiarization.MixHeadset.development AMI.SpeakerDiarization.MixHeadset.development AMI.SpeakerDiarization.MixHeadset.development)
 num_dbs=${#tst_vec[@]}
 
-#Train overlap
+#Test overlap
 if [ $stage -le 1 ];then
 
     mkdir -p $out_dir
@@ -37,14 +38,16 @@ if [ $stage -le 1 ];then
         db=${tst_vec[$i]}
         # We select just the net that we want for development purposes
         # The net should be selected based on the validation file (nets are still on a training stage)
-        paramfile=${exp_dir}/train/${tst_vec[$i]}.train/validate/${val_vec[$i]}/params.yml
+        paramfile=${exp_dir}/train/${trn_vec[$i]}.train/validate/${val_vec[$i]}/params.yml
         nit=`cat $paramfile | grep epoch | cut -d' ' -f2 | xargs -I num printf "%04d\n" num`
-        ovnet=${exp_dir}/train/${tst_vec[$i]}.train/weights/${nit}.pt
+        ovnet=${exp_dir}/train/${trn_vec[$i]}.train/weights/${nit}.pt
 
         ( 
-            $train_cmd_gpu $exp_dir/log/test_${i}.log \
+            $train_cmd_gpu $exp_dir/log/test_aux_${i}.log \
 	       ./local/test_overlap.sh $ovnet $db ${out_dir} || exit 1;
         ) &
+        sleep 10
+
     done
 
 fi
@@ -60,16 +63,17 @@ if [ $stage -le 2 ];then
         db=${tst_vec[$i]}
         # We select just the net that we want for development purposes
         # The net should be selected based on the validation file (nets are still on a training stage)
-        paramfile=${exp_dir}/train/${tst_vec[$i]}.train/validate/${val_vec[$i]}/params.yml
+        paramfile=${exp_dir}/train/${trn_vec[$i]}.train/validate/${val_vec[$i]}/params.yml
         offset=`cat $paramfile | grep -w offset: | cut -d' ' -f4`
         onset=`cat $paramfile | grep -w onset: | cut -d' ' -f4`
         #echo $onset
         #echo $offset
 	    #echo "./local/thr_and_conv_overlap.sh $db ${out_dir} $onset $offset";
+
         ( 
-            $train_cmd $exp_dir/log/thrcov_${i}.log \
-	       ./local/thr_and_conv_overlap.sh $db ${out_dir} $onset $offset || exit 1;
-        ) &
+            $train_cmd $exp_dir/log/thrcov_eval_and_dev_${i}.log \
+	       ./local/thr_and_conv_overlap.sh $db ${out_dir} $onset $offset true || exit 1;
+        ) 
     done
 
 fi
@@ -83,14 +87,18 @@ if [ $stage -le 3 ];then
     # for dsetname in babytrain ami sri
     for dsetname in ami
     do
-    ovtxt=${out_dir}/overlap_${dsetname}.txt
-    ./local/diar2spkdet.py ${ovtxt} ${out_dir}
-    dset=jsalt19_spkdet_${dsetname}_eval_test
-    cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/overlap.rttm > data/${dset}/overlap.rttm
-    cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/segoverlap > data/${dset}/segoverlap
+    for part in dev eval
+    do
+    ovtxt=${out_dir}/overlap_${part}_${dsetname}.txt
+    ./local/diar2spkdet.py ${ovtxt} ${out_dir} --outputname overlap_${part}_${dsetname}
+    dset=jsalt19_spkdet_${dsetname}_${part}_test
+    cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/overlap_${part}_${dsetname}.rttm > data/${dset}/overlap.rttm
+    cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/segoverlap_overlap_${part}_${dsetname} > data/${dset}/segoverlap
+    done
     done
 
 fi
+
 
 # Remove the overlap areas from the VAD
 if [ $stage -le 4 ];then
@@ -100,14 +108,17 @@ if [ $stage -le 4 ];then
     # for dsetname in babytrain ami sri
     for dsetname in ami
     do
-    dset=jsalt19_spkdet_${dsetname}_eval_test
+    for part in dev eval
+    do
+    dset=jsalt19_spkdet_${dsetname}_${part}_test
     ovrttm=data/${dset}/overlap.rttm
     vadrttm=data/${dset}/vad.rttm
-    cp -r data/jsalt19_spkdet_${dsetname}_eval_test data/jsalt19_spkdet_${dsetname}_eval_test_overlap
-    outputrttm=data/jsalt19_spkdet_${dsetname}_eval_test_overlap/vad_ov.rttm
+    cp -r data/jsalt19_spkdet_${dsetname}_${part}_test data/jsalt19_spkdet_${dsetname}_${part}_test_overlap
+    outputrttm=data/jsalt19_spkdet_${dsetname}_${part}_test_overlap/vad_ov.rttm
     ./local/merge_overlap.sh $vadrttm $ovrttm $outputrttm
-    hyp_utils/rttm_to_bin_vad.sh --nj 5 $outputrttm data/jsalt19_spkdet_${dsetname}_eval_test_overlap/ $vaddir_ov
-    # utils/fix_data_dir.sh data/jsalt19_spkdet_${dsetname}_eval_test_overlap
+    hyp_utils/rttm_to_bin_vad.sh --nj 5 $outputrttm data/jsalt19_spkdet_${dsetname}_${part}_test_overlap/ $vaddir_ov
+    # utils/fix_data_dir.sh data/jsalt19_spkdet_${dsetname}_${part}_test_overlap
+    done
     done
 
 fi
