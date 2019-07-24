@@ -52,6 +52,8 @@ fi
 # export CPATH=$HOME/usr/local/cudnn-v5.1/include:/usr/local/cuda/include:$CPATH
 # export LIBRARY_PATH=$HOME/usr/local/cudnn-v5.1/lib64:/usr/local/cuda/lib64:/usr/local/cuda/lib:$LIBRARY_PATH
 
+export HDF5_USE_FILE_LOCKING=FALSE
+
 export MPLBACKEND="agg"
 export PATH=$HYP_ROOT/hyperion/bin:/usr/local/cuda/bin:$PATH
 export PYTHONPATH=$HYP_ROOT:$PYTHONPATH
