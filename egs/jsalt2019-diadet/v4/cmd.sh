@@ -13,5 +13,6 @@
 export train_cmd="queue.pl --mem 4G -l hostname=\"[bc][01]*\" -V"
 export train_cmd_gpu="queue.pl --mem 4G -l gpu=1 -l hostname=\"b1[123456789]*|c0*\" -V"
 export pyannote_cmd="queue.pl --mem 20G -l hostname=\"c[01]*\" -V"
+export se_cmd_gpu="queue.pl --mem 20G -l gpu=1 -l hostname=\"b1[123456789]*|c0*\" -V"
 
 

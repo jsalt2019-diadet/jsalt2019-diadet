@@ -29,11 +29,11 @@ score_plda_gtvad_dir=$score_dir/plda_${spkdet_diar_name}_gtvad
 score_plda_adapt_gtvad_dir=$score_dir/plda_adapt_${spkdet_diar_name}_gtvad
 score_plda_adapt_snorm_gtvad_dir=$score_dir/plda_adapt_snorm_${spkdet_diar_name}_gtvad
 
-name_vec=(babytrain ami sri)
-be_vec=($be_babytrain_dir $be_ami_dir $be_sri_dir)
-coh_vec=(jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train jsalt19_spkdet_chime5_train)
+name_vec=(babytrain ami sri babytrain_enhanced ami_enhanced sri_enhanced)
+be_vec=($be_babytrain_dir $be_ami_dir $be_sri_dir $be_babytrain_dir $be_ami_dir $be_sri_dir)
+coh_vec=(jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train jsalt19_spkdet_chime5_train jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train jsalt19_spkdet_chime5_train)
 num_dbs=${#name_vec[@]}
-mem_scorer_vec=(30G 10G 10G)
+mem_scorer_vec=(40G 10G 10G 40G 10G 10G)
 
 
 if [ $stage -le 1 ];then
@@ -166,6 +166,7 @@ if [ $stage -le 2 ];then
 	echo "Calibrate scores of ${name_vec[$i]} with automatic diarization"
 	db=jsalt19_spkdet_${name_vec[$i]}
 	scorer=local/score_${name_vec[$i]}_spkdet.sh
+	mem_scorer=${mem_scorer_vec[$i]}
         for plda in plda_${spkdet_diar_name}{,_gtvad} plda_adapt_${spkdet_diar_name}{,_gtvad} \
 			 plda_adapt_snorm_${spkdet_diar_name}{,_gtvad} 
 	do
@@ -176,7 +177,7 @@ if [ $stage -le 2 ];then
 		fi
 
 		(
-		    local/calibrate_jsalt19_spkdet_v1.sh --cmd "$train_cmd" \
+		    local/calibrate_jsalt19_spkdet_v1.sh --cmd "$train_cmd --mem $mem_scorer" \
 							 $db $dur $score_dir/$plda
 
 		    $scorer --cmd "$train_cmd --mem $mem_scorer" \

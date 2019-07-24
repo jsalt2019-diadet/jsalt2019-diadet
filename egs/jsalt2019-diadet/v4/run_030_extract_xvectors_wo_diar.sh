@@ -40,7 +40,7 @@ fi
 
 if [ $stage -le 3 ]; then
     # Extracts x-vectors for adaptation data
-    for name in jsalt19_spkdet_{babytrain,chime5,ami}_train
+    for name in jsalt19_spkdet_{babytrain,chime5,ami}{,_enhanced}_train
     do
 	num_spk=$(wc -l data/${name}/spk2utt | cut -d " " -f 1)
 	nj=$(($num_spk < 40 ? $num_spk:40))
@@ -53,7 +53,7 @@ fi
 
 if [ $stage -le 4 ]; then
     # Extracts x-vectors for enrollment
-    for db in jsalt19_spkdet_{babytrain,ami,sri}_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}_{dev,eval}
     do
 	for d in 5 15 30
 	do
@@ -72,7 +72,7 @@ fi
 
 if [ $stage -le 5 ]; then
     # Extracts x-vectors for test with ground truth VAD
-    for db in jsalt19_spkdet_{babytrain,ami,sri}_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}_{dev,eval}
     do
 	name=${db}_test_gtvad
 	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \
@@ -83,7 +83,7 @@ fi
 
 if [ $stage -le 6 ]; then
     # Extracts x-vectors for test with energy VAD
-    for db in jsalt19_spkdet_{babytrain,ami,sri}_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}_{dev,eval}
     do
 	name=${db}_test
 	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \
@@ -96,7 +96,7 @@ fi
 if [ $stage -le 7 ]; then
     # combine enroll and test xvectors for step 041
     # no diarization, energy and GT VAD
-    for dset in jsalt19_spkdet_{babytrain,ami,sri}
+    for dset in jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}
     do
 	for part in dev eval
 	do

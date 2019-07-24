@@ -30,7 +30,7 @@ name_vec=(babytrain ami sri)
 be_vec=($be_babytrain_dir $be_ami_dir $be_sri_dir)
 coh_vec=(jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train jsalt19_spkdet_chime5_train)
 num_dbs=${#name_vec[@]}
-mem_scorer_vec=(30G 10G 10G)
+mem_scorer_vec=(35G 10G 10G)
 
 #train_cmd=run.pl
 
@@ -113,6 +113,7 @@ if [ $stage -le 2 ];then
 	echo "Calibrate scores of ${name_vec[$i]} with ground truth diarization"
 	db=jsalt19_spkdet_${name_vec[$i]}
 	scorer=local/score_${name_vec[$i]}_spkdet.sh
+	mem_scorer=${mem_scorer_vec[$i]}
         for plda in plda_gtdiar plda_adapt_gtdiar plda_adapt_snorm_gtdiar
 	do
 	    for dur in 5 15 30
@@ -121,7 +122,7 @@ if [ $stage -le 2 ];then
 		    continue
 		fi
 		(
-		    local/calibrate_jsalt19_spkdet_v1.sh --cmd "$train_cmd" \
+		    local/calibrate_jsalt19_spkdet_v1.sh --cmd "$train_cmd --mem $mem_scorer" \
 							 $db $dur $score_dir/$plda
 
 		    $scorer --cmd "$train_cmd --mem $mem_scorer" \

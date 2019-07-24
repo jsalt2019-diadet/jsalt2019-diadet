@@ -24,9 +24,19 @@ local/make_table_line_spkdiar_jsalt19_ami.sh "$name_adapt e-vad" $score_adapt_di
 
 echo ""
 
+#energy VAD of enhanced data
+local/make_table_line_spkdiar_jsalt19_ami_enhanced.sh --print-header true "$name e-vad" $score_dir
+local/make_table_line_spkdiar_jsalt19_ami_enhanced.sh "$name_adapt e-vad" $score_adapt_dir
+
+echo ""
+
 #GT VAD
 local/make_table_line_spkdiar_jsalt19_ami.sh --print-header true --use-gtvad true "$name" $score_dir
 local/make_table_line_spkdiar_jsalt19_ami.sh --use-gtvad true "$name_adapt" $score_adapt_dir
 
+echo ""
 
+#GT VAD of enhanced data
+local/make_table_line_spkdiar_jsalt19_ami_enhanced.sh --print-header true --use-gtvad true "$name" $score_dir
+local/make_table_line_spkdiar_jsalt19_ami_enhanced.sh --use-gtvad true "$name_adapt" $score_adapt_dir
 exit
