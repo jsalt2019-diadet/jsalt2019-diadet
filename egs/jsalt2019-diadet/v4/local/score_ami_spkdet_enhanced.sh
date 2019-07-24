@@ -29,7 +29,7 @@ mkdir -p $score_dir/log
 log_file_base=$score_dir/log/${db_name}_enr${enr_dur}
 
 
-echo "ami $dev_eval enr-$enr_dur total"
+echo "ami enhanced $dev_eval enr-$enr_dur total"
 $cmd $log_file_base.log \
      python local/score_dcf.py --key-file $trials \
      --score-file ${score_file_base}_scores \
@@ -43,7 +43,7 @@ $cmd $log_file_base.log \
 
 for test_dur in 5 15 30
 do
-    echo "ami $dev_eval enr-$enr_dur test-$test_dur"
+    echo "ami enhanced $dev_eval enr-$enr_dur test-$test_dur"
     $cmd ${log_file_base}_test${test_dur}.log \
 	 python local/score_dcf.py --key-file ${trials}_test${test_dur} \
 	 --score-file ${score_file_base}_scores \
