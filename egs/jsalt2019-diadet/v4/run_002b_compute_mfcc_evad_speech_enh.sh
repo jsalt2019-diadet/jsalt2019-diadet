@@ -84,7 +84,7 @@ if [ $stage -le 2 ];then
 fi
 
 #Spk diarization data
-if [ $stage -le 6 ];then 
+if [ $stage -le 3 ];then 
     for name in jsalt19_spkdiar_babytrain_enhanced_{train,dev,eval} \
     						   jsalt19_spkdiar_chime5_enhanced_train jsalt19_spkdiar_chime5_enhanced_{dev,eval}_{U01,U06} \
     						   jsalt19_spkdiar_ami_enhanced_train jsalt19_spkdiar_ami_enhanced_{dev,eval}_{Mix-Headset,Array1-01,Array2-01} \
