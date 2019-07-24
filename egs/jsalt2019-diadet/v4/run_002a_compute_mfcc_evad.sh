@@ -71,7 +71,7 @@ fi
 fi
 
 #Spk detection training data
-if [ $stage -le 4 ] && [ "$enh_adapt" == false ];;then 
+if [ $stage -le 4 ] && [ "$enh_adapt" == false ];then 
     for name in jsalt19_spkdet_{babytrain,chime5,ami}_train 
     do
 	steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj 40 --cmd "$train_cmd" \
@@ -130,7 +130,7 @@ if [ $stage -le 5 ] && [ "$enh_test" == false ];then
 fi
 
 #Spk diarization train data
-if [ $stage -le 6 ] && [ "$enh_adapt" == false ];;then 
+if [ $stage -le 6 ] && [ "$enh_adapt" == false ];then 
     for name in jsalt19_spkdiar_{babytrain,chime5,ami}_train
     do
 	num_utt=$(wc -l data/$name/utt2spk | cut -d " " -f 1)
