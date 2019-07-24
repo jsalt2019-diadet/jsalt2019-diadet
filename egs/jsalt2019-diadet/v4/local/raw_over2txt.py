@@ -94,7 +94,7 @@ def main():
     # performance). we use log_scale=True because of the final log-softmax in the 
     binarize = Binarize(onset=opt.onset, offset=opt.offset, log_scale=True)
 
-    fw = open(opt.outputfile, 'wt')
+    fw = open(opt.outputfile, 'a+')
 
     if opt.dev:
         for test_file in protocol.development():

@@ -8,7 +8,7 @@
 set -e
 
 config_file=default_config.sh
-stage=1
+stage=6
 
 . parse_options.sh || exit 1;
 . $config_file
@@ -112,6 +112,27 @@ conds_name=("no-adapt-slid-win-gtvad" "adap-slid-win-gtvad")
 
 
 echo "Sliding Window Diarization"
+args="--print-header true"
+#print EER table
+for((i=0;i<${#conds[*]};i++))
+do
+    score_dir=$score_dir0/${conds[$i]}_cal_v1
+    name="$name0 ${conds_name[$i]}"
+    local/make_table_line_spkdet_jsalt19_xxx.sh $args "$name" ami $score_dir
+    args=""
+done
+echo ""
+fi
+
+########
+
+if [ $stage -le 6 ]; then
+#SLIDING WIND with GT VAD
+conds=(plda_overlap_spkdetdiar_nnet${nnet_name}_thrbest plda_adapt_overlap_spkdetdiar_nnet${nnet_name}_thrbest)
+conds_name=("no-adapt-overlap-gtvad" "adap-overlap-gtvad")
+
+
+echo "Overlap removal from GT VAD"
 args="--print-header true"
 #print EER table
 for((i=0;i<${#conds[*]};i++))

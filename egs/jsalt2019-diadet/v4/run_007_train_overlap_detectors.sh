@@ -9,7 +9,7 @@ set -e
 
 stage=2
 
-from=10
+from=700
 to=1000
 every=10
 validate=true
@@ -24,7 +24,8 @@ config_overlap=config.yml
 
 # SRI overlap model is trained in CHiME5
 # trn_vec=(AMI.SpeakerDiarization.MixHeadset BabyTrain.SpeakerDiarization.All CHiME5.SpeakerDiarization.U01)
-trn_vec=(BabyTrain.SpeakerDiarization.All CHiME5.SpeakerDiarization.U01)
+# trn_vec=(BabyTrain.SpeakerDiarization.All CHiME5.SpeakerDiarization.U01)
+trn_vec=(BabyTrain.SpeakerDiarization.All)
 # trn_vec=(AMI.SpeakerDiarization.MixHeadset)
 num_dbs=${#trn_vec[@]}
 
@@ -61,7 +62,6 @@ if $validate ; then
             $train_cmd_gpu $exp_dir/log/validate_${i}.log \
                 ./local/validate_overlap.sh ${exp_dir}/train/${db}.train $db $from $to $every || exit 1;
         ) &
-        sleep 15
     done
 fi
 fi

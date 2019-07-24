@@ -5,7 +5,7 @@
 set -e
 
 feats_diar=`pwd -P`/exp/feats_diar
-storage_name=jsalt19-v3-diar-$(date +'%m_%d_%H_%M')
+storage_name=jsalt19-v1-diar-$(date +'%m_%d_%H_%M')
 stage=1
 config_file=default_config.sh
 
@@ -17,26 +17,29 @@ config_file=default_config.sh
 # - speaker diarization datasets with energy vad and ground truth vad
 dsets_train="voxceleb"
 dsets_adapt=(jsalt19_spkdiar_{babytrain,chime5,ami}_train_gtvad)
-dsets_spkdiar_test_evad=(jsalt19_spkdiar_babytrain_{dev,eval} jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06} jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01})
-dsets_spkdiar_test_gtvad=(jsalt19_spkdiar_babytrain_{dev,eval}_gtvad jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06}_gtvad jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_gtvad)
+#dsets_spkdiar_test_evad=(jsalt19_spkdiar_babytrain_{dev,eval} jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06} jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01} jsalt19_spkdiar_sri_{dev,eval})
+#dsets_spkdiar_test_gtvad=(jsalt19_spkdiar_babytrain_{dev,eval}_gtvad jsalt19_spkdiar_chime5_{dev,eval}_{U01,U06}_gtvad jsalt19_spkdiar_ami_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_gtvad jsalt19_spkdiar_sri_{dev,eval}_gtvad)
+#
+#dsets_spkdiar_test_enhanced_evad=(jsalt19_spkdiar_babytrain_enhanced_{dev,eval}  jsalt19_spkdiar_chime5_enhanced_{dev,eval}_{U01,U06} jsalt19_spkdiar_ami_enhanced_{dev,eval}_{Mix-Headset,Array1-01,Array2-01} jsalt19_spkdiar_sri_enhanced_{dev,eval} )
+#dsets_spkdiar_test_enhanced_gtvad=(jsalt19_spkdiar_babytrain_enhanced_{dev,eval}_gtvad jsalt19_spkdiar_chime5_enhanced_{dev,eval}_{U01,U06}_gtvad jsalt19_spkdiar_ami_enhanced_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_gtvad jsalt19_spkdiar_sri_enhanced_{dev,eval}_gtvad )
 
-dsets_spkdiar_test_enhanced_evad=(jsalt19_spkdiar_babytrain_enhanced_{dev,eval}  jsalt19_spkdiar_chime5_enhanced_{dev,eval}_{U01,U06} jsalt19_spkdiar_ami_enhanced_{dev,eval}_{Mix-Headset,Array1-01,Array2-01})
-dsets_spkdiar_test_enhanced_gtvad=(jsalt19_spkdiar_babytrain_enhanced_{dev,eval}_gtvad jsalt19_spkdiar_chime5_enhanced_{dev,eval}_{U01,U06}_gtvad jsalt19_spkdiar_ami_enhanced_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_gtvad)
-
-dsets_spkdet_test_evad=(jsalt19_spkdet_babytrain_{dev,eval}_test jsalt19_spkdet_ami_{dev,eval}_test jsalt19_spkdet_sri_{dev,eval}_test)
+#dsets_spkdet_test_evad=(jsalt19_spkdet_babytrain_{dev,eval}_test jsalt19_spkdet_ami_{dev,eval}_test jsalt19_spkdet_ami_{dev,eval}_test_overlap jsalt19_spkdet_sri_{dev,eval}_test)
+dsets_spkdet_test_evad=(jsalt19_spkdet_sri_{dev,eval}_test_overlap jsalt19_spkdet_babytrain_{dev,eval}_test_overlap)
 dsets_spkdet_test_gtvad=(jsalt19_spkdet_babytrain_{dev,eval}_test_gtvad jsalt19_spkdet_ami_{dev,eval}_test_gtvad jsalt19_spkdet_sri_{dev,eval}_test_gtvad)
 
 
 #datasets from array to string list"
 dsets_adapt="${dsets_adapt[@]}"
 dsets_test_evad="${dsets_spkdiar_test_evad[@]} ${dsets_spkdiar_test_enhanced_evad[@]} ${dsets_spkdet_test_evad[@]}"
-dsets_test_gtvad="${dsets_spkdiar_test_gtvad[@]} ${dsets_spkdiar_test_enhanced_gtvad[@]} ${dsets_spkdet_test_gtvad[@]}"
+#dsets_test_gtvad="${dsets_spkdiar_test_gtvad[@]} ${dsets_spkdiar_test_enhanced_gtvad[@]} ${dsets_spkdet_test_gtvad[@]}"
 
 
+echo "Stage 1"
 if [ $stage -le 1 ];then
 
     for name in $dsets_train $dsets_adapt $dsets_test_evad $dsets_test_gtvad
     do
+    echo $name
 	num_utt=$(wc -l data/$name/utt2spk | cut -d " " -f 1)
 	nj=$(($num_utt < 40 ? 2:40))
     	steps_kaldi_diar/prepare_feats.sh --nj $nj --cmd "$train_cmd" --storage_name $storage_name \
@@ -51,11 +54,13 @@ if [ $stage -le 1 ];then
 fi
 
 
-
+if false; then
+echo "Stage 2"
 if [ $stage -le 2 ];then
     # Create segments to extract x-vectors for ground truth VAD
     for name in $dsets_test_gtvad
     do
+    echo $name
 	echo "0.01" > data_diar/${name}_cmn/frame_shift
 	
 	# remove segments file if exists because having segments file, it will produce rttm time marks w.r.t to original audio file
@@ -79,11 +84,15 @@ if [ $stage -le 2 ];then
 	fi
     done
 fi
+fi
 
+
+echo "Stage 3"
 if [ $stage -le 3 ];then
     # Create segments to extract x-vectors for energy VAD
     for name in $dsets_train $dsets_test_evad
     do
+    echo $name
 	echo "0.01" > data_diar/${name}_cmn/frame_shift
 	num_utt=$(wc -l data/$name/utt2spk | cut -d " " -f 1)
 	nj=$(($num_utt < 10 ? 1:10))
@@ -97,12 +106,13 @@ if [ $stage -le 3 ];then
 fi
 
 
-
+echo "Stage 4"
 if [ $stage -le 4 ];then
     # Create segments to extract x-vectors for adaptation datsets using ground truth VAD
     # requires diarization.rttm
     for name in $dsets_adapt
     do
+    echo $name
 	echo "0.01" > data_diar/${name}_cmn/frame_shift
 	rm -f data_diar/${name}_cmn/segments
 	# we already have the ground truth diarization marks to generate segments for training PLDA
