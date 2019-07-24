@@ -12,8 +12,8 @@
 set -e
 nodes=fs01 #by default it puts mfcc in /export/fs01/jsalt19
 storage_name=$(date +'%m_%d_%H_%M')
-mfccdir=`pwd`/mfcc
-vaddir=`pwd`/mfcc  # energy VAD
+mfccdir=`pwd`/mfcc_speech_enh
+vaddir=`pwd`/mfcc_speech_enh  # energy VAD
 vaddir_gt=`pwd`/vad_gt  # ground truth VAD
 
 stage=1
@@ -22,54 +22,11 @@ config_file=default_config.sh
 . parse_options.sh || exit 1;
 . $config_file
 
-# Make filterbanks and compute the energy-based VAD for each dataset
-
-if [ $stage -le 1 ]; then
-    # Prepare to distribute data over multiple machines
-    if [[ $(hostname -f) == *.clsp.jhu.edu ]] && [ ! -d $mfccdir/storage ]; then
-	dir_name=$USER/hyp-data/jsalt2019diadet/v3/$storage_name/mfcc/storage
-	if [ "$nodes" == "b0" ];then
-	    utils/create_split_dir.pl \
-			    utils/create_split_dir.pl \
-		/export/b{04,05,06,07}/$dir_name $mfccdir/storage
-	elif [ "$nodes" == "b1" ];then
-	    utils/create_split_dir.pl \
-		/export/b{14,15,16,17}/$dir_name $mfccdir/storage
-	else 
-	    utils/create_split_dir.pl \
-		/export/fs01/jsalt19/$dir_name $mfccdir/storage
-	fi
-    fi
-fi
-
-#Train datasets
-if [ $stage -le 2 ];then 
-    for name in voxceleb1 voxceleb2_train
-    do
-	steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj 40 --cmd "$train_cmd" \
-			   data/${name} exp/make_mfcc $mfccdir
-	utils/fix_data_dir.sh data/${name}
-	steps_fe/compute_vad_decision.sh --nj 30 --cmd "$train_cmd" \
-					 data/${name} exp/make_vad $vaddir
-	utils/fix_data_dir.sh data/${name}
-    done
-fi
-
-# Combine voxceleb
-if [ $stage -le 3 ];then 
-  utils/combine_data.sh --extra-files "utt2num_frames" data/voxceleb data/voxceleb1 data/voxceleb2_train
-  utils/fix_data_dir.sh data/voxceleb
-
-  if [ "$nnet_data" == "voxceleb_div2" ] || [ "$plda_data" == "voxceleb_div2" ];then
-      #divide the size of voxceleb
-      utils/subset_data_dir.sh data/voxceleb $(echo "1236567/2" | bc) data/voxceleb_div2
-  fi
-fi
-
+# Make MFCC and compute the energy-based VAD for each dataset
 
 #Spk detection training data
-if [ $stage -le 4 ];then 
-    for name in jsalt19_spkdet_{babytrain,chime5,ami}{,_enhanced}_train 
+if [ $stage -le 1 ];then 
+    for name in jsalt19_spkdet_{babytrain,chime5,ami}_enhanced_train 
     do
 	steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc_16k.conf --nj 40 --cmd "$train_cmd" \
 			   data/${name} exp/make_mfcc $mfccdir
@@ -81,9 +38,9 @@ if [ $stage -le 4 ];then
 fi
 
 #Spk detection enrollment and test data
-if [ $stage -le 5 ];then
+if [ $stage -le 2 ];then
 
-    for db in jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}_{dev,eval}
+    for db in jsalt19_spkdet_{babytrain,ami,sri}_enhanced_{dev,eval}
     do
 	# enrollment 
 	for d in 5 15 30
@@ -128,10 +85,10 @@ fi
 
 #Spk diarization data
 if [ $stage -le 6 ];then 
-    for name in jsalt19_spkdiar_babytrain{,_enhanced}_{train,dev,eval} \
-    					  jsalt19_spkdiar_chime5{,_enhanced}_train jsalt19_spkdiar_chime5{,_enhanced}_{dev,eval}_{U01,U06} \
-    					  jsalt19_spkdiar_ami{,_enhanced}_train jsalt19_spkdiar_ami{,_enhanced}_{dev,eval}_{Mix-Headset,Array1-01,Array2-01} \
-					  jsalt19_spkdiar_sri{,_enhanced}_{dev,eval}
+    for name in jsalt19_spkdiar_babytrain_enhanced_{train,dev,eval} \
+    						   jsalt19_spkdiar_chime5_enhanced_train jsalt19_spkdiar_chime5_enhanced_{dev,eval}_{U01,U06} \
+    						   jsalt19_spkdiar_ami_enhanced_train jsalt19_spkdiar_ami_enhanced_{dev,eval}_{Mix-Headset,Array1-01,Array2-01} \
+						   jsalt19_spkdiar_sri_enhanced_{dev,eval}
     do
 	num_utt=$(wc -l data/$name/utt2spk | cut -d " " -f 1)
 	nj=$(($num_utt < 40 ? 2:40))
