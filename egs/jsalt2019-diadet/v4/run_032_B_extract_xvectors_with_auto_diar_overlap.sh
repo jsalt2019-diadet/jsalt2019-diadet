@@ -25,7 +25,7 @@ if [ $stage -le 1 ]; then
 
     # prepared datasets with subsegments based on automatic diarization with energy VAD
     # each subsegment is defined by a binary vad
-    for db in jsalt19_spkdet_babytrain_{dev,eval}_test_overlap
+    for db in jsalt19_spkdet_{ami,babytrain,sri}_{dev,eval}_test_overlap
     do
 	name=${db}
 	if [[ "$db" =~ .*_babytrain_.* ]];then
@@ -45,7 +45,7 @@ fi
 echo "Stage 2"
 if [ $stage -le 2 ]; then
     # Extracts x-vectors for test with automatic diarization and energy VAD
-    for db in jsalt19_spkdet_babytrain_{dev,eval}_test_overlap
+    for db in jsalt19_spkdet_{ami,babytrain,sri}_{dev,eval}_test_overlap
     do
 	name=${db}_${spkdet_diar_name}
     echo $name
@@ -59,7 +59,7 @@ echo "Stage 3"
 if [ $stage -le 3 ]; then
     # combine enroll and test xvectors for step 043
     # with automatic diarization energy vad
-    for dset in jsalt19_spkdet_babytrain_{dev,eval}
+    for dset in jsalt19_spkdet_{ami,babytrain,sri}_{dev,eval}
     do
 	    db=${dset}
 	    for dur in 5 15 30

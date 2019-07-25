@@ -25,14 +25,10 @@ score_dir=exp/scores/$nnet_name/${be_name}
 score_plda_dir=$score_dir/plda_overlap_${spkdet_diar_name}
 score_plda_adapt_dir=$score_dir/plda_adapt_overlap_${spkdet_diar_name}
 
-#name_vec=(babytrain ami sri)
-name_vec=(babytrain)
-# be_vec=($be_babytrain_dir $be_ami_dir $be_sri_dir)
-be_vec=($be_babytrain_dir)
-#coh_vec=(jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train jsalt19_spkdet_chime5_train)
+name_vec=(babytrain ami sri)
+be_vec=($be_babytrain_dir $be_ami_dir $be_sri_dir)
 num_dbs=${#name_vec[@]}
-# mem_scorer_vec=(30G 10G 10G)
-mem_scorer_vec=(30G)
+mem_scorer_vec=(30G 10G 10G)
 
 
 if [ $stage -le 1 ];then
@@ -43,7 +39,6 @@ if [ $stage -le 1 ];then
 	for part in dev eval
 	do
 	    db=jsalt19_spkdet_${name_vec[$i]}_${part}
-	    # coh_data=${coh_vec[$i]}
 	    be_dir=${be_vec[$i]}
 	    scorer=local/score_${name_vec[$i]}_spkdet.sh
 	    mem_scorer=${mem_scorer_vec[$i]}
