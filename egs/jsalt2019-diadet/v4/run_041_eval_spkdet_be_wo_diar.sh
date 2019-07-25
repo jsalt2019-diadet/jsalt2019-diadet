@@ -33,7 +33,7 @@ name_vec=(babytrain ami sri babytrain_enhanced ami_enhanced sri_enhanced )
 be_vec=($be_babytrain_dir $be_ami_dir $be_sri_dir $be_babytrain_dir $be_ami_dir $be_sri_dir)
 coh_vec=(jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train jsalt19_spkdet_chime5_train jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train jsalt19_spkdet_chime5_train)
 num_dbs=${#name_vec[@]}
-mem_scorer_vec=(30G 10G 10G 30G 10G 10G)
+mem_scorer_vec=(40G 10G 10G 40G 10G 10G)
 
 #train_cmd=run.pl
 
@@ -166,7 +166,7 @@ if [ $stage -le 2 ];then
 		    continue
 		fi
 		(
-		    local/calibrate_jsalt19_spkdet_v1.sh --cmd "$train_cmd" \
+		    local/calibrate_jsalt19_spkdet_v1.sh --cmd "$train_cmd --mem $mem_scorer" \
 							 $db $dur $score_dir/$plda
 
 		    $scorer --cmd "$train_cmd --mem $mem_scorer" \

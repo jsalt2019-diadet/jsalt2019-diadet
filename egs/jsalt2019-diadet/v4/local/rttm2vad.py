@@ -63,6 +63,21 @@ def rttm2vad_file(file_id, rttm, num_frames, fvad, fu2o, fseg, min_dur):
             fu2o.write('%s %s\n' % (file_dir_id, file_id))
 
 
+
+def dummy_vad_file(file_id, num_frames, fvad, fu2o, fseg):
+
+    vad = np.ones((num_frames,), dtype=int)
+    tbeg = 0.0
+    tend = num_frames*frame_shift
+    file_dir_id = '%s-d%03d' % (file_id,0)
+    write_vad(fvad, file_dir_id, vad)
+    fu2o.write('%s %s\n' % (file_dir_id, file_id))
+    if fseg is not None:
+        fseg.write('%s-%03d %s %.3f %.3f %s\n' % (
+            file_dir_id,0,file_id,tbeg,tend, file_dir_id))
+
+
+            
 def rttm2vad(rttm_file, num_frames_file, vad_file, utt2orig, ext_segments, min_dur):
 
     rttm = pd.read_csv(rttm_file, sep='\s+', header=None,
@@ -81,11 +96,16 @@ def rttm2vad(rttm_file, num_frames_file, vad_file, utt2orig, ext_segments, min_d
     with open(vad_file, 'w') as fvad:
         with open(utt2orig, 'w') as fu2o:
             for file_id in df_num_frames.file_id:
+                print('generating VAD for %s' % (file_id))
                 num_frames_i = int(df_num_frames.num_frames.loc[file_id])
-                print(file_id)
-                rttm_i = rttm.loc[file_id]
-                file_diars_ids=rttm2vad_file(
-                    file_id, rttm_i, num_frames_i, fvad, fu2o, fseg, min_dur)
+                if file_id in rttm:
+                    rttm_i = rttm.loc[file_id]
+                    rttm2vad_file(
+                        file_id, rttm_i, num_frames_i, fvad, fu2o, fseg, min_dur)
+                else:
+                    print('Not speech found in %s, genrating dummy file' % (file_id))
+                    dummy_vad_file(
+                        file_id, num_frames_i, fvad, fu2o, fseg)
         
     
 

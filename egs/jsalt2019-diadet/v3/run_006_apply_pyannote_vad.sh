@@ -64,7 +64,7 @@ if [ $stage -le 2 ];then
                         ["AMI.SpeakerDiarization.MixHeadset"]="jsalt19_spkdiar_ami_enhanced_dev_Mix-Headset" \
                         ["BabyTrain.SpeakerDiarization.All"]="jsalt19_spkdiar_babytrain_enhanced_dev" \
                         ["CHiME5.SpeakerDiarization.U01"]="jsalt19_spkdiar_chime5_enhanced_dev_U01" \
-                        ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime_enhanced_dev_U06" \
+                        ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime5_enhanced_dev_U06" \
                         ["SRI.SpeakerDiarization.All"]="jsalt19_spkdiar_sri_enhanced_dev" ) 
     cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.development.rttm ./data/${mapping[$PROTOCOL]}/pyannote_vad.rttm
 
@@ -97,7 +97,7 @@ if [ $stage -le 2 ];then
                         ["AMI.SpeakerDiarization.MixHeadset"]="jsalt19_spkdiar_ami_enhanced_eval_Mix-Headset" \
                         ["BabyTrain.SpeakerDiarization.All"]="jsalt19_spkdiar_babytrain_enhanced_eval" \
                         ["CHiME5.SpeakerDiarization.U01"]="jsalt19_spkdiar_chime5_enhanced_eval_U01" \
-                        ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime_enhanced_eval_U06" \
+                        ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime5_enhanced_eval_U06" \
                         ["SRI.SpeakerDiarization.All"]="jsalt19_spkdiar_sri_enhanced_eval" )                        
     cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.test.rttm ./data/${mapping[$PROTOCOL]}/pyannote_vad.rttm
 
