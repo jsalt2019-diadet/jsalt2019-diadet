@@ -85,7 +85,7 @@ if [ $stage -le 3 ];then
     # Train a overlap detection model based on LSTM and SyncNet features
     echo "Covert to Kaldi for SpkDet and VAD RTTM for SpkDet"
     # for dsetname in babytrain ami sri
-    for dsetname in sri babytrain
+    for dsetname in ami sri babytrain
     do
     for part in dev eval
     do
