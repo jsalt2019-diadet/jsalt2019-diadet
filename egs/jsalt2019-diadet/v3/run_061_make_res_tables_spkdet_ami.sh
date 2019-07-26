@@ -8,7 +8,7 @@
 set -e
 
 config_file=default_config.sh
-stage=6
+stage=1
 
 . parse_options.sh || exit 1;
 . $config_file
