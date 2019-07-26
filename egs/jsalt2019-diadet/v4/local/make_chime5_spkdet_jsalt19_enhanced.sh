@@ -35,7 +35,7 @@ do
 
     python local/make_jsalt19_spkdet.py \
 	   --list-path $list_path/train \
-	   --wav-path $wav_path/CHiME5/train/SE_1000h_model_m3_s3 
+	   --wav-path $wav_path/CHiME5/train/SE_1000h_model_m3_s3 \
 	   --output-path $output_path \
 	   --data-name $data_name \
 	   --partition train \
@@ -59,7 +59,7 @@ exit
 # Make dev data
 python local/make_jsalt19_spkdet.py \
        --list-path $list_path/dev \
-       --wav-path $wav_path/CHiME5/dev/SE_1000h_model_m3_s3 
+       --wav-path $wav_path/CHiME5/dev/SE_1000h_model_m3_s3 \
        --output-path $output_path \
        --data-name $data_name \
        --partition dev \
