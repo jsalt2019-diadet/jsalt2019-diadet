@@ -7,7 +7,7 @@
 . ./path.sh
 set -e
 
-stage=4
+stage=1
 
 
 config_file=default_config.sh
@@ -17,6 +17,7 @@ config_file=default_config.sh
 
 exp_dir=exp/overlap_models
 out_dir=${exp_dir}/test_raw
+out_dir_dev=${exp_dir}/test_raw_dev
 config_overlap=config.yml
 vaddir_ov=`pwd`/vad_ov  # VAD without OV regions
 
@@ -24,15 +25,16 @@ vaddir_ov=`pwd`/vad_ov  # VAD without OV regions
 # tst_vec=(AMI.SpeakerDiarization.MixHeadset BabyTrain.SpeakerDiarization.All SRI.SpeakerDiarization.All)
 tst_vec=(AMI.SpeakerDiarization.MixHeadset)
 val_vec=(AMI.SpeakerDiarization.MixHeadset.development)
-num_dbs=${#tst_vec[@]}
+num_dbs_tst=${#tst_vec[@]}
 
-#Train overlap
+#Test overlap in test databases
 if [ $stage -le 1 ];then
 
-    mkdir -p $out_dir
-    # Train a overlap detection model based on LSTM and SyncNet features
+    mkdir -p ${out_dir}
+    mkdir -p ${out_dir_dev}
+    # Test overlap detector in eval and dev
     echo "Test overlap detector"
-    for((i=0;i<$num_dbs;i++))
+    for((i=0;i<$num_dbs_tst;i++))
     do
         db=${tst_vec[$i]}
         # We select just the net that we want for development purposes
@@ -55,7 +57,7 @@ if [ $stage -le 2 ];then
 
     # Train a overlap detection model based on LSTM and SyncNet features
     echo "Thresholding and converting..."
-    for((i=0;i<$num_dbs;i++))
+    for((i=0;i<$num_dbs_tst;i++))
     do
         db=${tst_vec[$i]}
         # We select just the net that we want for development purposes
@@ -74,6 +76,7 @@ if [ $stage -le 2 ];then
 
 fi
 wait
+exit
 
 # To Kaldi format and RTTM for overlap spkdet
 if [ $stage -le 3 ];then

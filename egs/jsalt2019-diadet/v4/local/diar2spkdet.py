@@ -35,8 +35,8 @@ def main():
             ID t_in t_out \
             into a kaldi format file for spkdet task"
     version = "%prog 0.1"
-    parser.add_option("-o", "--outputname", action="store", type="string", help="Output file name", default=None)
     parser = OptionParser(usage=usage, description=desc, version=version)
+    parser.add_option("-o", "--outputname", action="store", type="string", help="Output file name", default=None)
     (opt, args) = parser.parse_args()
 
     if(len(args)!=2):
@@ -49,7 +49,7 @@ def main():
     fr.close()
 
     if opt.outputname:
-        fws = open(outputdir+'/'+ opt.outputname,'wt')
+        fws = open(outputdir+'/'+'segoverlap_' +opt.outputname,'wt')
         fwrttm = open(outputdir+'/'+ opt.outputname + '.rttm','wt')
     else:
         fws = open(outputdir+'/segoverlap','wt')

@@ -13,4 +13,5 @@ if $loadenv ; then
 source activate ${envname}
 fi
 
+echo "pyannote-overlap-detection apply --gpu ${net} ${dataset} ${dest_dir}"
 pyannote-overlap-detection apply --gpu ${net} ${dataset} ${dest_dir}

@@ -23,7 +23,7 @@ score_dir=exp/diarization/$nnet_name/$be_diar_name
 dsets_spkdiar_dev_evad=(jsalt19_spkdiar_babytrain{,_enhanced}_dev jsalt19_spkdiar_chime5{,_enhanced}_dev_{U01,U06} jsalt19_spkdiar_ami{,_enhanced}_dev_{Mix-Headset,Array1-01,Array2-01})
 dsets_spkdiar_dev_gtvad=(jsalt19_spkdiar_babytrain{,_enhanced}_dev_gtvad jsalt19_spkdiar_chime5{,_enhanced}_dev_{U01,U06}_gtvad jsalt19_spkdiar_ami{,_enhanced}_dev_{Mix-Headset,Array1-01,Array2-01}_gtvad)
 
-dsets_spkdet_dev_evad=(jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}_dev_test)
+dsets_spkdet_dev_evad=(jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}_dev_test jsalt19_spkdet_{ami,sri,babytrain}_dev_test_overlap)
 dsets_spkdet_dev_gtvad=(jsalt19_spkdet_{babytrain,ami,sri}{,_enhanced}_dev_test_gtvad)
 
 #eval datasets
