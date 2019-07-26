@@ -70,8 +70,8 @@ if [ $stage -le 2 ]; then
       --cmd "$train_cmd --mem 10G" \
       --ivector-dim $ivector_dim --num-iters 5 --apply-cmn false \
       --num-threads 1 --num-processes 1 --nj 40 \
-      $VB_models_dir/diag_ubm_$num_components/final.dubm  data/$name \
-      $VB_models_dir/extractor_diag_c${num_components}_i${ivector_dim}
+      $VB_models_dir/$name/diag_ubm_$num_components/final.dubm  data/$name \
+      $VB_models_dir/$name/extractor_diag_c${num_components}_i${ivector_dim}
     ) & 
     done
 fi
