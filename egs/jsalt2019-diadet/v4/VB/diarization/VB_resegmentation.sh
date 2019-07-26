@@ -113,5 +113,4 @@ if [ $stage -le 1 ]; then
         $sdata/JOB $init_rttm_filename $output_dir/tmp $output_dir/tmp/dubm.tmp $output_dir/tmp/ie.tmp || exit 1;
 
     cat $output_dir/tmp/*.rttm > $output_dir/rttm
-    # cat $output_dir/tmp/q_out.npy > $output_dir/q_out.npy
 fi
