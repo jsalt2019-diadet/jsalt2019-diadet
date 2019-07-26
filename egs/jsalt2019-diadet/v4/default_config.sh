@@ -15,6 +15,9 @@ be_diar_name=lda${lda_diar_dim}_plda_${plda_diar_data}
 be_diar_babytrain_name=lda${lda_diar_dim}_plda_${plda_diar_data}_babytrain
 be_diar_chime5_name=lda${lda_diar_dim}_plda_${plda_diar_data}_chime5
 be_diar_ami_name=lda${lda_diar_dim}_plda_${plda_diar_data}_ami
+be_diar_babytrain_enhanced_name=lda${lda_diar_dim}_plda_${plda_diar_data}_babytrain_enhanced
+be_diar_chime5_enhanced_name=lda${lda_diar_dim}_plda_${plda_diar_data}_chime5_enhanced
+be_diar_ami_enhanced_name=lda${lda_diar_dim}_plda_${plda_diar_data}_ami_enhanced
 
 
 #spkdet diarization vars

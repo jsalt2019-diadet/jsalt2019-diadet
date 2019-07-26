@@ -24,6 +24,8 @@ chime5_prots=(CHiME5.SpeakerDiarization.{U01,U06})
 sri_prots=(SRI.SpeakerDiarization.All)
 all_prots="${ami_prots[@]} ${babytrain_prots[@]} ${chime5_prots[@]} ${sri_prots[@]}"
 
+# TESTING(FIXME) - do we need to include SRI ?
+all_prots="${ami_prots[@]} ${babytrain_prots[@]} ${chime5_prots[@]}"
 
 
 
@@ -67,17 +69,21 @@ if [ $stage -le 2 ];then
                         ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime5_enhanced_dev_U06" \
                         ["SRI.SpeakerDiarization.All"]="jsalt19_spkdiar_sri_enhanced_dev" ) 
     cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.development.rttm ./data/${mapping[$PROTOCOL]}/pyannote_vad.rttm
+    cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.development.rttm ./data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.rttm
 
     # Usage: rttm_to_bin_vad.sh [options] <rttm-file> <data-dir> <path-to-vad-dir>
     # overwrite evad vad.scp in the data dir 
     num_utt=$(wc -l data/${mapping[$PROTOCOL]}/utt2spk | cut -d " " -f 1)
     nj=$(($num_utt < 5 ? 1:5))
-    rm -f data/${mapping[$PROTOCOL]}/vad.scp
+    mv data/${mapping[$PROTOCOL]}/vad.scp data/${mapping[$PROTOCOL]}/evad.scp
     hyp_utils/rttm_to_bin_vad.sh --nj $nj data/${mapping[$PROTOCOL]}/pyannote_vad.rttm data/${mapping[$PROTOCOL]} $vaddir_supervad
+    mv data/${mapping[$PROTOCOL]}/vad.scp data/${mapping[$PROTOCOL]}/pyannote_vad.scp
+    ln -rs data/${mapping[$PROTOCOL]}/pyannote_vad.scp data/${mapping[$PROTOCOL]}/vad.scp
 
     # take vad.scp from the unenhanced data dir, copy over to enhanced
-    rm -f data/${mapping_enhanced[$PROTOCOL]}/vad.scp
-    cp data/${mapping[$PROTOCOL]}/vad.scp data/${mapping_enhanced[$PROTOCOL]}
+    mv data/${mapping_enhanced[$PROTOCOL]}/vad.scp data/${mapping_enhanced[$PROTOCOL]}/evad.scp
+    cp data/${mapping[$PROTOCOL]}/pyannote_vad.scp data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.scp
+    ln -rs data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.scp data/${mapping_enhanced[$PROTOCOL]}/vad.scp
 
     utils/fix_data_dir.sh data/${mapping[$PROTOCOL]}
     utils/fix_data_dir.sh data/${mapping_enhanced[$PROTOCOL]}
@@ -100,17 +106,21 @@ if [ $stage -le 2 ];then
                         ["CHiME5.SpeakerDiarization.U06"]="jsalt19_spkdiar_chime5_enhanced_eval_U06" \
                         ["SRI.SpeakerDiarization.All"]="jsalt19_spkdiar_sri_enhanced_eval" )                        
     cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.test.rttm ./data/${mapping[$PROTOCOL]}/pyannote_vad.rttm
+    cp ${EXPERIMENT_DIR}/results/${PROTOCOL}.test.rttm ./data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.rttm
 
     # Usage: rttm_to_bin_vad.sh [options] <rttm-file> <data-dir> <path-to-vad-dir>
     # overwrite evad vad.scp in the data dir 
     num_utt=$(wc -l data/${mapping[$PROTOCOL]}/utt2spk | cut -d " " -f 1)
     nj=$(($num_utt < 5 ? 1:5))
-    rm -f data/${mapping[$PROTOCOL]}/vad.scp
+    mv data/${mapping[$PROTOCOL]}/vad.scp data/${mapping[$PROTOCOL]}/evad.scp
     hyp_utils/rttm_to_bin_vad.sh --nj $nj data/${mapping[$PROTOCOL]}/pyannote_vad.rttm data/${mapping[$PROTOCOL]} $vaddir_supervad
+    mv data/${mapping[$PROTOCOL]}/vad.scp data/${mapping[$PROTOCOL]}/pyannote_vad.scp
+    ln -rs data/${mapping[$PROTOCOL]}/pyannote_vad.scp data/${mapping[$PROTOCOL]}/vad.scp
 
     # take vad.scp from the unenhanced data dir, copy over to enhanced
-    rm -f data/${mapping_enhanced[$PROTOCOL]}/vad.scp
-    cp data/${mapping[$PROTOCOL]}/vad.scp data/${mapping_enhanced[$PROTOCOL]}
+    mv data/${mapping_enhanced[$PROTOCOL]}/vad.scp data/${mapping_enhanced[$PROTOCOL]}/evad.scp
+    cp data/${mapping[$PROTOCOL]}/pyannote_vad.scp data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.scp
+    ln -rs data/${mapping_enhanced[$PROTOCOL]}/pyannote_vad.scp data/${mapping_enhanced[$PROTOCOL]}/vad.scp
 
     utils/fix_data_dir.sh data/${mapping[$PROTOCOL]}
     utils/fix_data_dir.sh data/${mapping_enhanced[$PROTOCOL]}
