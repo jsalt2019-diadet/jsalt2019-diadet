@@ -28,5 +28,5 @@ outputfile=$dest_dir/overlap_${name}.txt
 # Covert the output to txt
 echo "Converting"
 echo "./local/raw_over2txt.py $dataset $dest_dir --onset $onset --offset $offset --outputfile $outputfile"
-#./local/raw_over2txt.py $dataset $dest_dir --onset $onset --offset $offset --outputfile $outputfile
+./local/raw_over2txt.py $dataset $dest_dir --onset $onset --offset $offset --outputfile $outputfile
 
