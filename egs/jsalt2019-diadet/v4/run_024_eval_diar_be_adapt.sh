@@ -42,6 +42,7 @@ dsets_spkdiar_eval_evad=($(echo ${dsets_spkdiar_dev_evad[@]} | sed 's@_dev@_eval
 dsets_spkdiar_eval_gtvad=($(echo ${dsets_spkdiar_dev_gtvad[@]} | sed 's@_dev@_eval@g'))
 
 dsets_spkdet_eval_evad=($(echo ${dsets_spkdet_dev_evad[@]} | sed 's@_dev@_eval@g'))
+dsets_spkdet_eval_gtvad=($(echo ${dsets_spkdet_dev_gtvad[@]} | sed 's@_dev@_eval@g'))
 
 dsets_dev=(${dsets_spkdiar_dev_evad[@]} ${dsets_spkdiar_dev_gtvad[@]} ${dsets_spkdet_dev_evad[@]} ${dsets_spkdet_dev_gtvad[@]})
 dsets_eval=(${dsets_spkdiar_eval_evad[@]} ${dsets_spkdiar_eval_gtvad[@]} ${dsets_spkdet_eval_evad[@]} ${dsets_spkdet_eval_gtvad[@]})
