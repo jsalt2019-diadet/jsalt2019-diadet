@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 # Copyright 2019  Zili Huang
-
+#
+#           2019 Latané Bullock (JSALT 2019) - minor addition: write out put q matrix to file 
+# 
 # This script is evoked by diarization/VB_resegmentation.sh. It prepares the necessary
 # inputs for the VB system and creates the output RTTM file. The inputs include data directory
 # (data_dir), the rttm file to initialize the VB system(init_rttm_filename), the directory to
@@ -187,6 +189,7 @@ def main():
             q = VB_diarization.frame_labels2posterior_mx(init_ref_voiced, args.max_speakers)
         else:
             q = None
+
         
         # VB resegmentation
 
@@ -206,6 +209,12 @@ def main():
 
         # Create the output rttm file
         create_rttm_output(utt, predicted_label, args.output_dir, args.channel)
+
+        # Write per-frame posterior attribution to output file as numpy array
+        # This can be used for overlap reassignment
+        with open("{}/{}_q_out.npy".format(args.output_dir, utt), 'wb') as fout:
+            np.save(fout, q_out)
+
     return 0
 
 if __name__ == "__main__":

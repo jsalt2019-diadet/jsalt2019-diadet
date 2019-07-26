@@ -122,3 +122,39 @@ if [ $stage -le 4 ];then
     done
 
 fi
+
+if [ $stage -le 5 ];then
+    # Take txt files created for detection and write them in a 
+    # diarization-appropriate format 
+
+    # TESTING(FIXME)- make sure to use all dsets
+    # for dsetname in ami babytrain chime5 sri 
+    # do
+    for dsetname in ami babytrain chime5; do
+    for part in dev eval; do
+        if [[ "$dsetname" =~ .*ami.* ]];then
+            for mic in Array1-01 Array2-01 Mix-Headset; do 
+                cat $out_dir/overlap_${part}_${dsetname}.txt \
+                    | grep ${mic} \
+                    | awk '{ print "SPEAKER",$1,"1",$2,($3-$2),"<NA> <NA>","overlap","<NA>" }' \
+                    > ${out_dir}/diar_overlap_${dsetname}_${part}_${mic}.rttm
+            done
+
+        elif [[ "$dsetname" =~ .*chime5.* ]];then
+            for mic in U01 U06; do 
+                cat $out_dir/overlap_${part}_${dsetname}.txt \
+                    | grep ${mic} \
+                    | awk '{ print "SPEAKER",$1,"1",$2,($3-$2),"<NA> <NA>","overlap","<NA>" }' \
+                    > ${out_dir}/diar_overlap_${dsetname}_${part}_${mic}.rttm
+            done   
+
+        # TESTING(FIXME) - what to do here with dsets without mics 
+        elif [[ "$dsetname" =~ .*babytrain.* || "$dsetname" =~ .*sri.* ]];then
+            cat $out_dir/overlap_${part}_${dsetname}.txt \
+                | awk '{ print "SPEAKER",$1,"1",$2,($3-$2),"<NA> <NA>","overlap","<NA>" }' \
+                > ${out_dir}/diar_overlap_${dsetname}_${part}.rttm
+        fi    
+        
+    done
+    done
+fi

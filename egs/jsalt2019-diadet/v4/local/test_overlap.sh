@@ -7,7 +7,7 @@ net=${1:-./weights/0960.pt}
 dataset=${2:-AMI.SpeakerDiarization.MixHeadset}
 dest_dir=${3:-./}
 loadenv=${4:-true}
-envname=${5:-'pyannote-audio'}
+envname=${5:-'pyannote'}
 
 if $loadenv ; then
 source activate ${envname}
