@@ -27,8 +27,8 @@ score_plda_adapt_dir=$score_dir/plda_adapt_gtdiar
 score_plda_adapt_snorm_dir=$score_dir/plda_adapt_snorm_gtdiar
 
 name_vec=(babytrain ami sri babytrain_enhanced ami_enhanced sri_enhanced)
-be_vec=($be_babytrain_dir $be_ami_dir $be_sri_dir $be_babytrain_dir $be_ami_dir $be_sri_dir)
-coh_vec=(jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train jsalt19_spkdet_chime5_train jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train jsalt19_spkdet_chime5_train)
+be_vec=($be_babytrain_dir $be_ami_dir $be_sri_dir ${be_babytrain_dir}_enhanced ${be_ami_dir}_enhanced ${be_sri_dir}_enhanced)
+coh_vec=(jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train jsalt19_spkdet_chime5_train jsalt19_spkdet_babytrain_enhanced_train jsalt19_spkdet_ami_enhanced_train jsalt19_spkdet_chime5_enhanced_train)
 num_dbs=${#name_vec[@]}
 mem_scorer_vec=(40G 10G 10G 40G 10G 10G)
 
