@@ -40,7 +40,7 @@ if [ $stage -le 1 ]; then
 	fi
     fi
 fi
-stage=4
+
 #Train datasets
 if [ $stage -le 2 ];then 
     for name in voxceleb1 voxceleb2_train

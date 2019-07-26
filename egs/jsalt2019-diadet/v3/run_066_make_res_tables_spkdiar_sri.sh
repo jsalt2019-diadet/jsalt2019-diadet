@@ -19,8 +19,8 @@ score_adapt_dir=exp/diarization/$nnet_name/${be_diar_chime5_name}
 name_adapt="$nnet_name $be_diar_chime5_name"
 
 #energy VAD
-local/make_table_line_spkdiar_jsalt19_sri.sh --print-header true "$name e-vad" $score_dir
-local/make_table_line_spkdiar_jsalt19_sri.sh "$name_adapt e-vad" $score_adapt_dir
+local/make_table_line_spkdiar_jsalt19_sri.sh --print-header true "$name lstm-vad" $score_dir
+local/make_table_line_spkdiar_jsalt19_sri.sh "$name_adapt lstm-vad" $score_adapt_dir
 
 echo ""
 

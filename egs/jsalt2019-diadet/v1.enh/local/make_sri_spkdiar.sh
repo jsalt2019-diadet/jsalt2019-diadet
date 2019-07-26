@@ -4,7 +4,7 @@
 # Apache 2.0.
 
 # Make lists for JSALT19 worshop speaker diarization
-# for Babytrain dataset
+# for SRI dataset
 set -e 
 
 if [  $# != 3 ]; then
@@ -16,14 +16,13 @@ wav_path=$1
 list_path=$2
 output_path=$3
 
-data_name=jsalt19_spkdiar_babytrain_enhanced
-
+data_name=jsalt19_spkdiar_sri
 
 # Make dev data
 echo "making $data_name dev"
 python local/make_jsalt19_spkdiar.py \
        --list-path $list_path/dev \
-       --wav-path $wav_path/BabyTrain/dev/SE_1000h_model_m3_s3 \
+       --wav-path $wav_path \
        --output-path $output_path \
        --data-name $data_name \
        --rttm-suffix _dev \
@@ -42,7 +41,7 @@ utils/fix_data_dir.sh $output_path/${data_name}_dev
 echo "making $data_name eval"
 python local/make_jsalt19_spkdiar.py \
        --list-path $list_path/eval \
-       --wav-path $wav_path/BabyTrain/test/SE_1000h_model_m3_s3 \
+       --wav-path $wav_path \
        --output-path $output_path \
        --data-name $data_name \
        --rttm-suffix _test \

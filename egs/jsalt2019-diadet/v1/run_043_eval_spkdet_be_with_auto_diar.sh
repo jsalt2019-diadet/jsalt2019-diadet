@@ -33,7 +33,7 @@ name_vec=(babytrain ami sri)
 be_vec=($be_babytrain_dir $be_ami_dir $be_sri_dir)
 coh_vec=(jsalt19_spkdet_babytrain_train jsalt19_spkdet_ami_train jsalt19_spkdet_chime5_train)
 num_dbs=${#name_vec[@]}
-mem_scorer_vec=(30G 10G 10G)
+mem_scorer_vec=(35G 10G 10G)
 
 
 if [ $stage -le 1 ];then
