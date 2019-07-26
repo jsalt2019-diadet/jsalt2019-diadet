@@ -47,14 +47,13 @@ if [ $stage -le 1 ]; then
     # REDFLAG: this script will call a gmm-select binary
     # which may encounter memory issues, depending on your version of Kaldi
     # the issue came up with chime5-train in which files were very long
-    (
-      mkdir -p $VB_models_dir || exit 1;
-      VB/sid/train_diag_ubm.sh --cmd "$train_cmd --mem 10G" \
-      --nj 40 --num-threads 8 --subsample 1 --delta-order 0 --apply-cmn false \
-      data/$name \
-      $num_components $VB_models_dir/$name/diag_ubm_$num_components
-    ) &
-    done
+
+    mkdir -p $VB_models_dir || exit 1;
+    VB/sid/train_diag_ubm.sh --cmd "$train_cmd --mem 10G" \
+    --nj 40 --num-threads 8 --subsample 1 --delta-order 0 --apply-cmn false \
+    data/$name \
+    $num_components $VB_models_dir/$name/diag_ubm_$num_components
+  done
 fi
 
 wait
@@ -64,16 +63,14 @@ if [ $stage -le 2 ]; then
   for name in $dsets_train
     do
 
-    (
-      # Train the i-vector extractor. The UBM is assumed to be diagonal.
-      VB/diarization/train_ivector_extractor_diag.sh \
-      --cmd "$train_cmd --mem 10G" \
-      --ivector-dim $ivector_dim --num-iters 5 --apply-cmn false \
-      --num-threads 1 --num-processes 1 --nj 40 \
-      $VB_models_dir/$name/diag_ubm_$num_components/final.dubm  data/$name \
-      $VB_models_dir/$name/extractor_diag_c${num_components}_i${ivector_dim}
-    ) & 
-    done
+    # Train the i-vector extractor. The UBM is assumed to be diagonal.
+    VB/diarization/train_ivector_extractor_diag.sh \
+    --cmd "$train_cmd --mem 10G" \
+    --ivector-dim $ivector_dim --num-iters 5 --apply-cmn false \
+    --num-threads 1 --num-processes 1 --nj 40 \
+    $VB_models_dir/$name/diag_ubm_$num_components/final.dubm  data/$name \
+    $VB_models_dir/$name/extractor_diag_c${num_components}_i${ivector_dim}
+  done
 fi
 
 wait
