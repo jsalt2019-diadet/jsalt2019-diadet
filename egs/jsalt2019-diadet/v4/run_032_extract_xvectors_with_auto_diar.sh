@@ -28,11 +28,23 @@ if [ $stage -le 1 ]; then
     do
 	name=${db}_test
 	if [[ "$db" =~ .*_babytrain_.* ]];then
-	    rttm=$rttm_babytrain_dir/$name/plda_scores_t${diar_thr}/rttm
+	    if [[ "$db" =~ .*enhanced.* ]];then
+		rttm=${rttm_babytrain_dir}_enhanced/$name/plda_scores_t${diar_thr}/rttm
+	    else		
+		rttm=$rttm_babytrain_dir/$name/plda_scores_t${diar_thr}/rttm
+	    fi
 	elif [[ "$db" =~ .*_ami_.* ]];then
-	    rttm=$rttm_ami_dir/$name/plda_scores_t${diar_thr}/rttm
+	    if [[ "$db" =~ .*enhanced.* ]];then
+		rttm=${rttm_ami_dir}_enhanced/$name/plda_scores_t${diar_thr}/rttm
+	    else
+	    	rttm=$rttm_ami_dir/$name/plda_scores_t${diar_thr}/rttm
+	    fi
 	elif [[ "$db" =~ .*_sri_.* ]];then
-	    rttm=$rttm_sri_dir/$name/plda_scores_t${diar_thr}/rttm
+	    if [[ "$db" =~ .*enhanced.* ]];then
+		rttm=${rttm_sri_dir}_enhanced/$name/plda_scores_t${diar_thr}/rttm
+	    else
+	    	rttm=$rttm_sri_dir/$name/plda_scores_t${diar_thr}/rttm
+	    fi
 	else
 	    echo "rttm for $db not found"
 	    exit 1

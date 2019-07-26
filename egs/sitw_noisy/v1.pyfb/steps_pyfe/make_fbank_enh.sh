@@ -8,8 +8,6 @@ nj=4
 cmd=run.pl
 fbank_config=conf/fbank.conf
 compress=true
-#dummy enhancement 
-py_exec=pytorch-make-fbank-enh-fbank-i.py
 use_gpu=false
 chunk_size=0
 nnet_context=0

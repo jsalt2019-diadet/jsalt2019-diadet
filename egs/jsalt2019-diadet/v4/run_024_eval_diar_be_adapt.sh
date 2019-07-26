@@ -55,14 +55,29 @@ if [ $stage -le 1 ]; then
     for name in $dsets_test
     do
 	if [[ "$name" =~ .*babytrain.* ]];then
-	    be_dir_i=$be_babytrain_dir
-	    score_dir_i=$score_babytrain_dir
+	    if [[ "$name" =~ .*enhanced.* ]];then
+		be_dir_i=${be_babytrain_dir}_enhanced
+	    	score_dir_i=${score_babytrain_dir}_enhanced
+            else
+	        be_dir_i=$be_babytrain_dir
+	        score_dir_i=$score_babytrain_dir
+	    fi
 	elif [[ "$name" =~ .*chime5.* ]] || [[ "$name" =~ .*sri.* ]];then
-	    be_dir_i=$be_chime5_dir
-	    score_dir_i=$score_chime5_dir
+	    if [[ "$name" =~ .*enhanced.* ]];then
+		 be_dir_i=${be_chime5_dir}_enhanced
+	         score_dir_i=${score_chime5_dir}_enhanced
+	    else	
+	    	be_dir_i=$be_chime5_dir
+	    	score_dir_i=$score_chime5_dir
+	    fi
 	elif [[ "$name" =~ .*ami.* ]];then
-	    be_dir_i=$be_ami_dir
-	    score_dir_i=$score_ami_dir
+	    if [[ "$name" =~ .*enhanced.* ]];then
+ 		be_dir_i=${be_ami_dir}_enhanced
+	        score_dir_i=${score_ami_dir}_enhanced
+	    else	
+		be_dir_i=$be_ami_dir
+	        score_dir_i=$score_ami_dir
+	    fi
 	else
 	    echo "Dataset is not babytrain, chime5, ami or sri"
 	    exit 1
@@ -73,7 +88,6 @@ if [ $stage -le 1 ]; then
 	    mkdir -p $score_dir_i/$name
 	    num_spk=$(wc -l $xvector_dir/${name}/spk2utt | cut -d " " -f 1)
 	    nj=$(($num_spk < 40 ? $num_spk:40))
-
 	    steps_kaldi_diar/score_plda.sh --cmd "$train_cmd --mem 16G" \
 					   --nj $nj $be_dir_i $xvector_dir/$name \
 					   $score_dir_i/$name/plda_scores
@@ -95,15 +109,28 @@ if [ $stage -le 2 ]; then
 	dev_dataset_i=${dsets_dev[$i]}
 	eval_dataset_i=${dsets_eval[$i]}
 	if [[ "$dev_dataset_i" =~ .*babytrain.* ]];then
-	    score_dir_i=$score_babytrain_dir
+            if [[ "$dev_dataset_i" =~ .*enhanced.* ]];then
+		score_dir_i=${score_babytrain_dir}_enhanced
+	    else
+	        score_dir_i=$score_babytrain_dir
+	    fi
 	elif [[ "$dev_dataset_i" =~ .*chime5.* ]] || [[ "$dev_dataset_i" =~ .*sri.* ]];then
-	    score_dir_i=$score_chime5_dir
+	    if [[ "$dev_dataset_i" =~ .*enhanced.* ]];then
+		score_dir_i=${score_chime5_dir}_enhanced
+	    else
+	        score_dir_i=$score_chime5_dir
+	    fi
 	elif [[ "$dev_dataset_i" =~ .*ami.* ]];then
-	    score_dir_i=$score_ami_dir
+	    if [[ "$dev_dataset_i" =~ .*enhanced.* ]];then
+		score_dir_i=${score_ami_dir}_enhanced
+	    else
+	    	score_dir_i=$score_ami_dir
+	    fi
 	else
 	    echo "Dataset is not babytrain, chime5, ami or sri"
 	    exit 1
-	fi	    
+	fi
+
 	echo "Tuning clustering threshold for $dev_dataset_i/$eval_dataset_i"
 	(
 	    best_der=1000
