@@ -9,7 +9,6 @@ onset=${3:-./}
 offset=${4:-./}
 dev=${5:-false}
 loadenv=${6:-true}
-# TESTING(FIXME) - Diego
 envname=${7:-'pyannote'}
 
 if $loadenv ; then

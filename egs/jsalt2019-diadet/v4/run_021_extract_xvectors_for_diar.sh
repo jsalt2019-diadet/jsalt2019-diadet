@@ -20,7 +20,7 @@ dsets_adapt=(jsalt19_spkdiar_{babytrain,chime5,ami}{,_enhanced}_train_gtvad)
 dsets_spkdiar_test_evad=(jsalt19_spkdiar_babytrain{,_enhanced}_{dev,eval} jsalt19_spkdiar_chime5{,_enhanced}_{dev,eval}_{U01,U06} jsalt19_spkdiar_ami{,_enhanced}_{dev,eval}_{Mix-Headset,Array1-01,Array2-01})
 dsets_spkdiar_test_gtvad=(jsalt19_spkdiar_babytrain{,_enhanced}_{dev,eval}_gtvad jsalt19_spkdiar_chime5{,_enhanced}_{dev,eval}_{U01,U06}_gtvad jsalt19_spkdiar_ami{,_enhanced}_{dev,eval}_{Mix-Headset,Array1-01,Array2-01}_gtvad)
 
-dsets_spkdet_test_evad=(jsalt19_spkdet_babytrain{,_enhanced}_{dev,eval}_test jsalt19_spkdet_ami{,_enhanced}_{dev,eval}_test jsalt19_spkdet_sri{,_enhanced}_{dev,eval}_test)
+dsets_spkdet_test_evad=(jsalt19_spkdet_babytrain{,_enhanced}_{dev,eval}_test jsalt19_spkdet_ami{,_enhanced}_{dev,eval}_test jsalt19_spkdet_sri{,_enhanced}_{dev,eval}_test jsalt19_spkdet_{ami,sri,babytrain}_{dev,eval}_test_overlap)
 dsets_spkdet_test_gtvad=(jsalt19_spkdet_babytrain{,_enhanced}_{dev,eval}_test_gtvad jsalt19_spkdet_ami{,_enhanced}_{dev,eval}_test_gtvad jsalt19_spkdet_sri{,_enhanced}_{dev,eval}_test_gtvad)
 
 #datasets from array to string list

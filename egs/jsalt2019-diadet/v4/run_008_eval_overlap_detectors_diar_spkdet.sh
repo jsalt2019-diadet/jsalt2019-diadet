@@ -21,12 +21,9 @@ config_overlap=config.yml
 vaddir_ov=`pwd`/vad_ov  # VAD without OV regions
 
 # SRI overlap model is trained in CHiME5
-# tst_vec=(AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.Array1 AMI.SpeakerDiarization.Array2 SRI.SpeakerDiarization.All BabyTrain.SpeakerDiarization.All)
-# trn_vec=(AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.MixHeadset CHiME5.SpeakerDiarization.U01 BabyTrain.SpeakerDiarization.All)
-# val_vec=(AMI.SpeakerDiarization.MixHeadset.development AMI.SpeakerDiarization.MixHeadset.development AMI.SpeakerDiarization.MixHeadset.development CHiME5.SpeakerDiarization.U01.development BabyTrain.SpeakerDiarization.All.development)
-tst_vec=(CHiME5.SpeakerDiarization.U06 )
-trn_vec=(CHiME5.SpeakerDiarization.U01 )
-val_vec=(CHiME5.SpeakerDiarization.U01.development )
+tst_vec=(AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.Array1 AMI.SpeakerDiarization.Array2 SRI.SpeakerDiarization.All BabyTrain.SpeakerDiarization.All)
+trn_vec=(AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.MixHeadset CHiME5.SpeakerDiarization.U01 BabyTrain.SpeakerDiarization.All)
+val_vec=(AMI.SpeakerDiarization.MixHeadset.development AMI.SpeakerDiarization.MixHeadset.development AMI.SpeakerDiarization.MixHeadset.development CHiME5.SpeakerDiarization.U01.development BabyTrain.SpeakerDiarization.All.development)
 
 num_dbs=${#tst_vec[@]}
 
@@ -109,7 +106,7 @@ if [ $stage -le 4 ];then
     # Train a overlap detection model based on LSTM and SyncNet features
     echo "Remove the overlap areas from the VAD"
     # for dsetname in babytrain ami sri
-    for dsetname in sri babytrain
+    for dsetname in ami sri babytrain
     do
     for part in dev eval
     do
