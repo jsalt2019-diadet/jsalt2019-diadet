@@ -7,7 +7,7 @@
 . ./path.sh
 set -e
 
-stage=2
+stage=1
 
 from=700
 to=1000
