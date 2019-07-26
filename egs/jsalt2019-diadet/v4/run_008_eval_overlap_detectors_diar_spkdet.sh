@@ -21,10 +21,13 @@ config_overlap=config.yml
 vaddir_ov=`pwd`/vad_ov  # VAD without OV regions
 
 # SRI overlap model is trained in CHiME5
-# tst_vec=(AMI.SpeakerDiarization.MixHeadset BabyTrain.SpeakerDiarization.All SRI.SpeakerDiarization.All)
-tst_vec=(AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.Array1 AMI.SpeakerDiarization.Array2)
-trn_vec=(AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.MixHeadset)
-val_vec=(AMI.SpeakerDiarization.MixHeadset.development AMI.SpeakerDiarization.MixHeadset.development AMI.SpeakerDiarization.MixHeadset.development)
+# tst_vec=(AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.Array1 AMI.SpeakerDiarization.Array2 SRI.SpeakerDiarization.All BabyTrain.SpeakerDiarization.All)
+# trn_vec=(AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.MixHeadset CHiME5.SpeakerDiarization.U01 BabyTrain.SpeakerDiarization.All)
+# val_vec=(AMI.SpeakerDiarization.MixHeadset.development AMI.SpeakerDiarization.MixHeadset.development AMI.SpeakerDiarization.MixHeadset.development CHiME5.SpeakerDiarization.U01.development BabyTrain.SpeakerDiarization.All.development)
+tst_vec=(CHiME5.SpeakerDiarization.U06 )
+trn_vec=(CHiME5.SpeakerDiarization.U01 )
+val_vec=(CHiME5.SpeakerDiarization.U01.development )
+
 num_dbs=${#tst_vec[@]}
 
 #Test overlap
@@ -85,7 +88,7 @@ if [ $stage -le 3 ];then
     # Train a overlap detection model based on LSTM and SyncNet features
     echo "Covert to Kaldi for SpkDet and VAD RTTM for SpkDet"
     # for dsetname in babytrain ami sri
-    for dsetname in ami
+    for dsetname in sri babytrain
     do
     for part in dev eval
     do
@@ -106,7 +109,7 @@ if [ $stage -le 4 ];then
     # Train a overlap detection model based on LSTM and SyncNet features
     echo "Remove the overlap areas from the VAD"
     # for dsetname in babytrain ami sri
-    for dsetname in ami
+    for dsetname in sri babytrain
     do
     for part in dev eval
     do
@@ -121,4 +124,40 @@ if [ $stage -le 4 ];then
     done
     done
 
+fi
+
+if [ $stage -le 5 ];then
+    # Take txt files created for detection and write them in a 
+    # diarization-appropriate format 
+
+    # TESTING(FIXME)- make sure to use all dsets
+    # for dsetname in ami babytrain chime5 sri 
+    # do
+    for dsetname in ami babytrain chime5; do
+    for part in dev eval; do
+        if [[ "$dsetname" =~ .*ami.* ]];then
+            for mic in Array1-01 Array2-01 Mix-Headset; do 
+                cat $out_dir/overlap_${part}_${dsetname}.txt \
+                    | grep ${mic} \
+                    | awk '{ print "SPEAKER",$1,"1",$2,($3-$2),"<NA> <NA>","overlap","<NA>" }' \
+                    > ${out_dir}/diar_overlap_${dsetname}_${part}_${mic}.rttm
+            done
+
+        elif [[ "$dsetname" =~ .*chime5.* ]];then
+            for mic in U01 U06; do 
+                cat $out_dir/overlap_${part}_${dsetname}.txt \
+                    | grep ${mic} \
+                    | awk '{ print "SPEAKER",$1,"1",$2,($3-$2),"<NA> <NA>","overlap","<NA>" }' \
+                    > ${out_dir}/diar_overlap_${dsetname}_${part}_${mic}.rttm
+            done   
+
+        # TESTING(FIXME) - what to do here with dsets without mics 
+        elif [[ "$dsetname" =~ .*babytrain.* || "$dsetname" =~ .*sri.* ]];then
+            cat $out_dir/overlap_${part}_${dsetname}.txt \
+                | awk '{ print "SPEAKER",$1,"1",$2,($3-$2),"<NA> <NA>","overlap","<NA>" }' \
+                > ${out_dir}/diar_overlap_${dsetname}_${part}.rttm
+        fi    
+        
+    done
+    done
 fi
