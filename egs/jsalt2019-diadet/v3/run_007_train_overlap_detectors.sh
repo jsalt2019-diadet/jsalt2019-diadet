@@ -24,8 +24,6 @@ config_overlap=config.yml
 
 # SRI overlap model is trained in CHiME5
 trn_vec=(AMI.SpeakerDiarization.MixHeadset BabyTrain.SpeakerDiarization.All CHiME5.SpeakerDiarization.U01)
-# trn_vec=(BabyTrain.SpeakerDiarization.All CHiME5.SpeakerDiarization.U01)
-# trn_vec=(AMI.SpeakerDiarization.MixHeadset)
 num_dbs=${#trn_vec[@]}
 
 #Train overlap
