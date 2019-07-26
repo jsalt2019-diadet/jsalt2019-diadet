@@ -7,7 +7,8 @@ vadrttm=${1:-vad.rttm}
 ovrttm=${2:-ov.rttm}
 outputrttm=${3:-vad_overlap.rttm}
 loadenv=${4:-true}
-envname=${5:-'pyannote-audio'}
+#TESTING(FIXME)
+envname=${5:-'pyannote'}
 
 if $loadenv ; then
 source activate ${envname}

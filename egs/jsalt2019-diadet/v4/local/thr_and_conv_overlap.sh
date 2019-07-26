@@ -9,7 +9,8 @@ onset=${3:-./}
 offset=${4:-./}
 dev=${5:-false}
 loadenv=${6:-true}
-envname=${7:-'pyannote-audio'}
+# TESTING(FIXME) - Diego
+envname=${7:-'pyannote'}
 
 if $loadenv ; then
 source activate ${envname}
