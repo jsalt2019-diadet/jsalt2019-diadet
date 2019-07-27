@@ -21,7 +21,7 @@ config_overlap=config.yml
 vaddir_ov=`pwd`/vad_ov  # VAD without OV regions
 
 # SRI overlap model is trained in CHiME5
-tst_vec=(AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.Array1 AMI.SpeakerDiarization.Array2 SRI.SpeakerDiarization.All BabyTrain.SpeakerDiarization.All)
+tst_vec=(AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.Array1 AMI.SpeakerDiarization.Array2 CHiME5.SpeakerDiarization.U01 SRI.SpeakerDiarization.All BabyTrain.SpeakerDiarization.All)
 trn_vec=(AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.MixHeadset AMI.SpeakerDiarization.MixHeadset CHiME5.SpeakerDiarization.U01 BabyTrain.SpeakerDiarization.All)
 val_vec=(AMI.SpeakerDiarization.MixHeadset.development AMI.SpeakerDiarization.MixHeadset.development AMI.SpeakerDiarization.MixHeadset.development CHiME5.SpeakerDiarization.U01.development BabyTrain.SpeakerDiarization.All.development)
 
