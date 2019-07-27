@@ -25,7 +25,7 @@ from hyperion.io import SequentialDataReaderFactory as DRF
 from hyperion.io import DataWriterFactory as DWF
 from hyperion.io import compression_methods
 from hyperion.feats import MFCC
-from hyperion.feats import MeanVarianceNormalization as MVN
+from hyperion.feats import MeanVarianceNorm as MVN
 from hyperion.utils.math import logsumexp
 
 from cycgan_models.cycle_gan_gen_model_ver3 import ConvGenNet as CGN
@@ -93,7 +93,7 @@ def compute_mfcc_feats(input_path, output_path,
 
     #open device
     if  use_gpu and torch.cuda.is_available():
-                os.environ['CUDA_DEVICE_ORDER']='PCI_BUS_ID'
+        os.environ['CUDA_DEVICE_ORDER']='PCI_BUS_ID'
         max_tries = 100
         for g in range(max_tries):
             try:
@@ -126,7 +126,7 @@ def compute_mfcc_feats(input_path, output_path,
     mfcc1 = MFCC(**mfcc_args1)
     mfcc2 = MFCC(**mfcc_args2)   
 
-    mvn = MVN(norm_var=False, left_context=150, rigth_context=150)
+    mvn = MVN(norm_var=False, left_context=150, right_context=150)
     
     # PUT YOUR NNET MODEL HERE!!!!
     enhancer = CGN()
