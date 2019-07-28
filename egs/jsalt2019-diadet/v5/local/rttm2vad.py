@@ -98,7 +98,7 @@ def rttm2vad(rttm_file, num_frames_file, vad_file, utt2orig, ext_segments, min_d
             for file_id in df_num_frames.file_id:
                 print('generating VAD for %s' % (file_id))
                 num_frames_i = int(df_num_frames.num_frames.loc[file_id])
-                if file_id in rttm:
+                if file_id in rttm.index:
                     rttm_i = rttm.loc[file_id]
                     rttm2vad_file(
                         file_id, rttm_i, num_frames_i, fvad, fu2o, fseg, min_dur)
