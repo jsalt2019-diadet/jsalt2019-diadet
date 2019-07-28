@@ -18,15 +18,18 @@ name="$nnet_name $be_diar_name"
 score_adapt_dir=exp/diarization/$nnet_name/${be_diar_ami_name}
 name_adapt="$nnet_name $be_diar_ami_name"
 
+score_adapt_enh_dir=exp/diarization/$nnet_name/${be_diar_ami_enhanced_name}
+name_adapt_enh="$nnet_name $be_diar_ami_enhanced_name"
+
 #energy VAD
 local/make_table_line_spkdiar_jsalt19_ami.sh --print-header true "$name e-vad" $score_dir
 local/make_table_line_spkdiar_jsalt19_ami.sh "$name_adapt e-vad" $score_adapt_dir
 
-echo ""
+#echo ""
 
 #energy VAD of enhanced data
-local/make_table_line_spkdiar_jsalt19_ami_enhanced.sh --print-header true "$name e-vad" $score_dir
-local/make_table_line_spkdiar_jsalt19_ami_enhanced.sh "$name_adapt e-vad" $score_adapt_dir
+local/make_table_line_spkdiar_jsalt19_ami_enhanced.sh "$name e-vad speech-enhanced" $score_dir
+local/make_table_line_spkdiar_jsalt19_ami_enhanced.sh "$name_adapt_enh e-vad speech-enhanced" $score_adapt_enh_dir
 
 echo ""
 
@@ -34,9 +37,9 @@ echo ""
 local/make_table_line_spkdiar_jsalt19_ami.sh --print-header true --use-gtvad true "$name" $score_dir
 local/make_table_line_spkdiar_jsalt19_ami.sh --use-gtvad true "$name_adapt" $score_adapt_dir
 
-echo ""
+#echo ""
 
 #GT VAD of enhanced data
-local/make_table_line_spkdiar_jsalt19_ami_enhanced.sh --print-header true --use-gtvad true "$name" $score_dir
-local/make_table_line_spkdiar_jsalt19_ami_enhanced.sh --use-gtvad true "$name_adapt" $score_adapt_dir
+local/make_table_line_spkdiar_jsalt19_ami_enhanced.sh --use-gtvad true "$name" $score_dir
+local/make_table_line_spkdiar_jsalt19_ami_enhanced.sh --use-gtvad true "$name_adapt_enh" $score_adapt_enh_dir
 exit
