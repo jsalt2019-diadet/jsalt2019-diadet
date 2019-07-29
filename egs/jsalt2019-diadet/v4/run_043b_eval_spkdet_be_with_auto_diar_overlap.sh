@@ -28,7 +28,7 @@ score_plda_adapt_dir=$score_dir/plda_adapt_overlap_${spkdet_diar_name}
 name_vec=(babytrain ami sri)
 be_vec=($be_babytrain_dir $be_ami_dir $be_sri_dir)
 num_dbs=${#name_vec[@]}
-mem_scorer_vec=(30G 10G 10G)
+mem_scorer_vec=(40G 10G 10G)
 
 
 if [ $stage -le 1 ];then
@@ -94,7 +94,7 @@ if [ $stage -le 2 ];then
     do
 	echo "Calibrate scores of ${name_vec[$i]} with automatic diarization"
 	db=jsalt19_spkdet_${name_vec[$i]}
-    mem_scorer=${mem_scorer_vec[$i]}
+	mem_scorer=${mem_scorer_vec[$i]}
 	scorer=local/score_${name_vec[$i]}_spkdet.sh
         for plda in plda_overlap_${spkdet_diar_name} plda_adapt_overlap_${spkdet_diar_name} 
 	do

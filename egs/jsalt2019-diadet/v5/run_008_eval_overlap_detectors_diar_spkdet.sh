@@ -44,7 +44,7 @@ if [ $stage -le 1 ];then
 
         ( 
             $train_cmd_gpu $exp_dir/log/test_aux_${i}.log \
-	       ./local/test_overlap.sh $ovnet $db ${out_dir} || exit 1;
+			   ./local/test_overlap.sh $ovnet $db ${out_dir} || exit 1;
         ) &
         sleep 10
 
@@ -68,11 +68,11 @@ if [ $stage -le 2 ];then
         onset=`cat $paramfile | grep -w onset: | cut -d' ' -f4`
         #echo $onset
         #echo $offset
-	    #echo "./local/thr_and_conv_overlap.sh $db ${out_dir} $onset $offset";
+	#echo "./local/thr_and_conv_overlap.sh $db ${out_dir} $onset $offset";
 
         ( 
             $train_cmd $exp_dir/log/thrcov_eval_and_dev_${i}.log \
-	       ./local/thr_and_conv_overlap.sh $db ${out_dir} $onset $offset true || exit 1;
+		       ./local/thr_and_conv_overlap.sh $db ${out_dir} $onset $offset true || exit 1;
         ) 
     done
 
@@ -87,14 +87,14 @@ if [ $stage -le 3 ];then
     # for dsetname in babytrain ami sri
     for dsetname in ami sri babytrain
     do
-    for part in dev eval
-    do
-    ovtxt=${out_dir}/overlap_${part}_${dsetname}.txt
-    ./local/diar2spkdet.py ${ovtxt} ${out_dir} --outputname overlap_${part}_${dsetname}
-    dset=jsalt19_spkdet_${dsetname}_${part}_test
-    cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/overlap_${part}_${dsetname}.rttm > data/${dset}/overlap.rttm
-    cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/segoverlap_overlap_${part}_${dsetname} > data/${dset}/segoverlap
-    done
+	for part in dev eval
+	do
+	    ovtxt=${out_dir}/overlap_${part}_${dsetname}.txt
+	    ./local/diar2spkdet.py ${ovtxt} ${out_dir} --outputname overlap_${part}_${dsetname}
+	    dset=jsalt19_spkdet_${dsetname}_${part}_test
+	    cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/overlap_${part}_${dsetname}.rttm > data/${dset}/overlap.rttm
+	    cut -d' ' -f1 data/${dset}/segments | fgrep -f - ${out_dir}/segoverlap_overlap_${part}_${dsetname} > data/${dset}/segoverlap
+	done
     done
 
 fi
@@ -108,17 +108,17 @@ if [ $stage -le 4 ];then
     # for dsetname in babytrain ami sri
     for dsetname in ami sri babytrain
     do
-    for part in dev eval
-    do
-    dset=jsalt19_spkdet_${dsetname}_${part}_test
-    ovrttm=data/${dset}/overlap.rttm
-    vadrttm=data/${dset}/vad.rttm
-    cp -r data/jsalt19_spkdet_${dsetname}_${part}_test data/jsalt19_spkdet_${dsetname}_${part}_test_overlap
-    outputrttm=data/jsalt19_spkdet_${dsetname}_${part}_test_overlap/vad_ov.rttm
-    ./local/merge_overlap.sh $vadrttm $ovrttm $outputrttm
-    hyp_utils/rttm_to_bin_vad.sh --nj 5 $outputrttm data/jsalt19_spkdet_${dsetname}_${part}_test_overlap/ $vaddir_ov
-    # utils/fix_data_dir.sh data/jsalt19_spkdet_${dsetname}_${part}_test_overlap
-    done
+	for part in dev eval
+	do
+	    dset=jsalt19_spkdet_${dsetname}_${part}_test
+	    ovrttm=data/${dset}/overlap.rttm
+	    vadrttm=data/${dset}/vad.rttm
+	    cp -r data/jsalt19_spkdet_${dsetname}_${part}_test data/jsalt19_spkdet_${dsetname}_${part}_test_overlap
+	    outputrttm=data/jsalt19_spkdet_${dsetname}_${part}_test_overlap/vad_ov.rttm
+	    ./local/merge_overlap.sh $vadrttm $ovrttm $outputrttm
+	    hyp_utils/rttm_to_bin_vad.sh --nj 5 $outputrttm data/jsalt19_spkdet_${dsetname}_${part}_test_overlap/ $vaddir_ov
+	    # utils/fix_data_dir.sh data/jsalt19_spkdet_${dsetname}_${part}_test_overlap
+	done
     done
 
 fi
@@ -131,30 +131,30 @@ if [ $stage -le 5 ];then
     # for dsetname in ami babytrain chime5 sri 
     # do
     for dsetname in ami babytrain chime5; do
-    for part in dev eval; do
-        if [[ "$dsetname" =~ .*ami.* ]];then
-            for mic in Array1-01 Array2-01 Mix-Headset; do 
-                cat $out_dir/overlap_${part}_${dsetname}.txt \
-                    | grep ${mic} \
-                    | awk '{ print "SPEAKER",$1,"1",$2,($3-$2),"<NA> <NA>","overlap","<NA>" }' \
-                    > ${out_dir}/diar_overlap_${dsetname}_${part}_${mic}.rttm
-            done
+	for part in dev eval; do
+            if [[ "$dsetname" =~ .*ami.* ]];then
+		for mic in Array1-01 Array2-01 Mix-Headset; do 
+                    cat $out_dir/overlap_${part}_${dsetname}.txt \
+			| grep ${mic} \
+			| awk '{ print "SPEAKER",$1,"1",$2,($3-$2),"<NA> <NA>","overlap","<NA>" }' \
+			      > ${out_dir}/diar_overlap_${dsetname}_${part}_${mic}.rttm
+		done
 
-        elif [[ "$dsetname" =~ .*chime5.* ]];then
-            for mic in U01 U06; do 
-                cat $out_dir/overlap_${part}_${dsetname}.txt \
-                    | grep ${mic} \
-                    | awk '{ print "SPEAKER",$1,"1",$2,($3-$2),"<NA> <NA>","overlap","<NA>" }' \
-                    > ${out_dir}/diar_overlap_${dsetname}_${part}_${mic}.rttm
-            done   
+            elif [[ "$dsetname" =~ .*chime5.* ]];then
+		for mic in U01 U06; do 
+                    cat $out_dir/overlap_${part}_${dsetname}.txt \
+			| grep ${mic} \
+			| awk '{ print "SPEAKER",$1,"1",$2,($3-$2),"<NA> <NA>","overlap","<NA>" }' \
+			      > ${out_dir}/diar_overlap_${dsetname}_${part}_${mic}.rttm
+		done   
 
-        # TESTING(FIXME) - what to do here with dsets without mics 
-        elif [[ "$dsetname" =~ .*babytrain.* || "$dsetname" =~ .*sri.* ]];then
-            cat $out_dir/overlap_${part}_${dsetname}.txt \
-                | awk '{ print "SPEAKER",$1,"1",$2,($3-$2),"<NA> <NA>","overlap","<NA>" }' \
-                > ${out_dir}/diar_overlap_${dsetname}_${part}.rttm
-        fi    
-        
-    done
+		# TESTING(FIXME) - what to do here with dsets without mics 
+            elif [[ "$dsetname" =~ .*babytrain.* || "$dsetname" =~ .*sri.* ]];then
+		cat $out_dir/overlap_${part}_${dsetname}.txt \
+                    | awk '{ print "SPEAKER",$1,"1",$2,($3-$2),"<NA> <NA>","overlap","<NA>" }' \
+			  > ${out_dir}/diar_overlap_${dsetname}_${part}.rttm
+            fi    
+            
+	done
     done
 fi

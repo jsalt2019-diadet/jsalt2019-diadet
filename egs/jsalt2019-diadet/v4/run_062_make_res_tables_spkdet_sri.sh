@@ -42,21 +42,21 @@ do
     local/make_table_line_spkdet_jsalt19_xxx.sh --enr-durs 30 $args "$name" sri $score_dir
     args=""
 done
-echo ""
+
 
 if [ "$enhanced_included" = true ]; then
-    echo "Energy VAD of Enhanced data"
-    args="--print-header true"
+    #echo "Energy VAD of Enhanced data"
+    #args="--print-header true"
     for((i=0;i<${#conds[*]};i++))
     do
         score_dir=$score_dir0/${conds[$i]}_cal_v1
-        name="$name0 ${conds_name[$i]}"
+        name="$name0 ${conds_name[$i]} speech-enhanced"
         local/make_table_line_spkdet_jsalt19_xxx.sh --enr-durs 30 $args "$name" sri_enhanced $score_dir
         args=""
     done
-    echo ""
+    #echo ""
 fi
-
+echo ""
 fi
 
 
@@ -81,21 +81,21 @@ do
     local/make_table_line_spkdet_jsalt19_xxx.sh --enr-durs 30 $args "$name" sri $score_dir
     args=""
 done
-echo ""
+
 
 if [ "$enhanced_included" = true ]; then
-    echo "Ground Truth VAD of Enhanced data"
-    args="--print-header true"
+    #echo "Ground Truth VAD of Enhanced data"
+    #args="--print-header true"
     for((i=0;i<${#conds[*]};i++))
     do
         score_dir=$score_dir0/${conds[$i]}_cal_v1
-        name="$name0 ${conds_name[$i]}"
+        name="$name0 ${conds_name[$i]} speech-enhanced"
         local/make_table_line_spkdet_jsalt19_xxx.sh --enr-durs 30 $args "$name" sri_enhanced $score_dir
         args=""
     done
-    echo ""
+    #echo ""
 fi
-
+echo ""
 fi
 
 
@@ -112,24 +112,25 @@ args="--print-header true"
 for((i=0;i<${#conds[*]};i++))
 do
     score_dir=$score_dir0/${conds[$i]}_cal_v1
-    name="$name0 ${conds_name[$i]}"
+    name="$name0 ${conds_name[$i]} "
     local/make_table_line_spkdet_jsalt19_xxx.sh --enr-durs 30 $args "$name" sri $score_dir
     args=""
 done
-echo ""
+
 
 if [ "$enhanced_included" = true ]; then
-    echo "Ground Truth diarization of Enhanced data"
-    args="--print-header true"
+    #echo "Ground Truth diarization of Enhanced data"
+    #args="--print-header true"
     for((i=0;i<${#conds[*]};i++))
     do
         score_dir=$score_dir0/${conds[$i]}_cal_v1
-        name="$name0 ${conds_name[$i]}"
+        name="$name0 ${conds_name[$i]} speech-enhanced"
         local/make_table_line_spkdet_jsalt19_xxx.sh --enr-durs 30 $args "$name" sri_enhanced $score_dir
         args=""
     done
     echo ""
 fi
+echo ""
 fi
 
 #####

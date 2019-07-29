@@ -42,22 +42,22 @@ do
     local/make_table_line_spkdet_jsalt19_xxx.sh $args "$name" ami $score_dir
     args=""
 done
-echo ""
+
 
 
 if [ "$enhanced_included" = true ]; then
-    echo "Energy VAD of Enhanced Data"
-    args="--print-header true"
+    #echo "Energy VAD of Enhanced Data"
+    #args="--print-header true"
     for((i=0;i<${#conds[*]};i++))
     do
         score_dir=$score_dir0/${conds[$i]}_cal_v1
-        name="$name0 ${conds_name[$i]}"
+        name="$name0 ${conds_name[$i]} speech-enhanced"
         local/make_table_line_spkdet_jsalt19_xxx.sh $args "$name" ami_enhanced $score_dir
         args=""
     done
-    echo ""
+    #echo ""
 fi
-
+echo ""
 fi
 
 #####
@@ -82,22 +82,22 @@ do
     local/make_table_line_spkdet_jsalt19_xxx.sh $args "$name" ami $score_dir
     args=""
 done
-echo ""
+
 
 if [ "$enhanced_included" = true ]; then
-    echo "Ground Truth VAD of Enhanced Data"
-    args="--print-header true"
+    #echo "Ground Truth VAD of Enhanced Data"
+    #args="--print-header true"
     #print EER table
     for((i=0;i<${#conds[*]};i++))
     do
         score_dir=$score_dir0/${conds[$i]}_cal_v1
-        name="$name0 ${conds_name[$i]}"
+        name="$name0 ${conds_name[$i]} speech-enhanced"
         local/make_table_line_spkdet_jsalt19_xxx.sh $args "$name" ami_enhanced $score_dir
         args=""
     done
-    echo ""
+    #echo ""
 fi
-
+echo ""
 fi
 
 #####
@@ -117,21 +117,21 @@ do
     local/make_table_line_spkdet_jsalt19_xxx.sh $args "$name" ami $score_dir
     args=""
 done
-echo ""
+
 
 if [ "$enhanced_included" = true ]; then
-    echo "Ground Truth diarization of Enhanced Data"
-    args="--print-header true"
+    #echo "Ground Truth diarization of Enhanced Data"
+    #args="--print-header true"
     for((i=0;i<${#conds[*]};i++))
     do
         score_dir=$score_dir0/${conds[$i]}_cal_v1
-        name="$name0 ${conds_name[$i]}"
+        name="$name0 ${conds_name[$i]} speech-enhanced"
         local/make_table_line_spkdet_jsalt19_xxx.sh $args "$name" ami_enhanced $score_dir
         args=""
     done
-    echo ""
+    #echo ""
 fi
-
+echo ""
 fi
 ###########
 

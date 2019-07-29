@@ -75,7 +75,7 @@ enh_chunk_size=500
 
 # data to train plda for enhancement
 enh_train=false #don't enhance training data (voxceleb)
-enh_adapt=false #don't enhance adaptation data (datasets training sets)
+enh_adapt=true #don't enhance adaptation data (datasets training sets)
 enh_test=true #enhance test data (diarization, enroll, test dev and eval)
 
 

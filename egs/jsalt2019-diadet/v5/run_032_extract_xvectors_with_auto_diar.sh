@@ -62,11 +62,23 @@ if [ $stage -le 2 ]; then
 	name=${db}_test
 	name_gt=${db}_test_gtvad
 	if [[ "$db" =~ .*_babytrain_.* ]];then
-	    rttm=$rttm_babytrain_dir/$name_gt/plda_scores_t${diar_thr}/rttm
+	    if [[ "$db" =~ .*enhanced.* ]];then
+		rttm=${rttm_babytrain_dir}_enhanced/$name_gt/plda_scores_t${diar_thr}/rttm
+	    else		
+		rttm=$rttm_babytrain_dir/$name_gt/plda_scores_t${diar_thr}/rttm
+	    fi
 	elif [[ "$db" =~ .*_ami_.* ]];then
-	    rttm=$rttm_ami_dir/$name_gt/plda_scores_t${diar_thr}/rttm
+	    if [[ "$db" =~ .*enhanced.* ]];then
+		rttm=${rttm_ami_dir}_enhanced/$name_gt/plda_scores_t${diar_thr}/rttm
+	    else
+	    	rttm=$rttm_ami_dir/$name_gt/plda_scores_t${diar_thr}/rttm
+	    fi
 	elif [[ "$db" =~ .*_sri_.* ]];then
-	    rttm=$rttm_sri_dir/$name_gt/plda_scores_t${diar_thr}/rttm
+	    if [[ "$db" =~ .*enhanced.* ]];then
+		rttm=${rttm_sri_dir}_enhanced/$name_gt/plda_scores_t${diar_thr}/rttm
+	    else
+	    	rttm=$rttm_sri_dir/$name_gt/plda_scores_t${diar_thr}/rttm
+	    fi
 	else
 	    echo "rttm for $db not found"
 	    exit 1

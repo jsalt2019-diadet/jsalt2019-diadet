@@ -16,7 +16,7 @@ config_file=default_config.sh
 . parse_options.sh || exit 1;
 . $config_file
 
-vaddir_diar=./vad_${spkdet_diar_name}
+vaddir_diar=./vad_${spkdet_diar_name}_overlap
 xvector_dir=exp/xvectors/$nnet_name
 
 # create automatic diarization datasets
@@ -48,7 +48,7 @@ if [ $stage -le 2 ]; then
     for db in jsalt19_spkdet_{ami,babytrain,sri}_{dev,eval}_test_overlap
     do
 	name=${db}_${spkdet_diar_name}
-    echo $name
+	echo $name
 	steps_kaldi_xvec/extract_xvectors.sh --cmd "$train_cmd --mem 6G" --nj 40 \
 					     $nnet_dir data/$name \
 					     $xvector_dir/$name
@@ -61,18 +61,18 @@ if [ $stage -le 3 ]; then
     # with automatic diarization energy vad
     for dset in jsalt19_spkdet_{ami,babytrain,sri}_{dev,eval}
     do
-	    db=${dset}
-	    for dur in 5 15 30
-	    do
-		if [ ! -d data/${db}_enr${dur} ];then
-		    continue
-		fi
-		echo "combining ${db}_enr${dur}_test_overlap_${spkdet_diar_name}"
-		mkdir -p $xvector_dir/${db}_enr${dur}_test_overlap_${spkdet_diar_name}
-		cat $xvector_dir/${db}_{enr${dur},test_overlap_${spkdet_diar_name}}/xvector.scp \
-		    > $xvector_dir/${db}_enr${dur}_test_overlap_${spkdet_diar_name}/xvector.scp
-	    done
+	db=${dset}
+	for dur in 5 15 30
+	do
+	    if [ ! -d data/${db}_enr${dur} ];then
+		continue
+	    fi
+	    echo "combining ${db}_enr${dur}_test_overlap_${spkdet_diar_name}"
+	    mkdir -p $xvector_dir/${db}_enr${dur}_test_overlap_${spkdet_diar_name}
+	    cat $xvector_dir/${db}_{enr${dur},test_overlap_${spkdet_diar_name}}/xvector.scp \
+		> $xvector_dir/${db}_enr${dur}_test_overlap_${spkdet_diar_name}/xvector.scp
 	done
+    done
 fi
 
 
